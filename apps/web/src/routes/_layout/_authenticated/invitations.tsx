@@ -68,7 +68,7 @@ function InvitationsPage() {
       });
 
       navigate({
-        to: "/dashboard/workspace/$workspaceId",
+        to: "/relayops/$workspaceId",
         params: {
           workspaceId: data?.invitation.organizationId || organizationId,
         },

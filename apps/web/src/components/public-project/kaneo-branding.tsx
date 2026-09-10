@@ -4,14 +4,9 @@ export function KaneoBranding() {
   const { t } = useTranslation();
 
   return (
-    <a
-      href="https://kaneo.app"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="hover:text-foreground transition-colors"
-    >
+    <span className="text-muted-foreground">
       {t("publicProject:branding.poweredBy")}{" "}
       <span className="font-medium">{t("common:appName")}</span>
-    </a>
+    </span>
   );
 }

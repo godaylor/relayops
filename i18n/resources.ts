@@ -21,10 +21,20 @@ export const supportedLocales = [
 
 export type AppLocale = (typeof supportedLocales)[number];
 
-export const defaultLocale: AppLocale = "en-US";
+export const publicLocales = [
+  "ru-RU",
+  "en-US",
+] as const satisfies readonly AppLocale[];
+export type PublicLocale = (typeof publicLocales)[number];
+
+export const defaultLocale: PublicLocale = "ru-RU";
 
 export function isSupportedLocale(locale: string): locale is AppLocale {
   return (supportedLocales as readonly string[]).includes(locale);
+}
+
+export function isPublicLocale(locale: string): locale is PublicLocale {
+  return (publicLocales as readonly string[]).includes(locale);
 }
 
 export async function loadLocale(locale: AppLocale): Promise<object> {

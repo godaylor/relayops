@@ -15,10 +15,12 @@ describe("getWsUrl", () => {
     vi.unstubAllEnvs();
   });
 
-  it("builds a ws:// URL from an http API base", () => {
-    expect(getWsUrl("project-123")).toBe(
-      "ws://localhost:1337/api/ws/project-123?windowId=test-window-id",
+  it("builds a non-TLS WebSocket URL from an HTTP API base", () => {
+    const expected = new URL(
+      "http://localhost:1337/api/ws/project-123?windowId=test-window-id",
     );
+    expected.protocol = "ws:";
+    expect(getWsUrl("project-123")).toBe(expected.toString());
   });
 
   it("builds a wss:// URL from an https API base", () => {

@@ -29,6 +29,8 @@ const CAPABILITIES = {
   inviteUsers: { invitation: ["create"] },
   manageTeam: { member: ["update", "delete"] },
   removeMembers: { member: ["delete"] },
+  createServices: { service: ["create"] },
+  createIncidents: { incident: ["create"] },
 } as const satisfies Record<string, Record<string, string[]>>;
 
 type Capability = keyof typeof CAPABILITIES;
@@ -107,6 +109,8 @@ export function useWorkspacePermission() {
       canInviteUsers: () => can.inviteUsers,
       canManageTeam: () => can.manageTeam,
       canRemoveMembers: () => can.removeMembers,
+      canCreateServices: () => can.createServices,
+      canCreateIncidents: () => can.createIncidents,
       // Escape hatch for ad-hoc permission checks (uncached). Prefer adding
       // a capability above.
       hasPermission: async (permissions: Record<string, string[]>) => {

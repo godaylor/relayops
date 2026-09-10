@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
-		"build": "vite build",
+		"build": "vite build && node ../../scripts/release/licenses.mjs web dist/licenses",
 		"preview": "vite preview",
 		"lint": "biome check --write .",
 		"typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
@@ -116,6 +116,7 @@
 		"@types/node": "^26.1.2",
 		"@types/react": "^19.2.18",
 		"@types/react-dom": "^19.2.4",
+		"axe-core": "^4.13.0",
 		"globals": "^17.9.0",
 		"jsdom": "^30.0.1",
 		"postcss": "^8.5.26",

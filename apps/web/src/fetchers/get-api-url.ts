@@ -1,6 +1,6 @@
 export function getApiUrl(path: string) {
   const trimmedBase = (
-    import.meta.env.VITE_API_URL || "http://localhost:1337"
+    import.meta.env.VITE_API_URL || "http://127.0.0.1:32001"
   ).replace(/\/+$/, "");
   const apiUrl = trimmedBase.endsWith("/api")
     ? trimmedBase

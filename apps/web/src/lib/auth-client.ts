@@ -15,7 +15,7 @@ import { createAuthClient } from "better-auth/react";
 import { ac, admin, member, owner, viewer } from "./permissions";
 
 const getBaseURL = () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:1337";
+  const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:32001";
   try {
     const url = new URL(apiUrl);
     return `${url.protocol}//${url.host}`;
@@ -44,6 +44,9 @@ export const authClient = createAuthClient({
         owner,
       },
       dynamicAccessControl: {
+        enabled: true,
+      },
+      teams: {
         enabled: true,
       },
     }),

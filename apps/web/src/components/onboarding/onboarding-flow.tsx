@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { activateRelayOpsWorkspace } from "@/fetchers/relayops";
 import useCreateWorkspace from "@/hooks/queries/workspace/use-create-workspace";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@/lib/toast";
@@ -69,7 +70,10 @@ export function OnboardingFlow() {
     },
   });
 
-  const onSubmit = async (data: WorkspaceFormValues) => {
+  const onSubmit = async (
+    data: WorkspaceFormValues,
+    productMode: "legacy" | "relayops",
+  ) => {
     try {
       const workspace = await createWorkspace({
         name: data.name.trim(),
@@ -81,6 +85,9 @@ export function OnboardingFlow() {
       await authClient.organization.setActive({
         organizationId: workspace.id,
       });
+      if (productMode === "relayops") {
+        await activateRelayOpsWorkspace(workspace.id);
+      }
       setCreatedWorkspaceName(data.name);
       toast.success(t("auth:onboarding.toast.workspaceCreated"));
 
@@ -88,11 +95,14 @@ export function OnboardingFlow() {
 
       setTimeout(() => {
         navigate({
-          to: "/dashboard/workspace/$workspaceId",
+          to:
+            productMode === "relayops"
+              ? "/relayops/$workspaceId"
+              : "/dashboard/workspace/$workspaceId",
           params: { workspaceId: workspace.id },
           replace: true,
         });
-      }, 1500);
+      }, 500);
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -125,7 +135,10 @@ export function OnboardingFlow() {
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+          <form
+            onSubmit={form.handleSubmit((data) => onSubmit(data, "relayops"))}
+            className="space-y-3"
+          >
             <div className="space-y-3">
               <FormField
                 control={form.control}
@@ -171,10 +184,21 @@ export function OnboardingFlow() {
               />
             </div>
 
-            <Button type="submit" disabled={isPending} className="w-full mt-4">
+            <Button type="submit" disabled={isPending} className="mt-4 w-full">
               {isPending
                 ? t("auth:onboarding.creating")
-                : t("auth:onboarding.createWorkspace")}
+                : t("relayops:onboarding.createWorkspace")}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isPending}
+              className="w-full"
+              onClick={() =>
+                void form.handleSubmit((data) => onSubmit(data, "legacy"))()
+              }
+            >
+              {t("auth:onboarding.createWorkspace")}
             </Button>
           </form>
         </Form>

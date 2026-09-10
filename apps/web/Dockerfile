@@ -1,6 +1,6 @@
-# syntax=docker/dockerfile:1
+# Uses Docker Desktop's built-in BuildKit frontend (no extra registry frontend).
 # Build stage
-FROM --platform=$BUILDPLATFORM node:24.19.0-alpine AS builder
+FROM --platform=$BUILDPLATFORM node:24.19.0-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS builder
 
 # Sentry org/project are public identifiers (not secrets). The auth token
 # is the only real secret; it is mounted via `--mount=type=secret` during
@@ -13,7 +13,7 @@ ENV SENTRY_PROJECT=$SENTRY_PROJECT
 # Install build dependencies in a single layer
 RUN apk add --no-cache python3 make g++ && \
   corepack enable && \
-  corepack prepare pnpm@10.7.0 --activate
+  corepack prepare pnpm@10.32.1 --activate
 
 WORKDIR /app
 
@@ -25,7 +25,8 @@ COPY packages/libs/package.json ./packages/libs/
 COPY packages/permissions/package.json ./packages/permissions/
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=relayops-pnpm,target=/pnpm/store,sharing=locked \
+  pnpm install --frozen-lockfile --store-dir=/pnpm/store --network-concurrency=8
 
 # Copy only necessary source code
 COPY packages/typescript-config ./packages/typescript-config
@@ -33,6 +34,8 @@ COPY packages/libs ./packages/libs
 COPY packages/permissions ./packages/permissions
 COPY i18n ./i18n
 COPY apps/web ./apps/web
+COPY LICENSE THIRD_PARTY_NOTICES ./
+COPY scripts/release/licenses.mjs ./scripts/release/licenses.mjs
 
 # Build the permissions package first
 WORKDIR /app/packages/permissions
@@ -47,11 +50,14 @@ RUN --mount=type=secret,id=SENTRY_AUTH_TOKEN,required=false \
     if [ -f /run/secrets/SENTRY_AUTH_TOKEN ]; then export SENTRY_AUTH_TOKEN="$(cat /run/secrets/SENTRY_AUTH_TOKEN)"; fi; \
     pnpm run build
 
+RUN node /app/scripts/release/licenses.mjs web /app/licenses/web
+
 # Production stage with specific version
-FROM nginx:1.29.5-alpine AS runtime
+FROM nginx:1.30.4-alpine@sha256:dc5069ad14f19660b141b21236140b91656bf89bbc3e2417c70ae650cd66104c AS runtime
 
 # Create non-root user and configure nginx in a single layer
-RUN addgroup -g 1001 appuser && \
+RUN apk add --no-cache libcrypto3=3.5.8-r0 libssl3=3.5.8-r0 libuuid=2.42.3-r1 && \
+  addgroup -g 1001 appuser && \
   adduser -u 1001 -G appuser -D appuser && \
   # Set permissions for nginx directories
   chown -R appuser:appuser /var/cache/nginx && \
@@ -80,9 +86,17 @@ RUN chown -R appuser:appuser /etc/nginx/conf.d
 COPY --chown=appuser:appuser apps/web/env.sh /docker-entrypoint.d/env.sh
 RUN chmod +x /docker-entrypoint.d/env.sh
 
+COPY --from=builder /app/licenses/web /licenses
+COPY --from=builder /app/licenses/web /usr/share/nginx/html/licenses
+ARG RELAYOPS_SOURCE_URL
+ARG RELAYOPS_REVISION=local
+LABEL org.opencontainers.image.title="RelayOps web" org.opencontainers.image.licenses="MIT" org.opencontainers.image.source=$RELAYOPS_SOURCE_URL org.opencontainers.image.revision=$RELAYOPS_REVISION
 # Switch to non-root user
 USER appuser
 EXPOSE 5173
+
+HEALTHCHECK --interval=5s --timeout=3s --start-period=5s --retries=12 \
+  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:5173/ || exit 1
 
 # Use exec form of CMD for proper signal handling
 CMD ["nginx", "-g", "daemon off;"]

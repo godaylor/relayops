@@ -18,12 +18,12 @@ export function Logo({ className = "" }: LogoProps) {
     >
       <img
         src="/logo-dark.svg"
-        alt="Kaneo"
+        alt="RelayOps"
         className="h-6 w-auto dark:hidden"
       />
       <img
         src="/logo-light.svg"
-        alt="Kaneo"
+        alt="RelayOps"
         className="hidden h-6 w-auto dark:block"
       />
     </Link>

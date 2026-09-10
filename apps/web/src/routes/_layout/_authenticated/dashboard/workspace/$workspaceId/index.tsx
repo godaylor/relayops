@@ -18,8 +18,8 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { LayoutGrid, Plus } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { LayoutGrid, Plus, Radio } from "lucide-react";
 import {
   type CSSProperties,
   type ReactNode,
@@ -232,17 +232,29 @@ function RouteComponent() {
         <WorkspaceLayout
           title={t("workspace:projects.pageTitle")}
           headerActions={
-            canCreate ? (
+            <div className="flex gap-2">
               <Button
-                variant="outline"
+                variant="secondary"
                 size="xs"
-                onClick={handleCreateProject}
-                className="gap-1"
+                render={
+                  <Link to="/relayops/$workspaceId" params={{ workspaceId }} />
+                }
               >
-                <Plus className="w-3 h-3" />
-                {t("workspace:projects.createProject")}
+                <Radio className="size-3" />
+                {t("relayops:entry")}
               </Button>
-            ) : null
+              {canCreate ? (
+                <Button
+                  variant="outline"
+                  size="xs"
+                  onClick={handleCreateProject}
+                  className="gap-1"
+                >
+                  <Plus className="w-3 h-3" />
+                  {t("workspace:projects.createProject")}
+                </Button>
+              ) : null}
+            </div>
           }
         >
           <Table>
@@ -296,17 +308,29 @@ function RouteComponent() {
         <WorkspaceLayout
           title={t("workspace:projects.pageTitle")}
           headerActions={
-            canCreate ? (
+            <div className="flex gap-2">
               <Button
-                variant="outline"
+                variant="secondary"
                 size="xs"
-                onClick={handleCreateProject}
-                className="gap-1"
+                render={
+                  <Link to="/relayops/$workspaceId" params={{ workspaceId }} />
+                }
               >
-                <Plus className="w-3 h-3" />
-                {t("workspace:projects.createProject")}
+                <Radio className="size-3" />
+                {t("relayops:entry")}
               </Button>
-            ) : null
+              {canCreate ? (
+                <Button
+                  variant="outline"
+                  size="xs"
+                  onClick={handleCreateProject}
+                  className="gap-1"
+                >
+                  <Plus className="w-3 h-3" />
+                  {t("workspace:projects.createProject")}
+                </Button>
+              ) : null}
+            </div>
           }
         >
           <Empty className="min-h-[60vh]">
@@ -346,17 +370,29 @@ function RouteComponent() {
       <WorkspaceLayout
         title={t("workspace:projects.pageTitle")}
         headerActions={
-          canCreate ? (
+          <div className="flex gap-2">
             <Button
-              variant="outline"
+              variant="secondary"
               size="xs"
-              onClick={handleCreateProject}
-              className="gap-1"
+              render={
+                <Link to="/relayops/$workspaceId" params={{ workspaceId }} />
+              }
             >
-              <Plus className="w-3 h-3" />
-              {t("workspace:projects.createProject")}
+              <Radio className="size-3" />
+              {t("relayops:entry")}
             </Button>
-          ) : null
+            {canCreate ? (
+              <Button
+                variant="outline"
+                size="xs"
+                onClick={handleCreateProject}
+                className="gap-1"
+              >
+                <Plus className="w-3 h-3" />
+                {t("workspace:projects.createProject")}
+              </Button>
+            ) : null}
+          </div>
         }
       >
         <DndContext

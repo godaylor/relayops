@@ -1,7 +1,7 @@
 import {
-  type AppLocale,
   defaultLocale,
-  supportedLocales,
+  type PublicLocale,
+  publicLocales,
 } from "@i18n/resources";
 import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw } from "lucide-react";
@@ -31,7 +31,7 @@ export const Route = createFileRoute(
   component: RouteComponent,
 });
 
-function getLocaleLabel(locale: AppLocale) {
+function getLocaleLabel(locale: PublicLocale) {
   try {
     const localeObj = new Intl.Locale(locale);
     const languageDisplayNames = new Intl.DisplayNames([locale], {
@@ -84,7 +84,7 @@ function RouteComponent() {
     6: t("settings:preferencesPage.weekStartsOnSaturday"),
   };
 
-  const selectedLocale: AppLocale = locale ?? defaultLocale;
+  const selectedLocale: PublicLocale = locale ?? defaultLocale;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -157,7 +157,7 @@ function RouteComponent() {
               value={selectedLocale}
               onValueChange={(value) => {
                 if (value) {
-                  void setLocale(value as AppLocale);
+                  void setLocale(value as PublicLocale);
                 }
               }}
             >
@@ -169,7 +169,7 @@ function RouteComponent() {
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
-                {supportedLocales.map((supportedLocale) => (
+                {publicLocales.map((supportedLocale) => (
                   <SelectItem key={supportedLocale} value={supportedLocale}>
                     {getLocaleLabel(supportedLocale)}
                   </SelectItem>

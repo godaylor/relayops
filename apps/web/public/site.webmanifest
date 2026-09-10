@@ -1,6 +1,8 @@
 {
-	"name": "Kaneo",
-	"short_name": "Kaneo",
+	"name": "RelayOps",
+	"short_name": "RelayOps",
+	"description": "Realtime incident operations",
+	"lang": "ru-RU",
 	"icons": [
 		{
 			"src": "/web-app-manifest-192x192.png",

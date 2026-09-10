@@ -1,8 +1,10 @@
 import {
   type AppLocale,
   defaultLocale,
+  isPublicLocale,
   isSupportedLocale,
   loadLocale,
+  type PublicLocale,
   supportedLocales,
 } from "@i18n/resources";
 import i18n from "i18next";
@@ -15,9 +17,9 @@ function getLanguageCode(locale: string) {
 
 export function resolveLocale(
   preferredLocale?: string | null,
-  browserLocale?: string | null,
-): AppLocale {
-  const candidates = [preferredLocale, browserLocale].filter(
+  persistedLocale?: string | null,
+): PublicLocale {
+  const candidates = [preferredLocale, persistedLocale].filter(
     (value): value is string => Boolean(value),
   );
 
@@ -26,12 +28,12 @@ export function resolveLocale(
     const exactMatch = supportedLocales.find(
       (locale) => locale.toLowerCase() === normalizedCandidate,
     );
-    if (exactMatch) return exactMatch;
+    if (exactMatch && isPublicLocale(exactMatch)) return exactMatch;
 
     const languageMatch = supportedLocales.find(
       (locale) => getLanguageCode(locale) === getLanguageCode(candidate),
     );
-    if (languageMatch) return languageMatch;
+    if (languageMatch && isPublicLocale(languageMatch)) return languageMatch;
   }
 
   return defaultLocale;
@@ -40,6 +42,14 @@ export function resolveLocale(
 export function getBrowserLocale(): string | null {
   if (typeof navigator === "undefined") return null;
   return navigator.language || navigator.languages?.[0] || null;
+}
+
+export const localeStorageKey = "relayops.locale";
+
+export function getPersistedLocale(): string | null {
+  if (typeof window === "undefined") return null;
+  const value = window.localStorage.getItem(localeStorageKey);
+  return value && isPublicLocale(value) ? value : value ? defaultLocale : null;
 }
 
 // Components subscribe to the default namespace only, so any other namespace
@@ -66,7 +76,7 @@ export function preloadNamespaces(locale: AppLocale): Promise<void> {
   );
 }
 
-const initialLocale = resolveLocale(null, getBrowserLocale());
+const initialLocale = resolveLocale(null, getPersistedLocale());
 
 void i18n
   .use(

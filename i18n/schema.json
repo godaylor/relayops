@@ -5,6 +5,130 @@
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
+		"portfolio": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"eyebrow": {
+					"type": "string"
+				},
+				"title": {
+					"type": "string"
+				},
+				"intro": {
+					"type": "string"
+				},
+				"open": {
+					"type": "string"
+				},
+				"local": {
+					"type": "string"
+				},
+				"flow": {
+					"type": "string"
+				},
+				"service": {
+					"type": "string"
+				},
+				"signal": {
+					"type": "string"
+				},
+				"incident": {
+					"type": "string"
+				},
+				"timeline": {
+					"type": "string"
+				},
+				"views": {
+					"type": "string"
+				},
+				"operations": {
+					"type": "string"
+				},
+				"operationsText": {
+					"type": "string"
+				},
+				"workbench": {
+					"type": "string"
+				},
+				"workbenchText": {
+					"type": "string"
+				},
+				"board": {
+					"type": "string"
+				},
+				"boardText": {
+					"type": "string"
+				},
+				"room": {
+					"type": "string"
+				},
+				"roomText": {
+					"type": "string"
+				},
+				"services": {
+					"type": "string"
+				},
+				"servicesText": {
+					"type": "string"
+				},
+				"analytics": {
+					"type": "string"
+				},
+				"analyticsText": {
+					"type": "string"
+				},
+				"architecture": {
+					"type": "string"
+				},
+				"architectureText": {
+					"type": "string"
+				},
+				"provenance": {
+					"type": "string"
+				},
+				"licenses": {
+					"type": "string"
+				},
+				"upstream": {
+					"type": "string"
+				},
+				"language": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"eyebrow",
+				"title",
+				"intro",
+				"open",
+				"local",
+				"flow",
+				"service",
+				"signal",
+				"incident",
+				"timeline",
+				"views",
+				"operations",
+				"operationsText",
+				"workbench",
+				"workbenchText",
+				"board",
+				"boardText",
+				"room",
+				"roomText",
+				"services",
+				"servicesText",
+				"analytics",
+				"analyticsText",
+				"architecture",
+				"architectureText",
+				"provenance",
+				"licenses",
+				"upstream",
+				"language"
+			]
+		},
 		"common": {
 			"type": "object",
 			"additionalProperties": false,
@@ -8780,6 +8904,2475 @@
 				"membersTable"
 			]
 		},
+		"billing": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"title": {
+					"type": "string"
+				},
+				"disabled": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"currentPlan": {
+					"type": "string"
+				},
+				"currentPlanSubtitle": {
+					"type": "string"
+				},
+				"foundingFree": {
+					"type": "string"
+				},
+				"free": {
+					"type": "string"
+				},
+				"foundingDescription": {
+					"type": "string"
+				},
+				"accessEnds": {
+					"type": "string"
+				},
+				"renews": {
+					"type": "string"
+				},
+				"manageDescription": {
+					"type": "string"
+				},
+				"opening": {
+					"type": "string"
+				},
+				"manage": {
+					"type": "string"
+				},
+				"trialEnded": {
+					"type": "string"
+				},
+				"freeTrial": {
+					"type": "string"
+				},
+				"trialEndedDescription": {
+					"type": "string"
+				},
+				"trialDays_one": {
+					"type": "string"
+				},
+				"trialDays_zero": {
+					"type": "string"
+				},
+				"trialDays_two": {
+					"type": "string"
+				},
+				"trialDays_few": {
+					"type": "string"
+				},
+				"trialDays_many": {
+					"type": "string"
+				},
+				"trialDays_other": {
+					"type": "string"
+				},
+				"chooseAfterTrial": {
+					"type": "string"
+				},
+				"choosePlan": {
+					"type": "string"
+				},
+				"choosePlanSubtitle": {
+					"type": "string"
+				},
+				"monthly": {
+					"type": "string"
+				},
+				"annual": {
+					"type": "string"
+				},
+				"monthsFree": {
+					"type": "string"
+				},
+				"mostPopular": {
+					"type": "string"
+				},
+				"starting": {
+					"type": "string"
+				},
+				"chooseNamedPlan": {
+					"type": "string"
+				},
+				"processor": {
+					"type": "string"
+				},
+				"ownersOnly": {
+					"type": "string"
+				},
+				"seats_one": {
+					"type": "string"
+				},
+				"seats_zero": {
+					"type": "string"
+				},
+				"seats_two": {
+					"type": "string"
+				},
+				"seats_few": {
+					"type": "string"
+				},
+				"seats_many": {
+					"type": "string"
+				},
+				"seats_other": {
+					"type": "string"
+				},
+				"currentTeamPrice": {
+					"type": "string"
+				},
+				"currentPersonalPrice": {
+					"type": "string"
+				},
+				"status": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"active": {
+							"type": "string"
+						},
+						"trialing": {
+							"type": "string"
+						},
+						"past_due": {
+							"type": "string"
+						},
+						"scheduled_cancel": {
+							"type": "string"
+						},
+						"canceled": {
+							"type": "string"
+						},
+						"expired": {
+							"type": "string"
+						},
+						"paused": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"active",
+						"trialing",
+						"past_due",
+						"scheduled_cancel",
+						"canceled",
+						"expired",
+						"paused"
+					]
+				},
+				"prices": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"perMonth": {
+							"type": "string"
+						},
+						"perYear": {
+							"type": "string"
+						},
+						"perUserMonth": {
+							"type": "string"
+						},
+						"perUserYear": {
+							"type": "string"
+						},
+						"billedMonthly": {
+							"type": "string"
+						},
+						"personalAnnualNote": {
+							"type": "string"
+						},
+						"teamAnnualNote": {
+							"type": "string"
+						},
+						"month": {
+							"type": "string"
+						},
+						"year": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"perMonth",
+						"perYear",
+						"perUserMonth",
+						"perUserYear",
+						"billedMonthly",
+						"personalAnnualNote",
+						"teamAnnualNote",
+						"month",
+						"year"
+					]
+				},
+				"plans": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"personal": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"name": {
+									"type": "string"
+								},
+								"tagline": {
+									"type": "string"
+								}
+							},
+							"required": ["name", "tagline"]
+						},
+						"team": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"name": {
+									"type": "string"
+								},
+								"tagline": {
+									"type": "string"
+								}
+							},
+							"required": ["name", "tagline"]
+						}
+					},
+					"required": ["personal", "team"]
+				},
+				"features": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"singleUser": {
+							"type": "string"
+						},
+						"unlimitedWork": {
+							"type": "string"
+						},
+						"backups": {
+							"type": "string"
+						},
+						"emailSupport": {
+							"type": "string"
+						},
+						"unlimitedMembers": {
+							"type": "string"
+						},
+						"roles": {
+							"type": "string"
+						},
+						"prioritySupport": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"singleUser",
+						"unlimitedWork",
+						"backups",
+						"emailSupport",
+						"unlimitedMembers",
+						"roles",
+						"prioritySupport"
+					]
+				}
+			},
+			"required": [
+				"title",
+				"disabled",
+				"description",
+				"currentPlan",
+				"currentPlanSubtitle",
+				"foundingFree",
+				"free",
+				"foundingDescription",
+				"accessEnds",
+				"renews",
+				"manageDescription",
+				"opening",
+				"manage",
+				"trialEnded",
+				"freeTrial",
+				"trialEndedDescription",
+				"chooseAfterTrial",
+				"choosePlan",
+				"choosePlanSubtitle",
+				"monthly",
+				"annual",
+				"monthsFree",
+				"mostPopular",
+				"starting",
+				"chooseNamedPlan",
+				"processor",
+				"ownersOnly",
+				"currentTeamPrice",
+				"currentPersonalPrice",
+				"status",
+				"prices",
+				"plans",
+				"features"
+			]
+		},
+		"securityApproval": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"approve": {
+					"type": "string"
+				},
+				"deny": {
+					"type": "string"
+				},
+				"loading": {
+					"type": "string"
+				},
+				"signIn": {
+					"type": "string"
+				},
+				"signInTitle": {
+					"type": "string"
+				},
+				"mcp": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"failedTitle": {
+							"type": "string"
+						},
+						"failedSubtitle": {
+							"type": "string"
+						},
+						"restart": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"loading": {
+							"type": "string"
+						},
+						"checking": {
+							"type": "string"
+						},
+						"signInSubtitle": {
+							"type": "string"
+						},
+						"reviewSubtitle": {
+							"type": "string"
+						},
+						"warning": {
+							"type": "string"
+						},
+						"clientName": {
+							"type": "string"
+						},
+						"defaultClient": {
+							"type": "string"
+						},
+						"redirectUri": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"failedTitle",
+						"failedSubtitle",
+						"restart",
+						"title",
+						"loading",
+						"checking",
+						"signInSubtitle",
+						"reviewSubtitle",
+						"warning",
+						"clientName",
+						"defaultClient",
+						"redirectUri"
+					]
+				},
+				"device": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"checkingSession": {
+							"type": "string"
+						},
+						"noCode": {
+							"type": "string"
+						},
+						"enterCode": {
+							"type": "string"
+						},
+						"signInSubtitle": {
+							"type": "string"
+						},
+						"approveError": {
+							"type": "string"
+						},
+						"connected": {
+							"type": "string"
+						},
+						"denyError": {
+							"type": "string"
+						},
+						"cancelled": {
+							"type": "string"
+						},
+						"subtitle": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"checkingSession",
+						"noCode",
+						"enterCode",
+						"signInSubtitle",
+						"approveError",
+						"connected",
+						"denyError",
+						"cancelled",
+						"subtitle"
+					]
+				}
+			},
+			"required": [
+				"approve",
+				"deny",
+				"loading",
+				"signIn",
+				"signInTitle",
+				"mcp",
+				"device"
+			]
+		},
+		"relayops": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"pageTitle": {
+					"type": "string"
+				},
+				"tracerLabel": {
+					"type": "string"
+				},
+				"entry": {
+					"type": "string"
+				},
+				"back": {
+					"type": "string"
+				},
+				"createPanel": {
+					"type": "string"
+				},
+				"creating": {
+					"type": "string"
+				},
+				"service": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"name": {
+							"type": "string"
+						},
+						"slug": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"submit": {
+							"type": "string"
+						},
+						"error": {
+							"type": "string"
+						},
+						"tier": {
+							"type": "string"
+						},
+						"health": {
+							"type": "string"
+						},
+						"ownerTeam": {
+							"type": "string"
+						},
+						"noOwner": {
+							"type": "string"
+						},
+						"repositoryUrl": {
+							"type": "string"
+						},
+						"runbookUrl": {
+							"type": "string"
+						},
+						"backToCatalog": {
+							"type": "string"
+						},
+						"edit": {
+							"type": "string"
+						},
+						"cancelEdit": {
+							"type": "string"
+						},
+						"save": {
+							"type": "string"
+						},
+						"archive": {
+							"type": "string"
+						},
+						"restore": {
+							"type": "string"
+						},
+						"archiveTitle": {
+							"type": "string"
+						},
+						"archiveDescription": {
+							"type": "string"
+						},
+						"keepActive": {
+							"type": "string"
+						},
+						"archiveError": {
+							"type": "string"
+						},
+						"updated": {
+							"type": "string"
+						},
+						"descriptionTitle": {
+							"type": "string"
+						},
+						"noDescription": {
+							"type": "string"
+						},
+						"links": {
+							"type": "string"
+						},
+						"repository": {
+							"type": "string"
+						},
+						"runbook": {
+							"type": "string"
+						},
+						"noLinks": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"name",
+						"slug",
+						"description",
+						"submit",
+						"error",
+						"tier",
+						"health",
+						"ownerTeam",
+						"noOwner",
+						"repositoryUrl",
+						"runbookUrl",
+						"backToCatalog",
+						"edit",
+						"cancelEdit",
+						"save",
+						"archive",
+						"restore",
+						"archiveTitle",
+						"archiveDescription",
+						"keepActive",
+						"archiveError",
+						"updated",
+						"descriptionTitle",
+						"noDescription",
+						"links",
+						"repository",
+						"runbook",
+						"noLinks"
+					]
+				},
+				"incident": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"name": {
+							"type": "string"
+						},
+						"summary": {
+							"type": "string"
+						},
+						"severity": {
+							"type": "string"
+						},
+						"serviceFirst": {
+							"type": "string"
+						},
+						"submit": {
+							"type": "string"
+						},
+						"error": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"name",
+						"summary",
+						"severity",
+						"serviceFirst",
+						"submit",
+						"error"
+					]
+				},
+				"severity": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"unknown": {
+							"type": "string"
+						},
+						"sev1": {
+							"type": "string"
+						},
+						"sev2": {
+							"type": "string"
+						},
+						"sev3": {
+							"type": "string"
+						},
+						"sev4": {
+							"type": "string"
+						}
+					},
+					"required": ["unknown", "sev1", "sev2", "sev3", "sev4"]
+				},
+				"inspector": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"label": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"authoritative": {
+							"type": "string"
+						},
+						"empty": {
+							"type": "string"
+						},
+						"emptyHint": {
+							"type": "string"
+						},
+						"loading": {
+							"type": "string"
+						},
+						"error": {
+							"type": "string"
+						},
+						"retry": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"label",
+						"title",
+						"authoritative",
+						"empty",
+						"emptyHint",
+						"loading",
+						"error",
+						"retry"
+					]
+				},
+				"timeline": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"created": {
+							"type": "string"
+						},
+						"statusChanged": {
+							"type": "string"
+						},
+						"severityChanged": {
+							"type": "string"
+						},
+						"assignmentChanged": {
+							"type": "string"
+						},
+						"updatePublished": {
+							"type": "string"
+						},
+						"timestampsCorrected": {
+							"type": "string"
+						},
+						"resolved": {
+							"type": "string"
+						},
+						"dismissed": {
+							"type": "string"
+						},
+						"reopened": {
+							"type": "string"
+						},
+						"fallback": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"created",
+						"statusChanged",
+						"severityChanged",
+						"assignmentChanged",
+						"updatePublished",
+						"timestampsCorrected",
+						"resolved",
+						"dismissed",
+						"reopened",
+						"fallback"
+					]
+				},
+				"skipToContent": {
+					"type": "string"
+				},
+				"shell": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"subtitle": {
+							"type": "string"
+						},
+						"provenance": {
+							"type": "string"
+						}
+					},
+					"required": ["subtitle", "provenance"]
+				},
+				"nav": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"primary": {
+							"type": "string"
+						},
+						"operations": {
+							"type": "string"
+						},
+						"workbench": {
+							"type": "string"
+						},
+						"board": {
+							"type": "string"
+						},
+						"services": {
+							"type": "string"
+						},
+						"insights": {
+							"type": "string"
+						},
+						"manage": {
+							"type": "string"
+						},
+						"legacyArchive": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"primary",
+						"operations",
+						"workbench",
+						"board",
+						"services",
+						"insights",
+						"manage",
+						"legacyArchive"
+					]
+				},
+				"connection": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"connecting": {
+							"type": "string"
+						},
+						"connected": {
+							"type": "string"
+						},
+						"reconnecting": {
+							"type": "string"
+						},
+						"offline": {
+							"type": "string"
+						},
+						"stale": {
+							"type": "string"
+						},
+						"reconnectIn": {
+							"type": "string"
+						},
+						"lastSync": {
+							"type": "string"
+						},
+						"retry": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"connecting",
+						"connected",
+						"reconnecting",
+						"offline",
+						"stale",
+						"reconnectIn",
+						"lastSync",
+						"retry"
+					]
+				},
+				"clockRail": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"loading": {
+							"type": "string"
+						},
+						"error": {
+							"type": "string"
+						},
+						"retry": {
+							"type": "string"
+						},
+						"empty": {
+							"type": "string"
+						},
+						"elapsedHoursMinutes": {
+							"type": "string"
+						},
+						"elapsedMinutes": {
+							"type": "string"
+						},
+						"openIncident": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"loading",
+						"error",
+						"retry",
+						"empty",
+						"elapsedHoursMinutes",
+						"elapsedMinutes",
+						"openIncident"
+					]
+				},
+				"activation": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"pageTitle": {
+							"type": "string"
+						},
+						"eyebrow": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"legacyNotice": {
+							"type": "string"
+						},
+						"submit": {
+							"type": "string"
+						},
+						"activating": {
+							"type": "string"
+						},
+						"keepLegacy": {
+							"type": "string"
+						},
+						"adminRequired": {
+							"type": "string"
+						},
+						"error": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"pageTitle",
+						"eyebrow",
+						"title",
+						"description",
+						"legacyNotice",
+						"submit",
+						"activating",
+						"keepLegacy",
+						"adminRequired",
+						"error"
+					]
+				},
+				"states": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"loading": {
+							"type": "string"
+						},
+						"deniedTitle": {
+							"type": "string"
+						},
+						"deniedDescription": {
+							"type": "string"
+						},
+						"retryableTitle": {
+							"type": "string"
+						},
+						"retryableDescription": {
+							"type": "string"
+						},
+						"unrecoverableTitle": {
+							"type": "string"
+						},
+						"unrecoverableDescription": {
+							"type": "string"
+						},
+						"retry": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"loading",
+						"deniedTitle",
+						"deniedDescription",
+						"retryableTitle",
+						"retryableDescription",
+						"unrecoverableTitle",
+						"unrecoverableDescription",
+						"retry"
+					]
+				},
+				"onboarding": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"eyebrow": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"createWorkspace": {
+							"type": "string"
+						},
+						"stepWorkspace": {
+							"type": "string"
+						},
+						"stepService": {
+							"type": "string"
+						},
+						"stepIncident": {
+							"type": "string"
+						},
+						"serviceTitle": {
+							"type": "string"
+						},
+						"serviceDescription": {
+							"type": "string"
+						},
+						"serviceDenied": {
+							"type": "string"
+						},
+						"createService": {
+							"type": "string"
+						},
+						"serviceReady": {
+							"type": "string"
+						},
+						"demoDescription": {
+							"type": "string"
+						},
+						"createDemo": {
+							"type": "string"
+						},
+						"creatingDemo": {
+							"type": "string"
+						},
+						"skipDemo": {
+							"type": "string"
+						},
+						"demoSafety": {
+							"type": "string"
+						},
+						"demoError": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"eyebrow",
+						"title",
+						"createWorkspace",
+						"stepWorkspace",
+						"stepService",
+						"stepIncident",
+						"serviceTitle",
+						"serviceDescription",
+						"serviceDenied",
+						"createService",
+						"serviceReady",
+						"demoDescription",
+						"createDemo",
+						"creatingDemo",
+						"skipDemo",
+						"demoSafety",
+						"demoError"
+					]
+				},
+				"overview": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"eyebrow": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"openCatalog": {
+							"type": "string"
+						},
+						"metrics": {
+							"type": "string"
+						},
+						"activeIncidents": {
+							"type": "string"
+						},
+						"degradedServices": {
+							"type": "string"
+						},
+						"commanderless": {
+							"type": "string"
+						},
+						"services": {
+							"type": "string"
+						},
+						"activeTitle": {
+							"type": "string"
+						},
+						"activeDescription": {
+							"type": "string"
+						},
+						"noActiveTitle": {
+							"type": "string"
+						},
+						"noActiveDescription": {
+							"type": "string"
+						},
+						"latestTitle": {
+							"type": "string"
+						},
+						"latestDescription": {
+							"type": "string"
+						},
+						"noUpdates": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"eyebrow",
+						"title",
+						"description",
+						"openCatalog",
+						"metrics",
+						"activeIncidents",
+						"degradedServices",
+						"commanderless",
+						"services",
+						"activeTitle",
+						"activeDescription",
+						"noActiveTitle",
+						"noActiveDescription",
+						"latestTitle",
+						"latestDescription",
+						"noUpdates"
+					]
+				},
+				"catalog": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"eyebrow": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"create": {
+							"type": "string"
+						},
+						"createTitle": {
+							"type": "string"
+						},
+						"createDescription": {
+							"type": "string"
+						},
+						"searchLabel": {
+							"type": "string"
+						},
+						"searchPlaceholder": {
+							"type": "string"
+						},
+						"statusLabel": {
+							"type": "string"
+						},
+						"active": {
+							"type": "string"
+						},
+						"archived": {
+							"type": "string"
+						},
+						"all": {
+							"type": "string"
+						},
+						"apply": {
+							"type": "string"
+						},
+						"emptyTitle": {
+							"type": "string"
+						},
+						"emptyDescription": {
+							"type": "string"
+						},
+						"filteredEmptyTitle": {
+							"type": "string"
+						},
+						"filteredEmptyDescription": {
+							"type": "string"
+						},
+						"clearFilters": {
+							"type": "string"
+						},
+						"results": {
+							"type": "string"
+						},
+						"columnService": {
+							"type": "string"
+						},
+						"columnTier": {
+							"type": "string"
+						},
+						"columnHealth": {
+							"type": "string"
+						},
+						"columnOwner": {
+							"type": "string"
+						},
+						"open": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"eyebrow",
+						"title",
+						"description",
+						"create",
+						"createTitle",
+						"createDescription",
+						"searchLabel",
+						"searchPlaceholder",
+						"statusLabel",
+						"active",
+						"archived",
+						"all",
+						"apply",
+						"emptyTitle",
+						"emptyDescription",
+						"filteredEmptyTitle",
+						"filteredEmptyDescription",
+						"clearFilters",
+						"results",
+						"columnService",
+						"columnTier",
+						"columnHealth",
+						"columnOwner",
+						"open"
+					]
+				},
+				"tier": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"critical": {
+							"type": "string"
+						},
+						"high": {
+							"type": "string"
+						},
+						"standard": {
+							"type": "string"
+						},
+						"low": {
+							"type": "string"
+						}
+					},
+					"required": ["critical", "high", "standard", "low"]
+				},
+				"health": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"operational": {
+							"type": "string"
+						},
+						"degraded": {
+							"type": "string"
+						},
+						"major_outage": {
+							"type": "string"
+						},
+						"maintenance": {
+							"type": "string"
+						}
+					},
+					"required": ["operational", "degraded", "major_outage", "maintenance"]
+				},
+				"demo": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"description_zero": {
+							"type": "string"
+						},
+						"description_one": {
+							"type": "string"
+						},
+						"description_two": {
+							"type": "string"
+						},
+						"description_few": {
+							"type": "string"
+						},
+						"description_many": {
+							"type": "string"
+						},
+						"description_other": {
+							"type": "string"
+						},
+						"remove": {
+							"type": "string"
+						},
+						"confirmTitle": {
+							"type": "string"
+						},
+						"confirmDescription": {
+							"type": "string"
+						},
+						"cancel": {
+							"type": "string"
+						},
+						"confirm": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"remove",
+						"confirmTitle",
+						"confirmDescription",
+						"cancel",
+						"confirm"
+					]
+				},
+				"incidentRoom": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"back": {
+							"type": "string"
+						},
+						"demoBadge": {
+							"type": "string"
+						},
+						"statusDetected": {
+							"type": "string"
+						},
+						"authoritative": {
+							"type": "string"
+						},
+						"version": {
+							"type": "string"
+						},
+						"checklistTitle": {
+							"type": "string"
+						},
+						"checklistDescription": {
+							"type": "string"
+						},
+						"demoChecklistDescription": {
+							"type": "string"
+						},
+						"checklistAcknowledge": {
+							"type": "string"
+						},
+						"checklistOpenRunbook": {
+							"type": "string"
+						},
+						"checklistPostUpdate": {
+							"type": "string"
+						},
+						"checklistComplete": {
+							"type": "string"
+						},
+						"checklistFuture": {
+							"type": "string"
+						},
+						"freshness": {
+							"type": "string"
+						},
+						"operationalState": {
+							"type": "string"
+						},
+						"detectedAt": {
+							"type": "string"
+						},
+						"acknowledgedAt": {
+							"type": "string"
+						},
+						"mitigatedAt": {
+							"type": "string"
+						},
+						"resolvedAt": {
+							"type": "string"
+						},
+						"notRecorded": {
+							"type": "string"
+						},
+						"responseTeam": {
+							"type": "string"
+						},
+						"commander": {
+							"type": "string"
+						},
+						"unassigned": {
+							"type": "string"
+						},
+						"responders": {
+							"type": "string"
+						},
+						"affectedServices": {
+							"type": "string"
+						},
+						"none": {
+							"type": "string"
+						},
+						"resolutionSummary": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"back",
+						"demoBadge",
+						"statusDetected",
+						"authoritative",
+						"version",
+						"checklistTitle",
+						"checklistDescription",
+						"demoChecklistDescription",
+						"checklistAcknowledge",
+						"checklistOpenRunbook",
+						"checklistPostUpdate",
+						"checklistComplete",
+						"checklistFuture",
+						"freshness",
+						"operationalState",
+						"detectedAt",
+						"acknowledgedAt",
+						"mitigatedAt",
+						"resolvedAt",
+						"notRecorded",
+						"responseTeam",
+						"commander",
+						"unassigned",
+						"responders",
+						"affectedServices",
+						"none",
+						"resolutionSummary"
+					]
+				},
+				"lifecycle": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"detected": {
+							"type": "string"
+						},
+						"triaging": {
+							"type": "string"
+						},
+						"mitigating": {
+							"type": "string"
+						},
+						"monitoring": {
+							"type": "string"
+						},
+						"resolved": {
+							"type": "string"
+						},
+						"dismissed": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"detected",
+						"triaging",
+						"mitigating",
+						"monitoring",
+						"resolved",
+						"dismissed"
+					]
+				},
+				"board": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"count_one": {
+							"type": "string"
+						},
+						"count_zero": {
+							"type": "string"
+						},
+						"count_two": {
+							"type": "string"
+						},
+						"count_few": {
+							"type": "string"
+						},
+						"count_many": {
+							"type": "string"
+						},
+						"count_other": {
+							"type": "string"
+						},
+						"dragHandle": {
+							"type": "string"
+						},
+						"moveTo": {
+							"type": "string"
+						},
+						"openIncident": {
+							"type": "string"
+						},
+						"pending": {
+							"type": "string"
+						},
+						"emptyLane": {
+							"type": "string"
+						},
+						"invalidTarget": {
+							"type": "string"
+						},
+						"invalidTargetDescription": {
+							"type": "string"
+						},
+						"dndDisabled": {
+							"type": "string"
+						},
+						"reducedMotionFallback": {
+							"type": "string"
+						},
+						"screenReaderInstructions": {
+							"type": "string"
+						},
+						"lift": {
+							"type": "string"
+						},
+						"target": {
+							"type": "string"
+						},
+						"invalid": {
+							"type": "string"
+						},
+						"dropPending": {
+							"type": "string"
+						},
+						"cancelled": {
+							"type": "string"
+						},
+						"accepted": {
+							"type": "string"
+						},
+						"rollback": {
+							"type": "string"
+						},
+						"failedTitle": {
+							"type": "string"
+						},
+						"conflictTitle": {
+							"type": "string"
+						},
+						"conflictDescription": {
+							"type": "string"
+						},
+						"yourMove": {
+							"type": "string"
+						},
+						"currentState": {
+							"type": "string"
+						},
+						"compare": {
+							"type": "string"
+						},
+						"reapply": {
+							"type": "string"
+						},
+						"discard": {
+							"type": "string"
+						},
+						"undo": {
+							"type": "string"
+						},
+						"undoDescription": {
+							"type": "string"
+						},
+						"resolutionPrompt": {
+							"type": "string"
+						},
+						"resolutionRequired": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"description",
+						"dragHandle",
+						"moveTo",
+						"openIncident",
+						"pending",
+						"emptyLane",
+						"invalidTarget",
+						"invalidTargetDescription",
+						"dndDisabled",
+						"reducedMotionFallback",
+						"screenReaderInstructions",
+						"lift",
+						"target",
+						"invalid",
+						"dropPending",
+						"cancelled",
+						"accepted",
+						"rollback",
+						"failedTitle",
+						"conflictTitle",
+						"conflictDescription",
+						"yourMove",
+						"currentState",
+						"compare",
+						"reapply",
+						"discard",
+						"undo",
+						"undoDescription",
+						"resolutionPrompt",
+						"resolutionRequired"
+					]
+				},
+				"presence": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"onlyYou": {
+							"type": "string"
+						}
+					},
+					"required": ["title", "onlyYou"]
+				},
+				"signals": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"eyebrow": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"manualHeading": {
+							"type": "string"
+						},
+						"queueHeading": {
+							"type": "string"
+						},
+						"titleField": {
+							"type": "string"
+						},
+						"summaryField": {
+							"type": "string"
+						},
+						"serviceField": {
+							"type": "string"
+						},
+						"noService": {
+							"type": "string"
+						},
+						"severityField": {
+							"type": "string"
+						},
+						"createManual": {
+							"type": "string"
+						},
+						"createDemo": {
+							"type": "string"
+						},
+						"attach": {
+							"type": "string"
+						},
+						"attached": {
+							"type": "string"
+						},
+						"empty": {
+							"type": "string"
+						},
+						"pending": {
+							"type": "string"
+						},
+						"error": {
+							"type": "string"
+						},
+						"source": {
+							"type": "string"
+						},
+						"observedAt": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"eyebrow",
+						"title",
+						"description",
+						"manualHeading",
+						"queueHeading",
+						"titleField",
+						"summaryField",
+						"serviceField",
+						"noService",
+						"severityField",
+						"createManual",
+						"createDemo",
+						"attach",
+						"attached",
+						"empty",
+						"pending",
+						"error",
+						"source",
+						"observedAt"
+					]
+				},
+				"manage": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"eyebrow": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"team": {
+							"type": "string"
+						},
+						"teamDescription": {
+							"type": "string"
+						},
+						"apiAuthority": {
+							"type": "string"
+						},
+						"apiAuthorityDescription": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"eyebrow",
+						"title",
+						"description",
+						"team",
+						"teamDescription",
+						"apiAuthority",
+						"apiAuthorityDescription"
+					]
+				},
+				"legacy": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"readOnly": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"export": {
+							"type": "string"
+						},
+						"exportError": {
+							"type": "string"
+						},
+						"emptyTitle": {
+							"type": "string"
+						},
+						"emptyDescription": {
+							"type": "string"
+						},
+						"taskCount_one": {
+							"type": "string"
+						},
+						"taskCount_zero": {
+							"type": "string"
+						},
+						"taskCount_two": {
+							"type": "string"
+						},
+						"taskCount_few": {
+							"type": "string"
+						},
+						"taskCount_many": {
+							"type": "string"
+						},
+						"taskCount_other": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"readOnly",
+						"description",
+						"export",
+						"exportError",
+						"emptyTitle",
+						"emptyDescription"
+					]
+				},
+				"workbench": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"searchLabel": {
+							"type": "string"
+						},
+						"searchPlaceholder": {
+							"type": "string"
+						},
+						"applyFilters": {
+							"type": "string"
+						},
+						"clearFilters": {
+							"type": "string"
+						},
+						"statusFilter": {
+							"type": "string"
+						},
+						"severityFilter": {
+							"type": "string"
+						},
+						"from": {
+							"type": "string"
+						},
+						"to": {
+							"type": "string"
+						},
+						"group": {
+							"type": "string"
+						},
+						"density": {
+							"type": "string"
+						},
+						"compact": {
+							"type": "string"
+						},
+						"comfortable": {
+							"type": "string"
+						},
+						"columns": {
+							"type": "string"
+						},
+						"pinColumn": {
+							"type": "string"
+						},
+						"moveEarlier": {
+							"type": "string"
+						},
+						"moveLater": {
+							"type": "string"
+						},
+						"narrowColumn": {
+							"type": "string"
+						},
+						"widenColumn": {
+							"type": "string"
+						},
+						"sortColumn": {
+							"type": "string"
+						},
+						"selectIncident": {
+							"type": "string"
+						},
+						"loading": {
+							"type": "string"
+						},
+						"backgroundRefresh": {
+							"type": "string"
+						},
+						"emptyTitle": {
+							"type": "string"
+						},
+						"emptyDescription": {
+							"type": "string"
+						},
+						"filteredEmptyTitle": {
+							"type": "string"
+						},
+						"filteredEmptyDescription": {
+							"type": "string"
+						},
+						"loadMore": {
+							"type": "string"
+						},
+						"loadingMore": {
+							"type": "string"
+						},
+						"inspectorTitle": {
+							"type": "string"
+						},
+						"inspectorDescription": {
+							"type": "string"
+						},
+						"openRoom": {
+							"type": "string"
+						},
+						"closeInspector": {
+							"type": "string"
+						},
+						"savedViews": {
+							"type": "string"
+						},
+						"unsavedView": {
+							"type": "string"
+						},
+						"saveCurrentView": {
+							"type": "string"
+						},
+						"updateSavedView": {
+							"type": "string"
+						},
+						"viewName": {
+							"type": "string"
+						},
+						"privateVisibility": {
+							"type": "string"
+						},
+						"workspaceVisibility": {
+							"type": "string"
+						},
+						"conflictTitle": {
+							"type": "string"
+						},
+						"conflictDescription": {
+							"type": "string"
+						},
+						"conflictDraft": {
+							"type": "string"
+						},
+						"conflictCurrent": {
+							"type": "string"
+						},
+						"useCurrent": {
+							"type": "string"
+						},
+						"retryDraft": {
+							"type": "string"
+						},
+						"selectedCount": {
+							"type": "string"
+						},
+						"selectedCount_zero": {
+							"type": "string"
+						},
+						"selectedCount_one": {
+							"type": "string"
+						},
+						"selectedCount_two": {
+							"type": "string"
+						},
+						"selectedCount_few": {
+							"type": "string"
+						},
+						"selectedCount_many": {
+							"type": "string"
+						},
+						"selectedCount_other": {
+							"type": "string"
+						},
+						"partialBulk": {
+							"type": "string"
+						},
+						"hourShort": {
+							"type": "string"
+						},
+						"minuteShort": {
+							"type": "string"
+						},
+						"columnsById": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"key": {
+									"type": "string"
+								},
+								"title": {
+									"type": "string"
+								},
+								"status": {
+									"type": "string"
+								},
+								"severity": {
+									"type": "string"
+								},
+								"impact": {
+									"type": "string"
+								},
+								"service": {
+									"type": "string"
+								},
+								"affectedServices": {
+									"type": "string"
+								},
+								"commander": {
+									"type": "string"
+								},
+								"responders": {
+									"type": "string"
+								},
+								"detectedAt": {
+									"type": "string"
+								},
+								"elapsed": {
+									"type": "string"
+								},
+								"lastUpdateAt": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"key",
+								"title",
+								"status",
+								"severity",
+								"impact",
+								"service",
+								"affectedServices",
+								"commander",
+								"responders",
+								"detectedAt",
+								"elapsed",
+								"lastUpdateAt"
+							]
+						},
+						"groupsById": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"none": {
+									"type": "string"
+								},
+								"status": {
+									"type": "string"
+								},
+								"severity": {
+									"type": "string"
+								},
+								"service": {
+									"type": "string"
+								},
+								"commander": {
+									"type": "string"
+								}
+							},
+							"required": ["none", "status", "severity", "service", "commander"]
+						},
+						"severityById": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"sev1": {
+									"type": "string"
+								},
+								"sev2": {
+									"type": "string"
+								},
+								"sev3": {
+									"type": "string"
+								},
+								"sev4": {
+									"type": "string"
+								}
+							},
+							"required": ["sev1", "sev2", "sev3", "sev4"]
+						}
+					},
+					"required": [
+						"title",
+						"description",
+						"searchLabel",
+						"searchPlaceholder",
+						"applyFilters",
+						"clearFilters",
+						"statusFilter",
+						"severityFilter",
+						"from",
+						"to",
+						"group",
+						"density",
+						"compact",
+						"comfortable",
+						"columns",
+						"pinColumn",
+						"moveEarlier",
+						"moveLater",
+						"narrowColumn",
+						"widenColumn",
+						"sortColumn",
+						"selectIncident",
+						"loading",
+						"backgroundRefresh",
+						"emptyTitle",
+						"emptyDescription",
+						"filteredEmptyTitle",
+						"filteredEmptyDescription",
+						"loadMore",
+						"loadingMore",
+						"inspectorTitle",
+						"inspectorDescription",
+						"openRoom",
+						"closeInspector",
+						"savedViews",
+						"unsavedView",
+						"saveCurrentView",
+						"updateSavedView",
+						"viewName",
+						"privateVisibility",
+						"workspaceVisibility",
+						"conflictTitle",
+						"conflictDescription",
+						"conflictDraft",
+						"conflictCurrent",
+						"useCurrent",
+						"retryDraft",
+						"partialBulk",
+						"hourShort",
+						"minuteShort",
+						"columnsById",
+						"groupsById",
+						"severityById"
+					]
+				},
+				"analytics": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"eyebrow": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"export": {
+							"type": "string"
+						},
+						"filters": {
+							"type": "string"
+						},
+						"from": {
+							"type": "string"
+						},
+						"to": {
+							"type": "string"
+						},
+						"status": {
+							"type": "string"
+						},
+						"severity": {
+							"type": "string"
+						},
+						"service": {
+							"type": "string"
+						},
+						"all": {
+							"type": "string"
+						},
+						"compare": {
+							"type": "string"
+						},
+						"metrics": {
+							"type": "string"
+						},
+						"volume": {
+							"type": "string"
+						},
+						"incidentsInPeriod": {
+							"type": "string"
+						},
+						"previousValue": {
+							"type": "string"
+						},
+						"mtta": {
+							"type": "string"
+						},
+						"mttr": {
+							"type": "string"
+						},
+						"mitigation": {
+							"type": "string"
+						},
+						"reopen": {
+							"type": "string"
+						},
+						"stale": {
+							"type": "string"
+						},
+						"sampleDetail": {
+							"type": "string"
+						},
+						"p90": {
+							"type": "string"
+						},
+						"staleDetail": {
+							"type": "string"
+						},
+						"volumeTrend": {
+							"type": "string"
+						},
+						"drilldownHint": {
+							"type": "string"
+						},
+						"openBucket": {
+							"type": "string"
+						},
+						"openBucket_zero": {
+							"type": "string"
+						},
+						"openBucket_one": {
+							"type": "string"
+						},
+						"openBucket_two": {
+							"type": "string"
+						},
+						"openBucket_few": {
+							"type": "string"
+						},
+						"openBucket_many": {
+							"type": "string"
+						},
+						"openBucket_other": {
+							"type": "string"
+						},
+						"empty": {
+							"type": "string"
+						},
+						"hotspotEyebrow": {
+							"type": "string"
+						},
+						"hotspots": {
+							"type": "string"
+						},
+						"primaryServiceOnly": {
+							"type": "string"
+						},
+						"tableTitle": {
+							"type": "string"
+						},
+						"tableDescription": {
+							"type": "string"
+						},
+						"date": {
+							"type": "string"
+						},
+						"action": {
+							"type": "string"
+						},
+						"openWorkbench": {
+							"type": "string"
+						},
+						"generatedAt": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"eyebrow",
+						"title",
+						"description",
+						"export",
+						"filters",
+						"from",
+						"to",
+						"status",
+						"severity",
+						"service",
+						"all",
+						"compare",
+						"metrics",
+						"volume",
+						"incidentsInPeriod",
+						"previousValue",
+						"mtta",
+						"mttr",
+						"mitigation",
+						"reopen",
+						"stale",
+						"sampleDetail",
+						"p90",
+						"staleDetail",
+						"volumeTrend",
+						"drilldownHint",
+						"empty",
+						"hotspotEyebrow",
+						"hotspots",
+						"primaryServiceOnly",
+						"tableTitle",
+						"tableDescription",
+						"date",
+						"action",
+						"openWorkbench",
+						"generatedAt"
+					]
+				},
+				"status": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"detected": {
+							"type": "string"
+						},
+						"triaging": {
+							"type": "string"
+						},
+						"mitigating": {
+							"type": "string"
+						},
+						"monitoring": {
+							"type": "string"
+						},
+						"resolved": {
+							"type": "string"
+						},
+						"dismissed": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"detected",
+						"triaging",
+						"mitigating",
+						"monitoring",
+						"resolved",
+						"dismissed"
+					]
+				},
+				"impact": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"unknown": {
+							"type": "string"
+						},
+						"none": {
+							"type": "string"
+						},
+						"degraded": {
+							"type": "string"
+						},
+						"partial_outage": {
+							"type": "string"
+						},
+						"full_outage": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"unknown",
+						"none",
+						"degraded",
+						"partial_outage",
+						"full_outage"
+					]
+				},
+				"commands": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"version": {
+							"type": "string"
+						},
+						"transition": {
+							"type": "string"
+						},
+						"resolutionSummary": {
+							"type": "string"
+						},
+						"resolutionPlaceholder": {
+							"type": "string"
+						},
+						"updateLabel": {
+							"type": "string"
+						},
+						"updatePlaceholder": {
+							"type": "string"
+						},
+						"publish": {
+							"type": "string"
+						},
+						"conflictTransition": {
+							"type": "string"
+						},
+						"conflictTitle": {
+							"type": "string"
+						},
+						"conflictDescription": {
+							"type": "string"
+						},
+						"loadCurrent": {
+							"type": "string"
+						},
+						"reapply": {
+							"type": "string"
+						},
+						"discard": {
+							"type": "string"
+						},
+						"failedTitle": {
+							"type": "string"
+						},
+						"failed": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"version",
+						"transition",
+						"resolutionSummary",
+						"resolutionPlaceholder",
+						"updateLabel",
+						"updatePlaceholder",
+						"publish",
+						"conflictTransition",
+						"conflictTitle",
+						"conflictDescription",
+						"loadCurrent",
+						"reapply",
+						"discard",
+						"failedTitle",
+						"failed"
+					]
+				}
+			},
+			"required": [
+				"pageTitle",
+				"tracerLabel",
+				"entry",
+				"back",
+				"createPanel",
+				"creating",
+				"service",
+				"incident",
+				"severity",
+				"inspector",
+				"timeline",
+				"skipToContent",
+				"shell",
+				"nav",
+				"connection",
+				"clockRail",
+				"activation",
+				"states",
+				"onboarding",
+				"overview",
+				"catalog",
+				"tier",
+				"health",
+				"demo",
+				"incidentRoom",
+				"lifecycle",
+				"board",
+				"presence",
+				"signals",
+				"manage",
+				"legacy",
+				"workbench",
+				"analytics",
+				"status",
+				"impact",
+				"commands"
+			]
+		},
 		"publicProject": {
 			"type": "object",
 			"additionalProperties": false,
@@ -8921,6 +11514,7 @@
 		}
 	},
 	"required": [
+		"portfolio",
 		"common",
 		"auth",
 		"settings",
@@ -8931,6 +11525,9 @@
 		"invitations",
 		"workspace",
 		"team",
+		"billing",
+		"securityApproval",
+		"relayops",
 		"publicProject"
 	]
 }

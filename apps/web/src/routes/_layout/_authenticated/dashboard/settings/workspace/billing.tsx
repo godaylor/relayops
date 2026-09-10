@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowUpRight, Check, Sparkles, TriangleAlert } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import PageTitle from "@/components/page-title";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,69 +24,22 @@ export const Route = createFileRoute(
 type Interval = "monthly" | "annual";
 type PlanKey = "personal" | "team";
 
-const PLANS: {
-  plan: PlanKey;
-  name: string;
-  tagline: string;
-  monthly: { price: string; suffix: string; note: string };
-  annual: { price: string; suffix: string; note: string };
-  features: string[];
-  highlighted?: boolean;
-}[] = [
-  {
-    plan: "personal",
-    name: "Personal",
-    tagline: "For individuals",
-    monthly: { price: "$4", suffix: "/ month", note: "Billed monthly" },
-    annual: {
-      price: "$40",
-      suffix: "/ year",
-      note: "$3.33 / month, billed yearly",
-    },
-    features: [
-      "Single user",
-      "Unlimited projects and tasks",
-      "Automatic backups and updates",
-      "Email support",
-    ],
-  },
-  {
-    plan: "team",
-    name: "Team",
-    tagline: "For teams working together",
-    monthly: { price: "$5", suffix: "/ user / month", note: "Billed monthly" },
-    annual: {
-      price: "$50",
-      suffix: "/ user / year",
-      note: "$4.17 / user / month, billed yearly",
-    },
-    features: [
-      "Unlimited team members",
-      "Unlimited projects and tasks",
-      "Workspace roles and permissions",
-      "Automatic backups and updates",
-      "Priority email support",
-    ],
-    highlighted: true,
-  },
-];
-
-const STATUS: Record<
+const STATUS_VARIANTS: Record<
   string,
-  { label: string; variant: "success" | "warning" | "error" | "secondary" }
+  "success" | "warning" | "error" | "secondary"
 > = {
-  active: { label: "Active", variant: "success" },
-  trialing: { label: "Trial", variant: "success" },
-  past_due: { label: "Payment past due", variant: "warning" },
-  scheduled_cancel: { label: "Cancels soon", variant: "warning" },
-  canceled: { label: "Canceled", variant: "error" },
-  expired: { label: "Expired", variant: "error" },
-  paused: { label: "Paused", variant: "secondary" },
+  active: "success",
+  trialing: "success",
+  past_due: "warning",
+  scheduled_cancel: "warning",
+  canceled: "error",
+  expired: "error",
+  paused: "secondary",
 };
 
-function formatDate(value: string | null | undefined) {
+function formatDate(value: string | null | undefined, locale: string) {
   if (!value) return null;
-  return new Date(value).toLocaleDateString(undefined, {
+  return new Date(value).toLocaleDateString(locale, {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -114,6 +68,7 @@ function SectionHeader({
 }
 
 function RouteComponent() {
+  const { t, i18n } = useTranslation();
   const { workspace, isAdmin } = useWorkspacePermission();
   const workspaceId = workspace?.id;
   const canManage = isAdmin;
@@ -122,6 +77,60 @@ function RouteComponent() {
   const checkout = useCreateCheckout(workspaceId);
   const portal = useOpenBillingPortal(workspaceId);
   const [interval, setInterval] = useState<Interval>("annual");
+  const plans: Array<{
+    plan: PlanKey;
+    name: string;
+    tagline: string;
+    monthly: { price: string; suffix: string; note: string };
+    annual: { price: string; suffix: string; note: string };
+    features: string[];
+    highlighted?: boolean;
+  }> = [
+    {
+      plan: "personal",
+      name: t("billing:plans.personal.name"),
+      tagline: t("billing:plans.personal.tagline"),
+      monthly: {
+        price: "$4",
+        suffix: t("billing:prices.perMonth"),
+        note: t("billing:prices.billedMonthly"),
+      },
+      annual: {
+        price: "$40",
+        suffix: t("billing:prices.perYear"),
+        note: t("billing:prices.personalAnnualNote"),
+      },
+      features: [
+        t("billing:features.singleUser"),
+        t("billing:features.unlimitedWork"),
+        t("billing:features.backups"),
+        t("billing:features.emailSupport"),
+      ],
+    },
+    {
+      plan: "team",
+      name: t("billing:plans.team.name"),
+      tagline: t("billing:plans.team.tagline"),
+      monthly: {
+        price: "$5",
+        suffix: t("billing:prices.perUserMonth"),
+        note: t("billing:prices.billedMonthly"),
+      },
+      annual: {
+        price: "$50",
+        suffix: t("billing:prices.perUserYear"),
+        note: t("billing:prices.teamAnnualNote"),
+      },
+      features: [
+        t("billing:features.unlimitedMembers"),
+        t("billing:features.unlimitedWork"),
+        t("billing:features.roles"),
+        t("billing:features.backups"),
+        t("billing:features.prioritySupport"),
+      ],
+      highlighted: true,
+    },
+  ];
 
   if (isLoading) {
     return (
@@ -134,12 +143,11 @@ function RouteComponent() {
   if (!billing?.billingEnabled) {
     return (
       <>
-        <PageTitle title="Billing" />
+        <PageTitle title={t("billing:title")} />
         <div className="mx-auto max-w-4xl space-y-2">
-          <h1 className="font-semibold text-2xl">Billing</h1>
+          <h1 className="font-semibold text-2xl">{t("billing:title")}</h1>
           <p className="text-muted-foreground text-sm">
-            Billing isn't enabled on this instance. Self-hosted Kaneo includes
-            every feature, free forever.
+            {t("billing:disabled")}
           </p>
         </div>
       </>
@@ -147,36 +155,38 @@ function RouteComponent() {
   }
 
   const hasSubscription = Boolean(billing.plan && billing.status);
-  const status = billing.status ? STATUS[billing.status] : null;
-  const renews = formatDate(billing.currentPeriodEnd);
+  const statusVariant = billing.status ? STATUS_VARIANTS[billing.status] : null;
+  const renews = formatDate(billing.currentPeriodEnd, i18n.language);
   const trialDaysLeft = daysUntil(billing.trialEndsAt);
   const trialExpired =
     !billing.foundingFree && !hasSubscription && trialDaysLeft === 0;
 
-  const pricePer = billing.billingInterval === "annual" ? "year" : "month";
+  const pricePer = t(
+    billing.billingInterval === "annual"
+      ? "billing:prices.year"
+      : "billing:prices.month",
+  );
   const planLabel =
     billing.plan === "team"
-      ? "Team"
+      ? t("billing:plans.team.name")
       : billing.plan === "personal"
-        ? "Personal"
+        ? t("billing:plans.personal.name")
         : null;
 
   return (
     <>
-      <PageTitle title="Billing" />
+      <PageTitle title={t("billing:title")} />
       <div className="mx-auto max-w-4xl space-y-8">
         <div className="space-y-2">
-          <h1 className="font-semibold text-2xl">Billing</h1>
-          <p className="text-muted-foreground">
-            Manage the Kaneo Cloud subscription for this workspace.
-          </p>
+          <h1 className="font-semibold text-2xl">{t("billing:title")}</h1>
+          <p className="text-muted-foreground">{t("billing:description")}</p>
         </div>
 
         {/* ── Current plan ── */}
         <div className="space-y-6">
           <SectionHeader
-            title="Current plan"
-            subtitle="Your workspace's active plan and billing status."
+            title={t("billing:currentPlan")}
+            subtitle={t("billing:currentPlanSubtitle")}
           />
 
           {billing.foundingFree ? (
@@ -187,14 +197,15 @@ function RouteComponent() {
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-medium text-sm">Founding Free</h3>
+                    <h3 className="font-medium text-sm">
+                      {t("billing:foundingFree")}
+                    </h3>
                     <Badge variant="success" size="sm">
-                      Free
+                      {t("billing:free")}
                     </Badge>
                   </div>
                   <p className="text-muted-foreground text-sm leading-relaxed">
-                    This workspace has free access to Kaneo Cloud as an early
-                    supporter. Thank you for being here from the start.
+                    {t("billing:foundingDescription")}
                   </p>
                 </div>
               </div>
@@ -205,25 +216,35 @@ function RouteComponent() {
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
                     <h3 className="font-medium text-sm">
-                      Kaneo Cloud {planLabel}
+                      RelayOps Cloud {planLabel}
                     </h3>
-                    {status ? (
-                      <Badge variant={status.variant} size="sm">
-                        {status.label}
+                    {billing.status && statusVariant ? (
+                      <Badge variant={statusVariant} size="sm">
+                        {t(`billing:status.${billing.status}`)}
                       </Badge>
                     ) : null}
                   </div>
                   <p className="text-muted-foreground text-sm">
                     {billing.plan === "team"
-                      ? `$${billing.billingInterval === "annual" ? 50 : 5} / user / ${pricePer}`
-                      : `$${billing.billingInterval === "annual" ? 40 : 4} / ${pricePer}`}
-                    {billing.seats > 1 ? ` · ${billing.seats} seats` : null}
+                      ? t("billing:currentTeamPrice", {
+                          price: billing.billingInterval === "annual" ? 50 : 5,
+                          period: pricePer,
+                        })
+                      : t("billing:currentPersonalPrice", {
+                          price: billing.billingInterval === "annual" ? 40 : 4,
+                          period: pricePer,
+                        })}
+                    {billing.seats > 1
+                      ? ` · ${t("billing:seats", { count: billing.seats })}`
+                      : null}
                   </p>
                 </div>
                 <div className="text-right">
                   {renews ? (
                     <p className="text-muted-foreground text-xs">
-                      {billing.canceledAt ? "Access ends" : "Renews"}
+                      {billing.canceledAt
+                        ? t("billing:accessEnds")
+                        : t("billing:renews")}
                     </p>
                   ) : null}
                   {renews ? (
@@ -234,7 +255,7 @@ function RouteComponent() {
               <Separator />
               <div className="flex flex-col items-start gap-3 px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-muted-foreground text-xs">
-                  Update payment method, view invoices, or cancel anytime.
+                  {t("billing:manageDescription")}
                 </p>
                 {billing.hasCustomer ? (
                   <Button
@@ -243,7 +264,9 @@ function RouteComponent() {
                     disabled={!canManage || portal.isPending}
                     onClick={() => portal.mutate()}
                   >
-                    {portal.isPending ? "Opening…" : "Manage billing"}
+                    {portal.isPending
+                      ? t("billing:opening")
+                      : t("billing:manage")}
                     <ArrowUpRight className="size-4" />
                   </Button>
                 ) : null}
@@ -273,14 +296,16 @@ function RouteComponent() {
                 </div>
                 <div className="space-y-1">
                   <h3 className="font-medium text-sm">
-                    {trialExpired ? "Your trial has ended" : "Free trial"}
+                    {trialExpired
+                      ? t("billing:trialEnded")
+                      : t("billing:freeTrial")}
                   </h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
                     {trialExpired
-                      ? "Subscribe to a plan below to keep creating and editing. Your data stays safe and exportable in the meantime."
+                      ? t("billing:trialEndedDescription")
                       : trialDaysLeft !== null
-                        ? `You have ${trialDaysLeft} ${trialDaysLeft === 1 ? "day" : "days"} left on your free trial. Choose a plan to continue without interruption.`
-                        : "Choose a plan below to continue after your trial."}
+                        ? t("billing:trialDays", { count: trialDaysLeft })
+                        : t("billing:chooseAfterTrial")}
                   </p>
                 </div>
               </div>
@@ -293,8 +318,8 @@ function RouteComponent() {
           <div className="space-y-6">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <SectionHeader
-                title="Choose a plan"
-                subtitle="Switch anytime. Cancel whenever you like."
+                title={t("billing:choosePlan")}
+                subtitle={t("billing:choosePlanSubtitle")}
               />
               <div className="inline-flex items-center gap-2">
                 <div className="inline-flex rounded-md border border-border bg-sidebar p-0.5 text-xs">
@@ -310,13 +335,13 @@ function RouteComponent() {
                           : "text-muted-foreground hover:text-foreground",
                       )}
                     >
-                      {value}
+                      {t(`billing:${value}`)}
                     </button>
                   ))}
                 </div>
                 {interval === "annual" ? (
                   <Badge variant="success" size="sm">
-                    2 months free
+                    {t("billing:monthsFree")}
                   </Badge>
                 ) : null}
               </div>
@@ -324,7 +349,7 @@ function RouteComponent() {
 
             <div className="rounded-2xl border border-border/70 bg-card/70 p-2">
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {PLANS.map((p) => {
+                {plans.map((p) => {
                   const price = interval === "monthly" ? p.monthly : p.annual;
                   return (
                     <div
@@ -340,7 +365,7 @@ function RouteComponent() {
                         <h3 className="font-medium text-sm">{p.name}</h3>
                         {p.highlighted ? (
                           <span className="rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 font-medium text-primary text-xs">
-                            Most popular
+                            {t("billing:mostPopular")}
                           </span>
                         ) : null}
                       </div>
@@ -382,7 +407,9 @@ function RouteComponent() {
                           checkout.mutate({ plan: p.plan, interval })
                         }
                       >
-                        {checkout.isPending ? "Starting…" : `Choose ${p.name}`}
+                        {checkout.isPending
+                          ? t("billing:starting")
+                          : t("billing:chooseNamedPlan", { name: p.name })}
                       </Button>
                     </div>
                   );
@@ -391,9 +418,7 @@ function RouteComponent() {
             </div>
 
             <p className="text-muted-foreground text-xs">
-              {canManage
-                ? "Payments are securely processed by Creem. Prices exclude tax where applicable."
-                : "Only workspace owners and admins can manage billing."}
+              {canManage ? t("billing:processor") : t("billing:ownersOnly")}
             </p>
           </div>
         ) : null}

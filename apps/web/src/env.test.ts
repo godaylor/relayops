@@ -1,4 +1,3 @@
-import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -16,10 +15,7 @@ describe("runtime environment replacement", () => {
       `const configured = "https://example.com";`,
     ].join("\n");
 
-    const result = execFileSync("sed", ["-E", `s#${placeholderPattern}#""#g`], {
-      input: bundle,
-      encoding: "utf8",
-    });
+    const result = bundle.replace(new RegExp(placeholderPattern, "g"), '""');
 
     expect(result).not.toContain("KANEO_TURNSTILE_SITE_KEY");
     expect(result).toContain(`const required = "KANEO_API_URL";`);

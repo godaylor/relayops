@@ -38,10 +38,12 @@ export default defineConfig({
       : []),
   ],
   server: {
-    host: true,
+    host: "127.0.0.1",
     hmr: true,
-    port: 5173,
+    port: Number(process.env.RELAYOPS_WEB_PORT ?? 32000),
+    strictPort: true,
   },
+  preview: { host: "127.0.0.1", port: 32070, strictPort: true },
   optimizeDeps: {
     exclude: ["better-auth"],
   },

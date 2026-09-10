@@ -40,18 +40,17 @@ if [ ! -z "$KANEO_CLIENT_URL" ]; then
   echo "✅ Replaced KANEO_CLIENT_URL with $KANEO_CLIENT_URL"
 fi
 
-# Process any other KANEO_ prefixed environment variables (for future extensibility)
-# Exclude the ones we've already processed
-for key in $(env | grep '^KANEO_' | grep -v 'KANEO_API_URL\|KANEO_CLIENT_URL' | cut -d= -f1); do
-  value=$(printenv "$key")
+# Only explicitly public browser configuration may enter the static bundle.
+for key in KANEO_TURNSTILE_SITE_KEY KANEO_SENTRY_DSN; do
+  value=$(printenv "$key" || true)
   
   if [ ! -z "$value" ]; then
-    echo "Found $key: $value"
+    echo "Configuring public browser option $key"
     
     # Only process files that contain this specific key
     find /usr/share/nginx/html -type f \( -name "*.js" -o -name "*.css" \) -exec grep -l "$key" {} \; | xargs -r sed -i "s#$key#$value#g"
     
-    echo "✅ Replaced $key with $value"
+    echo "Configured $key"
   fi
 done
 

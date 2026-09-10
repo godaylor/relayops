@@ -12,7 +12,8 @@ vi.mock("@i18n/resources", async () => {
   };
 });
 
-const { i18n, preloadNamespaces } = await import("./index");
+const { getPersistedLocale, i18n, preloadNamespaces, resolveLocale } =
+  await import("./index");
 const resources = await import("@i18n/resources");
 
 describe("preloadNamespaces", () => {
@@ -32,5 +33,27 @@ describe("preloadNamespaces", () => {
     expect(
       (resources.loadLocale as ReturnType<typeof vi.fn>).mock.calls.length,
     ).toBe(callsBefore);
+  });
+});
+
+describe("public locale policy", () => {
+  it("defaults unknown and legacy locale values to Russian", () => {
+    expect(resolveLocale()).toBe("ru-RU");
+    expect(resolveLocale("de-DE")).toBe("ru-RU");
+    expect(resolveLocale("unknown-locale")).toBe("ru-RU");
+  });
+
+  it("accepts only public RU and EN selections", () => {
+    expect(resolveLocale("ru")).toBe("ru-RU");
+    expect(resolveLocale("en-GB")).toBe("en-US");
+    expect(resolveLocale("en-US")).toBe("en-US");
+  });
+
+  it("lets an unknown persisted locale force the Russian fallback", () => {
+    window.localStorage.setItem("relayops.locale", "de-DE");
+
+    expect(resolveLocale(getPersistedLocale(), "en-US")).toBe("ru-RU");
+
+    window.localStorage.removeItem("relayops.locale");
   });
 });
