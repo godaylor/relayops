@@ -3,7 +3,7 @@
 **Дата:** 2026-09-10 (Europe/Moscow)  
 **Baseline:** Kaneo 2.22.0, `8100f3b1ab47a0b49c7ac6deabe64eb0d1d9970d`  
 **Проверяемое состояние:** branch `codex/relayops-publication-prep`, рабочее дерево поверх неизменённого upstream `origin/main`  
-**Вердикт:** обязательные локальные mobile/OpenAPI/Helm исправления выполнены и проверены в новых локальных артефактах. Публичная публикация остаётся заблокирована внешними/ручными действиями ниже. Основной runtime на 32000 не обновлялся; проверочный экземпляр на 32041 остановлен после проверок.
+**Вердикт:** обязательные локальные mobile/OpenAPI/Helm исправления выполнены и проверены в новых локальных артефактах. Публичный статический portfolio demo опубликован на GitHub Pages; production runtime и перечисленные ручные gates остаются отдельными задачами. Основной runtime на 32000 не обновлялся; проверочный экземпляр на 32041 остановлен после проверок.
 
 ## Что можно демонстрировать сейчас
 
@@ -13,6 +13,7 @@
 - Техническую глубину: optimistic concurrency, append-only incident timeline, transactional outbox, optional Redis fan-out, API-authoritative capabilities, idempotent signed ingestion, analytics на 100k incidents/1M events, upgrade/fresh migrations и strangler-переход без удаления legacy data.
 - Desktop-внешний вид: самостоятельная тёмная «операционная» оболочка с Live Incident Clock Rail, компактными таблицами и явным состоянием соединения. Сохранённый screenshot Workbench проверен визуально; это уже не IA проекта/задач Kaneo.
 - Портфолио-страницу на RU и EN. RU desktop и mobile выглядят цельно, без горизонтального overflow; provenance и ссылки на notices/upstream видимы.
+- Публичный статический demo: https://godaylor.github.io/relayops/ (GitHub Pages, RU/EN).
 
 Нельзя демонстрировать как готовое: публичный production deployment, Kubernetes runtime, реальные OAuth/SMTP/billing/integration callbacks и коммерчески очищенный бренд.
 
@@ -80,27 +81,27 @@
 
 Source candidate artifacts/relayops-source-candidate.tar.gz пересоздан с актуальным FINAL_AUDIT.md, source SBOM/review и file-hash manifest. Hash и число файлов записаны отдельно в .local/audit-fix-source-candidate.json; архив проверен на включение актуального аудита и исключение private local state/Planka importer. Это review package, не clean commit или разрешение на публикацию.
 
-Основной relayops:local и сохранённые пользовательские данные не заменялись. Test fixtures созданы только в verify stack на 32040/32041; stack остановлен после проверок. Временные контейнеры для извлечения licenses удалены по конкретным IDs. Созданы шесть локальных commits; push, tag, PR и deploy не выполнялись.
+Основной relayops:local и сохранённые пользовательские данные не заменялись. Test fixtures созданы только в verify stack на 32040/32041; stack остановлен после проверок. Временные контейнеры для извлечения licenses удалены по конкретным IDs. Создано одиннадцать логичных commits поверх baseline; push выполнен в `publication/main`, статический Pages demo развёрнут, tag и PR не создавались.
 
 
 ## Publication preparation — 2026-09-10
 
-- Создана отдельная ветка `codex/relayops-publication-prep` с шестью смысловыми коммитами поверх неизменённого baseline commit; существующая история не переписывалась.
+- Создана отдельная ветка `codex/relayops-publication-prep` с одиннадцатью логичными коммитами поверх неизменённого baseline commit; существующая история не переписывалась.
 - Точный Git index проверен Gitleaks 8.30.1 (container digest `sha256:c00b6ae320ec3720ee2b70d30dd271f0bf5879910996e64c430113053239ef69`): `13.02 MB`, **0 leaks**.
 - Точный Git index проверен Semgrep 1.175.1 (`p/default`, затем severity `ERROR`). Найденные ошибки mutable GitHub Actions, `secrets: inherit`, AES-GCM без явной длины tag и insecure WebSocket test fixture устранены; повторная целевая проверка последнего файла дала **0 findings**. Legacy INFO/WARNING и parser warnings остаются review evidence, а не скрываются allowlist-ом.
 - Добавлен fail-closed GitHub security workflow: Gitleaks, CodeQL `security-extended` и dependency review. Все используемые внешние Actions закреплены на immutable commit SHA; workflow с ненужными правами и upstream publish/notification automation удалены.
 - GitHub-сеанс в браузере аутентифицирован как `godaylor`; `gh` не установлен. Public repository `godaylor/relayops` создан после явного подтверждения владельца; remote `publication` добавлен, upstream `origin` не менялся.
-- Gitleaks повторно проверил диапазон `8100f3b1..HEAD`: **6 commits, 3.05 MB, 0 leaks**.
+- Gitleaks повторно проверил диапазон `8100f3b1..HEAD`: **11 commits, 3.05 MB, 0 leaks**.
 
 ## Обязательные исправления до публикации
 
 | Приоритет | Проблема | Доказательство | Минимальное исправление |
 |---|---|---|---|
-| P0 | Независимые scans требуют подтверждения в clean GitHub CI | Локальные Gitleaks/Semgrep scans завершены и критичные findings исправлены; CodeQL/dependency-review ещё не выполнялись на GitHub runner. | После создания собственного repository дождаться green security workflow и сохранить ссылку на run. |
+| RESOLVED | Независимые scans требуют подтверждения в clean GitHub CI | Security workflow `34477531894` для публикационного HEAD завершён успешно; локальные Gitleaks/Semgrep scans также завершены. | При дальнейших изменениях повторять Security workflow и сохранять ссылку на run. |
 | DEFERRED | Manual accessibility gate отложен владельцем | Manual screen-reader/assistive-technology pass не выполнялся; это явно разрешено для текущего portfolio/demo. Автоматические axe/keyboard/zoom проверки не закрывают требование PLAN/ROP-013. | Выполнить NVDA/VoiceOver-проход перед production-quality release. |
 | P0 | Publication digests ещё не выбраны | Локальная stale-evidence проблема закрыта: новые image IDs совпадают со scanned IDs; SBOM/license inventory обновлены. Это не выбранные публичные digests. | Подтвердить соответствие выбранных publication artifacts проверенным IDs; при rebuild повторить SBOM/licenses/Trivy и выполнить независимый secret scan. |
-| OPEN | Push и Pages deploy не завершены | `godaylor/relayops` создан и public; `publication` remote настроен, но терминал получает timeout при подключении к `github.com:443`. | Повторить push из среды с рабочим HTTPS egress, затем включить Pages variables и дождаться green CI/security. |
-| P0 | Публикационная Git-история ещё не подтверждена удалённым CI | Локальная ветка содержит шесть смысловых commits поверх исходного Kaneo без переписывания истории; Gitleaks commit-range scan: 0 leaks. | Выполнить CI после push в собственный repository; никогда не отправлять эту ветку в upstream. |
+| RESOLVED | Push и Pages deploy | `godaylor/relayops` создан и public; `publication/main` содержит HEAD. Pages source — GitHub Actions, runs `34475140732` и `34475695046` завершены успешно, demo доступен по https://godaylor.github.io/relayops/. | Для production выбрать отдельный runtime target; не отправлять эту ветку в upstream. |
+| RESOLVED | Публикационная Git-история | Публичная ветка содержит одиннадцать логичных commits поверх исходного Kaneo без переписывания истории; CI run `34477531950` и Security run `34477531894` для HEAD завершены успешно, Gitleaks commit-range scan: 0 leaks. | При дальнейших изменениях повторять CI; upstream `origin` не использовать. |
 | RESOLVED | Legacy Planka importer имеет отдельный holder notice | `packages/planka-import/LICENSE` сохранён без изменений; package private, снабжён scope NOTICE, исключён из RelayOps Docker/static/Helm/source-candidate artifacts и не выдаётся за новый код. | Не удалять и не заменять исходный notice; не публиковать этот private package как RelayOps npm artifact. |
 | P1 | Не выполнен реальный target deployment | Нет Kubernetes runtime, production restore/upgrade, public DNS/HTTPS/WSS и manual release workflow dry-run в собственном repo. | Проверить только выбранные поддерживаемые поверхности на целевом окружении; если Helm заявляется поддерживаемым — выполнить cluster smoke и PVC/upgrade review. |
 
@@ -174,13 +175,13 @@ Source candidate artifacts/relayops-source-candidate.tar.gz пересоздан
 - Назначенные порты из `RELEASE_PREFLIGHT.md` сохранены. Во время финального среза из RelayOps host-published только `32000`; PostgreSQL `relayops-postgres-1` остаётся internal-only и healthy. Другие проекты/контейнеры не останавливались.
 - Сохранённый volume и backups не трогались; `.env`, database rows, uploads и credentials не изменялись.
 - Windows browser automation дважды не стартовала из-за sandbox error `apply deny-read ACLs`. Поэтому desktop оценка основана на свежих сохранённых screenshots и browser logs, а недостающий mobile app pass выполнен отдельным headless Chromium read-only context.
-- Manual screen-reader review отложен по явному разрешению владельца; GitHub-hosted security runs и public deployment не выполнялись из-за недоступного terminal HTTPS egress. Независимые локальные Gitleaks/Semgrep scans завершены; live optional integrations и Kubernetes runtime не заявляются частью статического demo-deploy.
+- Manual screen-reader review отложен по явному разрешению владельца; это production gate, не блокер статического demo. GitHub-hosted Security и Pages deployment завершены; live optional integrations и Kubernetes runtime не заявляются частью статического demo-deploy.
 - Source candidate и image inventories обновлены для этих исправлений. После будущих изменений их потребуется пересоздать; текущий архив не доказывает соответствие будущему commit/publication digest.
 
-## Оставшийся путь к публикации
+## Оставшийся путь к production-релизу
 
 1. Сохранить manual NVDA/VoiceOver pass как отложенный production gate; выполнить его перед production release.
-2. Повторить push в уже созданный public repository под аутентифицированным GitHub owner `godaylor`, без изменения прежней истории.
-3. Включить fail-closed Pages variables, дождаться green CI/security workflows и проверить статический demo по выданному HTTPS URL.
-4. Images/chart/full runtime остаются отдельным production release: для них потребуются актуальные digests, target secrets, restore/upgrade и Kubernetes checks. Статический Pages demo их не заявляет.
+2. Для production выбрать и проверить target runtime, секреты, backup/restore, HTTPS/WSS, OAuth/SMTP/billing callbacks и Kubernetes/Helm upgrade path.
+3. При публикации images/chart повторить artifact-level SBOM/license/Trivy checks на фактических digests и выполнить ручной release dry-run.
+4. Статический Pages demo уже опубликован и не заявляет production runtime.
 

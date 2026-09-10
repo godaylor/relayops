@@ -123,5 +123,5 @@ assert.equal(
 );
 console.log("Local source preflight: PASS. This is not release approval.");
 console.log(
-  "Manual accessibility review is deferred by explicit owner approval for the demo; push and Pages verification require an available GitHub HTTPS channel.",
+  "Manual accessibility review is deferred by explicit owner approval for the demo; the static Pages demo is published, while production release gates remain open.",
 );

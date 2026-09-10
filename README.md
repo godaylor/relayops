@@ -40,6 +40,8 @@ GitHub Actions запускают lint, i18n, typecheck, unit/integration tests,
 
 Статическая RU/EN portfolio-страница из `apps/site` публикуется бесплатно через GitHub Pages. Workflow автоматически учитывает подпуть project Pages (`/<repository>/`) и не выдаёт локальный runtime за публичное приложение. Если приложение действительно развернуто отдельно, задайте repository variable `RELAYOPS_APP_URL` его публичным HTTPS URL. Сам RelayOps runtime требует PostgreSQL и публикуется отдельно через Docker/Compose или Helm; GitHub Pages размещает только статическое портфолио.
 
+Публичное demo: [godaylor.github.io/relayops](https://godaylor.github.io/relayops/).
+
 ### Ключи шифрования секретов
 
 - `NOTIFICATION_SECRET_ENCRYPTION_KEY` задаёт текущий ключ для секретов каналов уведомлений; `NOTIFICATION_SECRET_ENCRYPTION_KEY_ID` задаёт его идентификатор. Старые ключи на время ротации передаются JSON-объектом `NOTIFICATION_SECRET_DECRYPTION_KEYS` в формате `{"old-key-id":"old-secret"}`.
