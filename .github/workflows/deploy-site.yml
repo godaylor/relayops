@@ -1,5 +1,7 @@
 name: Deploy Site to GitHub Pages
 
+# The demo release is intentionally opt-in through repository variables.
+
 on:
   push:
     branches: [main]
@@ -13,7 +15,7 @@ on:
       - "LICENSE-RELAYOPS"
       - "NOTICE"
       - ".github/workflows/deploy-site.yml"
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 permissions:
   contents: read
