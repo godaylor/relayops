@@ -85,21 +85,21 @@ Source candidate artifacts/relayops-source-candidate.tar.gz пересоздан
 
 ## Publication preparation — 2026-09-10
 
-- Создана отдельная ветка `codex/relayops-publication-prep` с пятью смысловыми коммитами поверх неизменённого baseline commit; существующая история не переписывалась.
+- Создана отдельная ветка `codex/relayops-publication-prep` с шестью смысловыми коммитами поверх неизменённого baseline commit; существующая история не переписывалась.
 - Точный Git index проверен Gitleaks 8.30.1 (container digest `sha256:c00b6ae320ec3720ee2b70d30dd271f0bf5879910996e64c430113053239ef69`): `13.02 MB`, **0 leaks**.
 - Точный Git index проверен Semgrep 1.175.1 (`p/default`, затем severity `ERROR`). Найденные ошибки mutable GitHub Actions, `secrets: inherit`, AES-GCM без явной длины tag и insecure WebSocket test fixture устранены; повторная целевая проверка последнего файла дала **0 findings**. Legacy INFO/WARNING и parser warnings остаются review evidence, а не скрываются allowlist-ом.
 - Добавлен fail-closed GitHub security workflow: Gitleaks, CodeQL `security-extended` и dependency review. Все используемые внешние Actions закреплены на immutable commit SHA; workflow с ненужными правами и upstream publish/notification automation удалены.
-- GitHub-сеанс в браузере аутентифицирован как `godaylor`; `gh` не установлен. Собственный public remote не создавался до закрытия manual accessibility gate; upstream `origin` не менялся.
-- Gitleaks повторно проверил диапазон `8100f3b1..HEAD`: **5 commits, 3.03 MB, 0 leaks**.
+- GitHub-сеанс в браузере аутентифицирован как `godaylor`; `gh` не установлен. Public repository `godaylor/relayops` создан после явного подтверждения владельца; remote `publication` добавлен, upstream `origin` не менялся.
+- Gitleaks повторно проверил диапазон `8100f3b1..HEAD`: **6 commits, 3.05 MB, 0 leaks**.
 
 ## Обязательные исправления до публикации
 
 | Приоритет | Проблема | Доказательство | Минимальное исправление |
 |---|---|---|---|
 | P0 | Независимые scans требуют подтверждения в clean GitHub CI | Локальные Gitleaks/Semgrep scans завершены и критичные findings исправлены; CodeQL/dependency-review ещё не выполнялись на GitHub runner. | После создания собственного repository дождаться green security workflow и сохранить ссылку на run. |
-| P0 | Не завершён manual accessibility gate | Manual screen-reader/assistive-technology pass не выполнялся. Автоматические axe/keyboard/zoom проверки не закрывают требование PLAN/ROP-013. | Выполнить краткий NVDA/VoiceOver-проход основных сценариев, зафиксировать браузер/AT/результат и исправить blockers. |
+| DEFERRED | Manual accessibility gate отложен владельцем | Manual screen-reader/assistive-technology pass не выполнялся; это явно разрешено для текущего portfolio/demo. Автоматические axe/keyboard/zoom проверки не закрывают требование PLAN/ROP-013. | Выполнить NVDA/VoiceOver-проход перед production-quality release. |
 | P0 | Publication digests ещё не выбраны | Локальная stale-evidence проблема закрыта: новые image IDs совпадают со scanned IDs; SBOM/license inventory обновлены. Это не выбранные публичные digests. | Подтвердить соответствие выбранных publication artifacts проверенным IDs; при rebuild повторить SBOM/licenses/Trivy и выполнить независимый secret scan. |
-| P0 | Public repository и Pages ещё не созданы | GitHub owner `godaylor` аутентифицирован; `origin` всё ещё `https://github.com/usekaneo/kaneo.git`; release guards намеренно запрещают upstream. | После manual AT создать отдельный public repository/remote, включить fail-closed Pages variables, дождаться green CI/security и проверить выданный HTTPS URL. |
+| OPEN | Push и Pages deploy не завершены | `godaylor/relayops` создан и public; `publication` remote настроен, но терминал получает timeout при подключении к `github.com:443`. | Повторить push из среды с рабочим HTTPS egress, затем включить Pages variables и дождаться green CI/security. |
 | P0 | Публикационная Git-история ещё не подтверждена удалённым CI | Локальная ветка содержит шесть смысловых commits поверх исходного Kaneo без переписывания истории; Gitleaks commit-range scan: 0 leaks. | Выполнить CI после push в собственный repository; никогда не отправлять эту ветку в upstream. |
 | RESOLVED | Legacy Planka importer имеет отдельный holder notice | `packages/planka-import/LICENSE` сохранён без изменений; package private, снабжён scope NOTICE, исключён из RelayOps Docker/static/Helm/source-candidate artifacts и не выдаётся за новый код. | Не удалять и не заменять исходный notice; не публиковать этот private package как RelayOps npm artifact. |
 | P1 | Не выполнен реальный target deployment | Нет Kubernetes runtime, production restore/upgrade, public DNS/HTTPS/WSS и manual release workflow dry-run в собственном repo. | Проверить только выбранные поддерживаемые поверхности на целевом окружении; если Helm заявляется поддерживаемым — выполнить cluster smoke и PVC/upgrade review. |
@@ -174,13 +174,13 @@ Source candidate artifacts/relayops-source-candidate.tar.gz пересоздан
 - Назначенные порты из `RELEASE_PREFLIGHT.md` сохранены. Во время финального среза из RelayOps host-published только `32000`; PostgreSQL `relayops-postgres-1` остаётся internal-only и healthy. Другие проекты/контейнеры не останавливались.
 - Сохранённый volume и backups не трогались; `.env`, database rows, uploads и credentials не изменялись.
 - Windows browser automation дважды не стартовала из-за sandbox error `apply deny-read ACLs`. Поэтому desktop оценка основана на свежих сохранённых screenshots и browser logs, а недостающий mobile app pass выполнен отдельным headless Chromium read-only context.
-- Manual screen-reader review, GitHub-hosted security runs и public deployment не выполнялись. Независимые локальные Gitleaks/Semgrep scans завершены; live optional integrations и Kubernetes runtime не заявляются частью статического demo-deploy.
+- Manual screen-reader review отложен по явному разрешению владельца; GitHub-hosted security runs и public deployment не выполнялись из-за недоступного terminal HTTPS egress. Независимые локальные Gitleaks/Semgrep scans завершены; live optional integrations и Kubernetes runtime не заявляются частью статического demo-deploy.
 - Source candidate и image inventories обновлены для этих исправлений. После будущих изменений их потребуется пересоздать; текущий архив не доказывает соответствие будущему commit/publication digest.
 
 ## Оставшийся путь к публикации
 
-1. Выполнить обязательный manual NVDA/VoiceOver pass основных сценариев и сохранить результат.
-2. Создать public repository под аутентифицированным GitHub owner `godaylor`, добавить отдельный remote и push reviewable commits без изменения прежней истории.
+1. Сохранить manual NVDA/VoiceOver pass как отложенный production gate; выполнить его перед production release.
+2. Повторить push в уже созданный public repository под аутентифицированным GitHub owner `godaylor`, без изменения прежней истории.
 3. Включить fail-closed Pages variables, дождаться green CI/security workflows и проверить статический demo по выданному HTTPS URL.
 4. Images/chart/full runtime остаются отдельным production release: для них потребуются актуальные digests, target secrets, restore/upgrade и Kubernetes checks. Статический Pages demo их не заявляет.
 
