@@ -91,7 +91,7 @@ Source candidate artifacts/relayops-source-candidate.tar.gz пересоздан
 - Точный Git index проверен Semgrep 1.175.1 (`p/default`, затем severity `ERROR`). Найденные ошибки mutable GitHub Actions, `secrets: inherit`, AES-GCM без явной длины tag и insecure WebSocket test fixture устранены; повторная целевая проверка последнего файла дала **0 findings**. Legacy INFO/WARNING и parser warnings остаются review evidence, а не скрываются allowlist-ом.
 - Добавлен fail-closed GitHub security workflow: Gitleaks, CodeQL `security-extended` и dependency review. Все используемые внешние Actions закреплены на immutable commit SHA; workflow с ненужными правами и upstream publish/notification automation удалены.
 - GitHub-сеанс в браузере аутентифицирован как `godaylor`; `gh` не установлен. Public repository `godaylor/relayops` создан после явного подтверждения владельца; remote `publication` добавлен, upstream `origin` не менялся.
-- Gitleaks повторно проверил диапазон `8100f3b1..HEAD`: **11 commits, 3.05 MB, 0 leaks**.
+- Gitleaks повторно проверил диапазон `8100f3b1..HEAD`: **0 leaks**.
 
 ## Обязательные исправления до публикации
 
