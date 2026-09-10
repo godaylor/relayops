@@ -59,6 +59,7 @@ apps/web/.tanstack/
 
 # RelayOps local runtime, backups and verification artifacts
 .local/
+.env.production
 .codex-temp/
 artifacts/
 .agents/skills/verify/

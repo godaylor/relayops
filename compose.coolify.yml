@@ -1,7 +1,7 @@
 # RelayOps on Coolify
 #
 # Deploy this stack from a Git source with Coolify's "Docker Compose" build pack:
-#   Repository -> your own RelayOps repository (not selected yet)
+#   Repository -> https://github.com/godaylor/relayops
 #   Build Pack: Docker Compose | Base Directory: / | Compose Location: compose.coolify.yml
 #
 # Assign your chosen domain to the compatibility-named "kaneo" service using container port 5173.
@@ -31,6 +31,8 @@ services:
   kaneo:
     # Back up data and keyrings before the API applies startup migrations.
     image: ${RELAYOPS_IMAGE:?Set your own verified RelayOps image and immutable tag}
+    volumes:
+      - uploads:/app/apps/api/data
     environment:
       - KANEO_CLIENT_URL=${KANEO_CLIENT_URL:?}
       - AUTH_SECRET=${SERVICE_HEX_64_KANEO:?}
@@ -42,6 +44,7 @@ services:
       - POSTGRES_DB=kaneo
       - POSTGRES_USER=kaneo
       - POSTGRES_PASSWORD=${SERVICE_PASSWORD_POSTGRES}
+      - DISABLE_EMAIL_OTP_SIGN_IN=true
       # Optional: SMTP_*, SSO providers, GitHub integration, Sentry, Redis...
       # add them here or in the Coolify UI for the kaneo service.
     depends_on:
@@ -57,3 +60,4 @@ services:
 
 volumes:
   postgres_data:
+  uploads:

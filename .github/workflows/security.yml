@@ -48,8 +48,7 @@ jobs:
         uses: github/codeql-action/analyze@311b4ee155dcdab395044f00946f664bd51ff173 # v4
 
   dependency-review:
-    name: Dependency review
-    if: github.event_name == 'pull_request'
+    name: Dependency audit
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -59,7 +58,17 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Review dependency changes
-        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
+      # Audit the entire frozen lockfile, including development tools, without
+      # requiring GitHub's optional Dependency graph repository feature.
+      - name: Setup pnpm
+        uses: pnpm/action-setup@f520eceda224fe1a4aed5a2a27a194379a409996 # v6
         with:
-          fail-on-severity: high
+          version: 10.32.1
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24.19.0
+      - name: Resolve the frozen dependency graph without lifecycle scripts
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Reject high and critical dependency advisories
+        run: pnpm audit --audit-level high

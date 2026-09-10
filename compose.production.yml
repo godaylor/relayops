@@ -1,0 +1,62 @@
+name: relayops-production
+services:
+  gateway:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "${RELAYOPS_HTTP_PORT:-80}:80"
+      - "${RELAYOPS_HTTPS_PORT:-443}:443"
+    environment:
+      RELAYOPS_DOMAIN: ${RELAYOPS_DOMAIN:?Set the public hostname}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.kaneo
+      args:
+        RELAYOPS_SOURCE_URL: https://github.com/godaylor/relayops
+        RELAYOPS_REVISION: ${RELAYOPS_REVISION:-local}
+    restart: unless-stopped
+    environment:
+      KANEO_CLIENT_URL: https://${RELAYOPS_DOMAIN:?}
+      CORS_ORIGINS: https://${RELAYOPS_DOMAIN:?}
+      AUTH_SECRET: ${AUTH_SECRET:?Set a persistent random secret}
+      NOTIFICATION_SECRET_ENCRYPTION_KEY: ${NOTIFICATION_SECRET_ENCRYPTION_KEY:?}
+      RELAYOPS_WEBHOOK_ENCRYPTION_KEY: ${RELAYOPS_WEBHOOK_ENCRYPTION_KEY:?}
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: relayops
+      POSTGRES_USER: relayops
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      DISABLE_EMAIL_OTP_SIGN_IN: "true"
+    volumes:
+      - uploads:/app/apps/api/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: relayops
+      POSTGRES_USER: relayops
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U relayops -d relayops"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+volumes:
+  postgres_data:
+  uploads:
+  caddy_data:
+  caddy_config:

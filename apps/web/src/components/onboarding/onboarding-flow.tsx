@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Trans, useTranslation } from "react-i18next";
 import { z } from "zod/v4";
@@ -50,12 +50,14 @@ export function OnboardingFlow() {
   const queryClient = useQueryClient();
   const { mutateAsync: createWorkspace, isPending } = useCreateWorkspace();
   const { user } = useAuth();
+  const createdWorkspace = useRef<{ id: string; name: string } | null>(null);
 
   const workspaceSchema = useMemo(
     () =>
       z.object({
         name: z
           .string()
+          .trim()
           .min(1, t("auth:onboarding.validation.workspaceNameRequired")),
         description: z.string().optional(),
       }),
@@ -70,35 +72,32 @@ export function OnboardingFlow() {
     },
   });
 
-  const onSubmit = async (
-    data: WorkspaceFormValues,
-    productMode: "legacy" | "relayops",
-  ) => {
+  const onSubmit = async (data: WorkspaceFormValues) => {
     try {
-      const workspace = await createWorkspace({
-        name: data.name.trim(),
-        description: data.description?.trim() || "",
-        userId: user?.id,
-      });
+      // Activation can fail after creation succeeds; retry the existing workspace.
+      const workspace =
+        createdWorkspace.current ??
+        (await createWorkspace({
+          name: data.name.trim(),
+          description: data.description?.trim() || "",
+          userId: user?.id,
+        }));
+      createdWorkspace.current = workspace;
 
       await queryClient.invalidateQueries({ queryKey: ["workspaces"] });
-      await authClient.organization.setActive({
+      const active = await authClient.organization.setActive({
         organizationId: workspace.id,
       });
-      if (productMode === "relayops") {
-        await activateRelayOpsWorkspace(workspace.id);
-      }
-      setCreatedWorkspaceName(data.name);
+      if (active.error) throw new Error(active.error.message);
+      await activateRelayOpsWorkspace(workspace.id);
+      setCreatedWorkspaceName(workspace.name);
       toast.success(t("auth:onboarding.toast.workspaceCreated"));
 
       setStep("success");
 
       setTimeout(() => {
         navigate({
-          to:
-            productMode === "relayops"
-              ? "/relayops/$workspaceId"
-              : "/dashboard/workspace/$workspaceId",
+          to: "/relayops/$workspaceId",
           params: { workspaceId: workspace.id },
           replace: true,
         });
@@ -135,10 +134,7 @@ export function OnboardingFlow() {
         </div>
 
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit((data) => onSubmit(data, "relayops"))}
-            className="space-y-3"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
             <div className="space-y-3">
               <FormField
                 control={form.control}
@@ -184,21 +180,14 @@ export function OnboardingFlow() {
               />
             </div>
 
-            <Button type="submit" disabled={isPending} className="mt-4 w-full">
-              {isPending
+            <Button
+              type="submit"
+              disabled={form.formState.isSubmitting || isPending}
+              className="mt-4 w-full"
+            >
+              {form.formState.isSubmitting || isPending
                 ? t("auth:onboarding.creating")
                 : t("relayops:onboarding.createWorkspace")}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={isPending}
-              className="w-full"
-              onClick={() =>
-                void form.handleSubmit((data) => onSubmit(data, "legacy"))()
-              }
-            >
-              {t("auth:onboarding.createWorkspace")}
             </Button>
           </form>
         </Form>

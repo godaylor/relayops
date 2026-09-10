@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { CreateIncidentDialog } from "@/components/relayops/create-incident-dialog";
 import {
   RelayOpsErrorState,
   RelayOpsSkeleton,
@@ -206,7 +207,12 @@ function OperationsOverview() {
                 </p>
               ) : null}
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <CreateIncidentDialog
+                  workspaceId={workspaceId}
+                  serviceId={createdService.id}
+                />
                 <Button
+                  variant="outline"
                   size="lg"
                   disabled={
                     createDemo.isPending ||

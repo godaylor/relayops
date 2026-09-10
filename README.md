@@ -1,5 +1,7 @@
 # RelayOps
 
+[![CI](https://github.com/godaylor/relayops/actions/workflows/ci.yml/badge.svg)](https://github.com/godaylor/relayops/actions/workflows/ci.yml) [![Security](https://github.com/godaylor/relayops/actions/workflows/security.yml/badge.svg)](https://github.com/godaylor/relayops/actions/workflows/security.yml)
+
 RelayOps — self-hosted платформа для операционного реагирования на инциденты в реальном времени. Продукт строится вокруг модели **Service → Signal → Incident → неизменяемая Timeline** и сохраняет PostgreSQL как источник истины, Hono API как границу авторизации и WebSocket-события как механизм актуализации клиентов.
 
 Русский язык используется по умолчанию. Публичный переключатель `RU / EN` переводит пользовательский интерфейс целиком и сохраняет выбор после перезагрузки.
@@ -10,12 +12,31 @@ RelayOps — self-hosted платформа для операционного р
 
 ## Что входит в RelayOps
 
+- Создание обычного инцидента из любого рабочего экрана: сервис, название, severity, описание; безопасный повтор после сетевой ошибки;
 - Operations Overview с live incident clock rail;
 - server-filtered и virtualized Incident Workbench с URL-native состоянием;
 - Response Board с pointer, keyboard и menu parity;
 - Incident Room с append-only timeline, optimistic concurrency и realtime refetch;
 - Services, signed signal ingestion, role-aware analytics и API-authoritative RBAC;
 - single-instance режим без Redis, split web/API и optional Redis fan-out.
+
+## Основной сценарий
+
+Зарегистрируйтесь, создайте рабочую область и первый сервис. Нажмите «Создать инцидент», опишите проблему и выберите severity. В Incident Room публикуйте обновления и назначайте участников, управляйте состоянием через Response Board, завершите инцидент с описанием решения. Insights показывает показатели по сохранённой истории. Демо-данные необязательны.
+
+![Создание настоящего инцидента](docs/screenshots/create-incident.png)
+
+Снимок локального рабочего приложения с тестовыми данными. [Материалы для портфолио и статус production](PORTFOLIO_HANDOFF.md).
+
+## Фактический стек
+
+React, TypeScript, Vite, Tailwind CSS, Base UI/coss и сохранённые Radix-компоненты, TanStack Router/Query, dnd-kit, Framer Motion, Tiptap, i18next; Node.js, Hono, Zod/OpenAPI, Better Auth, Drizzle ORM, PostgreSQL, WebSockets и транзакционный outbox. Redis, S3, SMTP и внешние интеграции опциональны. Статическая информационная страница использует Next.js. Сборка — pnpm/Turborepo; проверки — Vitest, Playwright, axe, Biome, Gitleaks, CodeQL и pnpm audit; deployment — Docker Compose, Nginx и Caddy, альтернативно Coolify/Helm.
+
+Новый incident-domain, timeline/outbox, workbench, board, service/signal flows и analytics составляют собственную работу RelayOps. Auth/workspace infrastructure, часть UI, интеграции и legacy runtime унаследованы от Kaneo и сохраняют его MIT attribution. Проект не заявляется полностью написанным с нуля.
+
+## Рабочее приложение в интернете
+
+Подготовлена [инструкция публичного развёртывания](docs/PRODUCTION_DEPLOY.md) с `compose.production.yml`: HTTPS gateway, приложение и PostgreSQL, постоянные uploads и генерация секретов без их вывода. Публичный runtime пока не развёрнут; Pages URL ниже — только информационная страница. Локальные browser tests не являются проверкой production.
 
 ## Запуск для разработки
 

@@ -2208,8 +2208,14 @@
 			"year": "year"
 		},
 		"plans": {
-			"personal": { "name": "Personal", "tagline": "For individuals" },
-			"team": { "name": "Team", "tagline": "For teams working together" }
+			"personal": {
+				"name": "Personal",
+				"tagline": "For individuals"
+			},
+			"team": {
+				"name": "Team",
+				"tagline": "For teams working together"
+			}
 		},
 		"features": {
 			"singleUser": "Single user",
@@ -2298,8 +2304,11 @@
 			"summary": "Summary (optional)",
 			"severity": "Severity",
 			"serviceFirst": "Create the service first.",
-			"submit": "Create detected incident",
-			"error": "Incident could not be created. Try again."
+			"submit": "Create incident",
+			"error": "Incident could not be created. Try again.",
+			"description": "Record the problem and affected service. Decisions and changes are saved in the incident timeline.",
+			"servicesError": "Services could not be loaded.",
+			"chooseService": "Choose a service"
 		},
 		"severity": {
 			"unknown": "Unknown",

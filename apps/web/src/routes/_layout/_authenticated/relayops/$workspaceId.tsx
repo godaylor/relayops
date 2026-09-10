@@ -12,6 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import PageTitle from "@/components/page-title";
+import { CreateIncidentDialog } from "@/components/relayops/create-incident-dialog";
 import { RelayOpsLanguageSwitcher } from "@/components/relayops/language-switcher";
 import { LiveIncidentClockRail } from "@/components/relayops/live-incident-clock-rail";
 import {
@@ -246,6 +247,7 @@ function RelayOpsShell() {
           </Link>
           <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2 text-xs sm:justify-end">
             <RelayOpsLanguageSwitcher />
+            <CreateIncidentDialog workspaceId={workspaceId} />
             <Badge
               variant="outline"
               className="min-h-8 gap-2 bg-white dark:bg-[#101a18]"

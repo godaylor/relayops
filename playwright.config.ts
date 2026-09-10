@@ -23,5 +23,6 @@ export default defineConfig({
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     ...devices["Desktop Chrome"],
+    channel: process.env.PLAYWRIGHT_CHANNEL,
   },
 });

@@ -2214,9 +2214,12 @@
 			"name": "Incident title",
 			"serviceFirst": "Create the service first.",
 			"severity": "Severity",
-			"submit": "Create detected incident",
+			"submit": "Create incident",
 			"summary": "Summary (optional)",
-			"title": "2 · Detected incident"
+			"title": "2 · Detected incident",
+			"description": "Record the problem and affected service. Decisions and changes are saved in the incident timeline.",
+			"servicesError": "Services could not be loaded.",
+			"chooseService": "Choose a service"
 		},
 		"inspector": {
 			"authoritative": "API truth",

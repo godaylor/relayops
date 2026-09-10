@@ -1,5 +1,21 @@
 # RelayOps — release candidate preflight
 
+## Working-product continuation — 2026-09-11
+
+The current owner request authorizes product completion and public deployment preparation. Ordinary incident creation is now available through the UI, including a service-prefilled first-run form and a shared shell action. New registration creates RelayOps workspaces only; retrying failed workspace activation reuses the created workspace. The prior tables below remain historical evidence.
+
+- Git remotes corrected: `origin` is `godaylor/relayops`; Kaneo is retained as `upstream`. Local `main` was fast-forwarded to the personal repository state without rewriting history.
+- Repository About/Website/topics updated. Website explicitly points to the static information page until a public app URL exists.
+- Broken Dependency Review was caused by disabled GitHub Dependency graph. The workflow now audits the complete frozen dependency graph with `pnpm audit --audit-level high`, including development dependencies, on pushes and PRs. It does not suppress vulnerability failures.
+- Next.js, Hono, Tiptap, Nodemailer, sharp, js-yaml and selector-parser advisory updates are in the lockfile. Current audit: zero high/critical, two moderate development-tool advisories remain.
+- Full typecheck: 7 tasks. Unit: 808 tests, 10 tasks. Production build: 7 tasks. PostgreSQL integration: 261 passed, two opt-in performance tests skipped. Browser: 13/13 on the final bundled image, including commit-success/response-lost create retry with no duplicate incident. Biome: no errors, 71 warnings and 27 infos. i18n parity passes.
+- Bundled image `relayops:portfolio-current`: image config `sha256:a941a5a3cafaf29629f1457afc9bca1fd69831287fd09e9300c4299fb76be8e2`, manifest-list `sha256:6249ef7299e7dd3dd544ea6457f9cb06d8abd0c980fef872fa96285f948501ad`. Trivy scan reports zero HIGH/CRITICAL; it warned that Alpine 3.24 was absent from its EOL list. No claim of a scan of every severity is made.
+- Source SBOM/license manifest refreshed: 1468 packages, zero unresolved metadata. Root upstream license retained. Local source preflight passes.
+- `compose.production.yml` validates and provides HTTPS, PostgreSQL and persistent uploads; it has not run on a public host. Coolify uploads now persist too. Secret generation refuses overwrite and `.env.production` is ignored.
+- Local DB backup before app update: `.local/backups/relayops-2026-09-10T23-32-56.589Z.sql`, 38,249,007 bytes, SHA-256 `cadc58e6f94c427904d952a56161747d6b0d4e25e2a5daa8edd184430f40d6a3`.
+
+Current handoff and remaining public-host requirements: [PORTFOLIO_HANDOFF.md](PORTFOLIO_HANDOFF.md), [production deployment](docs/PRODUCTION_DEPLOY.md). The public runtime is still pending; local evidence must not be presented as production evidence.
+
 Final local-demo and publication verification record, updated 2026-09-10 (Europe/Moscow). The static portfolio demo is published on GitHub Pages. S13/S14 production-release gates remain PARTIAL for the explicitly listed checks and external decisions; this is not production approval.
 
 ## Publication preparation — 2026-09-10
