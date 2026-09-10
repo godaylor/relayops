@@ -4,10 +4,11 @@ Final local-demo verification record, updated 2026-09-10 (Europe/Moscow). Local 
 
 ## Publication preparation — 2026-09-10
 
-- Work now lives on `codex/relayops-publication-prep`, directly above unchanged baseline `8100f3b1`; no existing commit was rewritten.
+- Work now lives as five logical commits on `codex/relayops-publication-prep`, directly above unchanged baseline `8100f3b1`; no existing commit was rewritten.
 - Gitleaks 8.30.1 scanned the exact staged tree (13.02 MB) with zero leaks. Semgrep 1.175.1 scanned the same tree; all ERROR findings were fixed, with no broad secret allowlist.
 - GitHub Actions now includes pinned Gitleaks, CodeQL security-extended and dependency review jobs. External Actions are pinned to immutable commit SHAs; legacy upstream publishing/notification and over-privileged automation were removed.
 - GitHub publication is not authenticated on this machine: `gh` is unavailable and the browser session is signed out. `origin` therefore remains the upstream Kaneo repository and must not be used for push.
+- Gitleaks re-scanned the resulting `8100f3b1..HEAD` history: 5 commits, 3.03 MB, zero leaks.
 - Manual AT review, clean GitHub-hosted security runs, publication artifact digests, target runtime and the legacy Planka holder clarification remain open.
 
 ## Local audit fixes — 2026-09-09 follow-up
@@ -17,7 +18,7 @@ Mobile shell and OpenAPI/Helm guidance fixes are verified; see FINAL_AUDIT.md fo
 ## Scope and preserved state
 
 - Work is restricted to `E:\Projects\PetProjects\01-relayops`. Root rename is repaired, including stale Windows dependency junctions. Historical audit references and internal `@kaneo/*`, `KANEO_*`, `charts/kaneo` compatibility identifiers are intentional.
-- Branch `main`, original HEAD `8100f3b1ab47a0b49c7ac6deabe64eb0d1d9970d`. Pre-existing S0–S12 edits are preserved. No commit, push, tag, PR or external deployment has been performed.
+- Branch `codex/relayops-publication-prep` contains five local commits above original HEAD `8100f3b1ab47a0b49c7ac6deabe64eb0d1d9970d`. Pre-existing S0–S12 work is preserved. No push, tag, PR or external deployment has been performed.
 - Origin is still `https://github.com/usekaneo/kaneo.git`, **not a RelayOps publication destination**. Own GitHub, hosting and domain are not selected. Publishing workflows and release scripts fail closed until explicitly configured and approved.
 - Main website: `http://127.0.0.1:32000`, same-origin `/api`, no required Redis/SMTP/S3/billing. PostgreSQL and uploads are not host-published.
 - Existing PostgreSQL 15 data remains on volume `68810d3d5bdc68cea5168c7bbf7d0ebe13d09dd36790e2f0983cd58dae9df1be`. Old container `relayops-codex-s3-postgres` stays stopped: never start a second PostgreSQL against the same volume. No database major upgrade or destructive conversion.
@@ -84,7 +85,7 @@ Logs are local under `.local/`; distributable inventories/reports under ignored 
 - Legacy Planka CLI holder text remains `Copyright (c) 2026 Kaneo MCP contributors`. Local history traces the copied notice to MCP and the importer addition to upstream commit `5c91febe` by Andrej (2026-08-11); this is not authoritative correction of the holder. The original notice and CLI source remain untouched locally. The CLI is private, has no active publish workflow, is absent from Docker/static/Helm artifacts and is excluded from the source-candidate archive. Publishing that separate legacy CLI or the entire legacy repository requires explicit holder clarification; this does not disable any approved RelayOps product flow.
 
 - Manual screen-reader/assistive-technology review required by S10/S14; automated axe/keyboard/zoom is not a substitute.
-- Choose own GitHub repository and owner namespace; review local diff and authorize commit/push separately. Change origin only to the chosen destination; never publish upstream.
+- Choose own GitHub repository and owner namespace. Add a separate publication remote for the prepared branch; never publish it to upstream `origin`.
 - Choose hosting, database/storage/backup policy and public URL. Supply production secrets through the chosen secret manager, preserve encryption keyrings, set exact client/API/CORS/OAuth URLs, verify HTTPS/WSS, DNS and restore/upgrade on the target environment.
 - Run GitHub CI and the manual release workflow's dry-run in the chosen repository. Public image/tag/chart/site publication requires separate explicit approval after all gates pass.
 - The RelayOps name is approved only for noncommercial portfolio/demo. Formal trademark/domain review remains required for commercial/full-production name/domain/package/image publication; no legal clearance is claimed.

@@ -26,12 +26,13 @@ env:
 
 jobs:
   validate:
+    if: ${{ github.repository != 'usekaneo/kaneo' && vars.RELAYOPS_PUBLISH_ENABLED == 'true' && vars.RELAYOPS_RELEASE_APPROVED == 'true' }}
     permissions:
       contents: read
     uses: ./.github/workflows/helm-validate.yml
 
   publish:
-    if: inputs.version != ''
+    if: ${{ github.repository != 'usekaneo/kaneo' && vars.RELAYOPS_PUBLISH_ENABLED == 'true' && vars.RELAYOPS_RELEASE_APPROVED == 'true' && (inputs.version != '') }}
     runs-on: ubuntu-24.04
     needs: validate
     permissions:
@@ -66,11 +67,11 @@ jobs:
       - name: Publish chart
         run: |
           OWNER="${GITHUB_REPOSITORY_OWNER,,}"
-          CHART_REF="oci://$REGISTRY/$OWNER/charts/kaneo"
+          CHART_REF="oci://$REGISTRY/$OWNER/charts/relayops"
 
           if helm show chart "$CHART_REF" --version "$CHART_VERSION" >/dev/null 2>&1; then
             echo "Chart $CHART_REF:$CHART_VERSION already exists; skipping publish."
             exit 0
           fi
 
-          helm push dist/kaneo-"$CHART_VERSION".tgz "oci://$REGISTRY/$OWNER/charts"
+          helm push dist/relayops-"$CHART_VERSION".tgz "oci://$REGISTRY/$OWNER/charts"

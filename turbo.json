@@ -1,6 +1,21 @@
 {
 	"$schema": "https://turbo.build/schema.json",
 	"ui": "tui",
+	"globalEnv": ["VITE_*", "NEXT_PUBLIC_*"],
+	"globalPassThroughEnv": [
+		"PORT",
+		"HOST",
+		"KANEO_*",
+		"RELAYOPS_*",
+		"DATABASE_URL",
+		"POSTGRES_*",
+		"AUTH_SECRET",
+		"CORS_ORIGINS",
+		"DISABLE_*",
+		"SMTP_*",
+		"REDIS_*",
+		"NOTIFICATION_SECRET_ENCRYPTION_KEY"
+	],
 	"tasks": {
 		"build": {
 			"dependsOn": ["^build"],

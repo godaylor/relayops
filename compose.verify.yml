@@ -1,0 +1,34 @@
+name: relayops-verify
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: relayops-local-verification-only
+      POSTGRES_DB: relayops_verify_test
+    ports:
+      - "127.0.0.1:${RELAYOPS_TEST_DB_PORT:-32040}:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d relayops_verify_test"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+  app:
+    image: relayops:local
+    ports:
+      - "127.0.0.1:${RELAYOPS_TEST_WEB_PORT:-32041}:5173"
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: relayops-local-verification-only
+      POSTGRES_DB: relayops_verify_test
+      AUTH_SECRET: relayops-verification-only-not-a-production-secret-123
+      NOTIFICATION_SECRET_ENCRYPTION_KEY: "1111111111111111111111111111111111111111111111111111111111111111"
+      RELAYOPS_WEBHOOK_ENCRYPTION_KEY: "hex:1111111111111111111111111111111111111111111111111111111111111111"
+      KANEO_CLIENT_URL: http://127.0.0.1:${RELAYOPS_TEST_WEB_PORT:-32041}
+      DISABLE_EMAIL_OTP_SIGN_IN: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy

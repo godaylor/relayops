@@ -1,8 +1,9 @@
 {
 	"name": "@kaneo/mcp",
+	"private": true,
 	"version": "0.1.11",
 	"mcpName": "io.github.usekaneo/kaneo",
-	"description": "Official MCP (Model Context Protocol) server for Kaneo, the open source project management platform: manage tasks, projects, and labels from Claude, Cursor, and other MCP clients",
+	"description": "Legacy Kaneo MCP compatibility package retained by RelayOps; not an official RelayOps incident API and not independently published",
 	"license": "MIT",
 	"author": "Kaneo (https://kaneo.app)",
 	"homepage": "https://kaneo.app/docs/core/integrations/mcp",

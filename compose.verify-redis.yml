@@ -1,0 +1,24 @@
+# Optional, disposable S14 two-instance/failure/recovery test topology.
+services:
+  redis:
+    image: redis:8.2.1-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  app:
+    environment:
+      REDIS_URL: redis://redis:6379
+      CORS_ORIGINS: http://127.0.0.1:32041,http://127.0.0.1:32060
+  secondary:
+    extends:
+      file: compose.verify.yml
+      service: app
+    ports: !override
+      - "127.0.0.1:32060:5173"
+    environment:
+      REDIS_URL: redis://redis:6379
+      KANEO_CLIENT_URL: http://127.0.0.1:32060
+      CORS_ORIGINS: http://127.0.0.1:32041,http://127.0.0.1:32060

@@ -1,59 +1,47 @@
+# Split web/API alternative; stop the bundled RelayOps website before using this file.
+name: relayops
 services:
   postgres:
-    image: postgres:16-alpine
-    env_file:
-      - .env.local
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U kaneo -d kaneo"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
+    extends:
+      file: compose.yml
+      service: postgres
   api:
+    image: relayops-api:local
     build:
       context: .
       dockerfile: apps/api/Dockerfile
     ports:
-      - "1337:1337"
-    env_file:
-      - .env.local
+      - "127.0.0.1:${RELAYOPS_API_PORT:-32001}:1337"
+    env_file: .env
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      PORT: "1337"
+      HOST: "0.0.0.0"
+      KANEO_API_URL: http://127.0.0.1:${RELAYOPS_API_PORT:-32001}
+      KANEO_CLIENT_URL: ${RELAYOPS_PUBLIC_URL:-http://127.0.0.1:32000}
+      CORS_ORIGINS: ${RELAYOPS_PUBLIC_URL:-http://127.0.0.1:32000}
+    volumes:
+      - uploads:/app/apps/api/data
     depends_on:
       postgres:
         condition: service_healthy
-    restart: unless-stopped
-
-#  Optional
-#  redis:
-#    image: valkey/valkey
-#    ports:
-#      - "6379:6379"
-
   web:
+    image: relayops-web:local
     build:
       context: .
       dockerfile: apps/web/Dockerfile
     ports:
-      - "5173:5173"
-    env_file:
-      - .env.local
+      - "127.0.0.1:${RELAYOPS_WEB_PORT:-32000}:5173"
+    environment:
+      KANEO_API_URL: http://127.0.0.1:${RELAYOPS_API_PORT:-32001}
+      KANEO_CLIENT_URL: ${RELAYOPS_PUBLIC_URL:-http://127.0.0.1:32000}
     depends_on:
-      - api
-    restart: unless-stopped
-
-  docs:
-    image: node:24.19.0-alpine
-    working_dir: /app/apps/docs
-    command: sh -c "npm install -g mintlify && mintlify dev --disable-openapi"
-    ports:
-      - "3421:3000"
-    volumes:
-      - ./apps/docs:/app/apps/docs
-    restart: unless-stopped
-
+      api:
+        condition: service_healthy
 volumes:
   postgres_data:
+    external: true
+    name: ${RELAYOPS_POSTGRES_VOLUME:?Run pnpm local:prepare}
+  uploads:
+    name: relayops_uploads

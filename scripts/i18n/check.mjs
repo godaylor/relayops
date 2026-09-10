@@ -89,6 +89,21 @@ function referenceValueFor(referenceData, key) {
   return undefined;
 }
 
+function deleteValueAtKey(data, key) {
+  const [namespace, nestedPath] = key.split(":");
+  const segments = nestedPath.split(".");
+  let current = data[namespace];
+  if (!current || typeof current !== "object" || Array.isArray(current)) return;
+  for (const segment of segments.slice(0, -1)) {
+    const next = current[segment];
+    if (!next || typeof next !== "object" || Array.isArray(next)) {
+      return;
+    }
+    current = next;
+  }
+  delete current[segments.at(-1)];
+}
+
 const args = process.argv.slice(2);
 const shouldFix = args.includes("--fix");
 const localeFilter = args.find((arg) => arg !== "--fix");
@@ -208,13 +223,16 @@ for (const locale of filteredLocales) {
     console.log("  Extra keys:");
     for (const key of formatKeyList(extra)) {
       console.log(`    - ${key}`);
+      if (shouldFix) {
+        deleteValueAtKey(locale.data, key);
+      }
     }
   }
 
-  if (shouldFix && missing.size > 0) {
+  if (shouldFix && (missing.size > 0 || extra.size > 0)) {
     await writeJson(locale.path, locale.data);
     console.log(
-      "  Added missing keys, using the locale's own plural wording where it had one.",
+      "  Synced keys, using the locale's own plural wording where it had one.",
     );
   }
 }

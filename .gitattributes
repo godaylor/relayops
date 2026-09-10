@@ -1,3 +1,6 @@
+* text=auto eol=lf
+
 # Husky hooks must use LF, otherwise a CRLF checkout makes the shell pass a
 # trailing carriage return to commitlint and every commit fails on Unix.
 .husky/* text eol=lf
+*.sh text eol=lf

@@ -80,16 +80,17 @@
 
 Source candidate artifacts/relayops-source-candidate.tar.gz пересоздан с актуальным FINAL_AUDIT.md, source SBOM/review и file-hash manifest. Hash и число файлов записаны отдельно в .local/audit-fix-source-candidate.json; архив проверен на включение актуального аудита и исключение private local state/Planka importer. Это review package, не clean commit или разрешение на публикацию.
 
-Основной relayops:local и сохранённые пользовательские данные не заменялись. Test fixtures созданы только в verify stack на 32040/32041; stack остановлен после проверок. Временные контейнеры для извлечения licenses удалены по конкретным IDs. Commit, push, tag, PR и deploy не выполнялись.
+Основной relayops:local и сохранённые пользовательские данные не заменялись. Test fixtures созданы только в verify stack на 32040/32041; stack остановлен после проверок. Временные контейнеры для извлечения licenses удалены по конкретным IDs. Созданы пять локальных commits; push, tag, PR и deploy не выполнялись.
 
 
 ## Publication preparation — 2026-09-10
 
-- Создана отдельная ветка `codex/relayops-publication-prep` поверх неизменённого baseline commit; существующая история не переписывалась.
+- Создана отдельная ветка `codex/relayops-publication-prep` с пятью смысловыми коммитами поверх неизменённого baseline commit; существующая история не переписывалась.
 - Точный Git index проверен Gitleaks 8.30.1 (container digest `sha256:c00b6ae320ec3720ee2b70d30dd271f0bf5879910996e64c430113053239ef69`): `13.02 MB`, **0 leaks**.
 - Точный Git index проверен Semgrep 1.175.1 (`p/default`, затем severity `ERROR`). Найденные ошибки mutable GitHub Actions, `secrets: inherit`, AES-GCM без явной длины tag и insecure WebSocket test fixture устранены; повторная целевая проверка последнего файла дала **0 findings**. Legacy INFO/WARNING и parser warnings остаются review evidence, а не скрываются allowlist-ом.
 - Добавлен fail-closed GitHub security workflow: Gitleaks, CodeQL `security-extended` и dependency review. Все используемые внешние Actions закреплены на immutable commit SHA; workflow с ненужными правами и upstream publish/notification automation удалены.
 - Локальный GitHub-сеанс отсутствует (`gh` не установлен, браузер показывает Sign in), поэтому собственный remote не создан и upstream `origin` не менялся.
+- Gitleaks повторно проверил диапазон `8100f3b1..HEAD`: **5 commits, 3.03 MB, 0 leaks**.
 
 ## Обязательные исправления до публикации
 
@@ -99,7 +100,7 @@ Source candidate artifacts/relayops-source-candidate.tar.gz пересоздан
 | P0 | Не завершён manual accessibility gate | Manual screen-reader/assistive-technology pass не выполнялся. Автоматические axe/keyboard/zoom проверки не закрывают требование PLAN/ROP-013. | Выполнить краткий NVDA/VoiceOver-проход основных сценариев, зафиксировать браузер/AT/результат и исправить blockers. |
 | P0 | Publication digests ещё не выбраны | Локальная stale-evidence проблема закрыта: новые image IDs совпадают со scanned IDs; SBOM/license inventory обновлены. Это не выбранные публичные digests. | Подтвердить соответствие выбранных publication artifacts проверенным IDs; при rebuild повторить SBOM/licenses/Trivy и выполнить независимый secret scan. |
 | P0 | Публикационная точка назначения отсутствует | `origin` всё ещё `https://github.com/usekaneo/kaneo.git`; release guards намеренно запрещают публикацию; собственные repo/owner/domain/hosting не выбраны. | Создать собственный repository/namespace, проверить весь diff, настроить exact public URLs/CORS/OAuth/HTTPS/WSS/secrets, затем выполнить GitHub CI и release dry-run. Не push в upstream. |
-| P0 | Публикационная Git-история ещё не подтверждена удалённым CI | Локальная ветка создана поверх исходного Kaneo без переписывания истории; изменения подготовлены для смысловых commits. | Проверить новый commit range Gitleaks и CI после commits; push выполнять только в собственный repository, никогда не в upstream. |
+| P0 | Публикационная Git-история ещё не подтверждена удалённым CI | Локальная ветка содержит пять смысловых commits поверх исходного Kaneo без переписывания истории; Gitleaks commit-range scan: 0 leaks. | Выполнить CI после push в собственный repository; никогда не отправлять эту ветку в upstream. |
 | P1 | Неясный holder в legacy Planka importer блокирует публикацию всего дерева | `packages/planka-import/LICENSE`: `Copyright (c) 2026 Kaneo MCP contributors`; локальная история недостаточна для авторитетного исправления. Package private и исключён из source candidate, но присутствует в полном repository. | Получить подтверждение provenance/holder либо юридически корректно определить scope публичного source artifact так, чтобы пакет не выдавался за очищенный. Не угадывать holder и не удалять исходный notice. |
 | P1 | Не выполнен реальный target deployment | Нет Kubernetes runtime, production restore/upgrade, public DNS/HTTPS/WSS и manual release workflow dry-run в собственном repo. | Проверить только выбранные поддерживаемые поверхности на целевом окружении; если Helm заявляется поддерживаемым — выполнить cluster smoke и PVC/upgrade review. |
 
@@ -180,7 +181,7 @@ Source candidate artifacts/relayops-source-candidate.tar.gz пересоздан
 
 1. Выполнить manual AT, независимый secret scan и SAST; сохранить реальные результаты.
 2. Выбрать собственные repository/image/chart/site namespace и target hosting; подтвердить holder либо юридически корректный scope Planka importer, не исправляя notice по догадке.
-3. Проверить состав source artifact, отдельно оформить reviewable commits в собственном repo и выполнить GitHub CI/release dry-run. Commit/push в этом проходе не разрешались и не выполнялись.
+3. После появления собственного remote отправить готовые reviewable commits и выполнить GitHub CI/release dry-run. Push в этом проходе не выполнялся.
 4. Для выбранных publication digests подтвердить актуальность SBOM/licenses/Trivy/secret scans; проверить target deployment, DNS/HTTPS/WSS, restore/upgrade и Kubernetes runtime, если Helm заявляется поддерживаемым.
 5. Только после отдельного approval публиковать tag/image/chart/site. Формальная trademark/domain review остаётся обязательной для коммерческого/full-production выпуска.
 

@@ -32,7 +32,7 @@ postgresql:
   auth:
     database: kaneo
     username: kaneo_user
-    password: kaneo_password
+    password: ""
     # Use existing secret for database credentials (optional)
     existingSecret: ""
     secretKeys:
@@ -60,17 +60,31 @@ postgresql:
 # Kaneo application configuration (combined API + web frontend)
 kaneo:
   image:
-    repository: ghcr.io/usekaneo/kaneo
+    # Set your own verified RelayOps repository before a cluster installation.
+    repository: relayops
     # Defaults to Chart.appVersion when empty.
     tag: ""
     pullPolicy: IfNotPresent
-  securityContext: {}
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 1001
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+    seccompProfile:
+      type: RuntimeDefault
   service:
     type: ClusterIP
     port: 5173
     targetPort: 5173
-  # Resources are optional and disabled by default
-  resources: {}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
   # resources:
   #   limits:
   #     cpu: 500m

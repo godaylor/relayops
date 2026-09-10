@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM node:24.19.0-alpine AS api-builder
+FROM --platform=$BUILDPLATFORM node:24.19.0-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS api-builder
 
 RUN apk add --no-cache python3 make g++ && \
   corepack enable && \
@@ -13,7 +13,8 @@ COPY packages/libs/package.json ./packages/libs/
 COPY packages/permissions/package.json ./packages/permissions/
 COPY apps/api/package.json ./apps/api/
 
-RUN pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=relayops-pnpm,target=/pnpm/store,sharing=locked \
+  pnpm install --frozen-lockfile --store-dir=/pnpm/store --network-concurrency=8
 
 COPY packages/typescript-config ./packages/typescript-config
 COPY packages/email ./packages/email
@@ -21,20 +22,24 @@ COPY packages/libs ./packages/libs
 COPY packages/permissions ./packages/permissions
 COPY i18n ./i18n
 COPY apps/api ./apps/api
+COPY LICENSE THIRD_PARTY_NOTICES ./
+COPY scripts/release/licenses.mjs ./scripts/release/licenses.mjs
 
 WORKDIR /app/packages/email
-RUN pnpm run build
+RUN rm -f .cache/tsbuildinfo.json && pnpm run build
 
 WORKDIR /app/packages/permissions
-RUN pnpm run build
+RUN rm -f .cache/tsbuildinfo.json && pnpm run build
 
 WORKDIR /app/apps/api
-RUN pnpm run build
+RUN pnpm run build && node /app/scripts/release/licenses.mjs api /app/licenses/api
 
 # Assembles the production node_modules on the BUILD platform (native, no QEMU emulation).
 # All API runtime deps are pure JavaScript (bcrypt was replaced with bcryptjs), so this
 # node_modules is architecture-independent and is copied into the runtime stage below.
-FROM --platform=$BUILDPLATFORM node:24.19.0-alpine AS api-runtime
+FROM --platform=$BUILDPLATFORM node:24.19.0-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS api-runtime
+
+RUN corepack enable && corepack prepare pnpm@10.32.1 --activate
 
 WORKDIR /app
 
@@ -45,17 +50,16 @@ COPY --from=api-builder /app/packages/libs/package.json ./packages/libs/
 COPY --from=api-builder /app/packages/email/package.json ./packages/email/
 COPY --from=api-builder /app/packages/permissions/package.json ./packages/permissions/
 
-RUN sed -i 's/"prepare": "husky"/"prepare": ""/g' package.json && \
-  corepack enable && \
-  corepack prepare pnpm@10.32.1 --activate && \
-  HUSKY=0 NODE_ENV=production pnpm install --prod --frozen-lockfile --no-optional
+RUN --mount=type=cache,id=relayops-pnpm,target=/pnpm/store,sharing=locked \
+  sed -i 's/"prepare": "husky"/"prepare": ""/g' package.json && \
+  HUSKY=0 NODE_ENV=production pnpm install --prod --frozen-lockfile --no-optional --store-dir=/pnpm/store --network-concurrency=8
 
 COPY --from=api-builder /app/apps/api/dist ./apps/api/dist
 COPY --from=api-builder /app/apps/api/drizzle ./apps/api/drizzle
 COPY --from=api-builder /app/packages/email ./packages/email
 COPY --from=api-builder /app/packages/permissions ./packages/permissions
 
-FROM --platform=$BUILDPLATFORM node:24.19.0-alpine AS web-builder
+FROM --platform=$BUILDPLATFORM node:24.19.0-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS web-builder
 
 RUN apk add --no-cache python3 make g++ && \
   corepack enable && \
@@ -67,23 +71,30 @@ COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY apps/web/package.json ./apps/web/
 COPY packages/typescript-config/package.json ./packages/typescript-config/
 COPY packages/libs/package.json ./packages/libs/
+COPY packages/permissions/package.json ./packages/permissions/
+
+RUN --mount=type=cache,id=relayops-pnpm,target=/pnpm/store,sharing=locked \
+  pnpm install --frozen-lockfile --store-dir=/pnpm/store --network-concurrency=8
+
 COPY packages/typescript-config ./packages/typescript-config
 COPY packages/libs ./packages/libs
 COPY packages/permissions ./packages/permissions
 COPY i18n ./i18n
 COPY apps/web ./apps/web
-
-RUN pnpm install --frozen-lockfile
+COPY LICENSE THIRD_PARTY_NOTICES ./
+COPY scripts/release/licenses.mjs ./scripts/release/licenses.mjs
 
 WORKDIR /app/packages/permissions
-RUN pnpm run build
+RUN rm -f .cache/tsbuildinfo.json && pnpm run build
 
 WORKDIR /app/apps/web
-RUN pnpm run build
+RUN pnpm run build && node /app/scripts/release/licenses.mjs web /app/licenses/web
 
-FROM node:24.19.0-alpine AS runtime
+FROM node:24.19.0-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS runtime
 
-RUN apk add --no-cache nginx=~1.30.4 && \
+RUN apk add --no-cache nginx=~1.30.4 libcrypto3=3.5.8-r0 libssl3=3.5.8-r0 && \
+  rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack && \
+  rm -f /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack /usr/local/bin/pnpm /usr/local/bin/pnpx /usr/local/bin/yarn /usr/local/bin/yarnpkg && \
   addgroup -g 1001 appuser && \
   adduser -u 1001 -G appuser -D appuser && \
   mkdir -p /app /app/apps/api/data /var/cache/nginx /var/run/nginx /var/log/nginx /var/lib/nginx/logs /var/lib/nginx/tmp /usr/share/nginx/html /docker-entrypoint.d && \
@@ -97,7 +108,7 @@ WORKDIR /app
 COPY --from=api-runtime --chown=appuser:appuser /app /app
 
 # Fail the build early if the runtime dependency layout is broken on the target architecture
-RUN cd /app/apps/api && node -e "const fs=require('fs');for(const m of ['bcryptjs','hono','pg','drizzle-orm','better-auth','ioredis','valibot','octokit','@modelcontextprotocol/sdk']){fs.accessSync('node_modules/'+m+'/package.json')}"
+RUN cd /app/apps/api && node -e "const fs=require('fs');for(const m of ['bcryptjs','hono','pg','drizzle-orm','better-auth','ioredis','valibot','octokit','@modelcontextprotocol/sdk']){fs.accessSync('node_modules/'+m+'/package.json')}for(const p of ['/app/packages/email/dist/index.js','/app/packages/permissions/dist/index.js']){fs.accessSync(p)}"
 
 COPY --from=web-builder --chown=appuser:appuser /app/apps/web/dist /usr/share/nginx/html
 COPY --chown=appuser:appuser apps/web/nginx.kaneo.conf /etc/nginx/conf.d/default.conf
@@ -107,7 +118,14 @@ COPY --chown=appuser:appuser deploy/kaneo-entrypoint.sh /usr/local/bin/kaneo-ent
 
 RUN chmod +x /docker-entrypoint.d/env.sh /usr/local/bin/kaneo-entrypoint.sh
 
-ENV NODE_ENV=production
+COPY --from=api-builder /app/licenses/api /licenses/api
+COPY --from=web-builder /app/licenses/web /licenses/web
+COPY --from=web-builder /app/licenses/web /usr/share/nginx/html/licenses
+COPY LICENSE THIRD_PARTY_NOTICES /licenses/
+ARG RELAYOPS_SOURCE_URL
+ARG RELAYOPS_REVISION=local
+LABEL org.opencontainers.image.title="RelayOps" org.opencontainers.image.licenses="MIT" org.opencontainers.image.source=$RELAYOPS_SOURCE_URL org.opencontainers.image.revision=$RELAYOPS_REVISION
+ENV HOST=0.0.0.0 PORT=1337 NODE_ENV=production
 
 USER appuser
 EXPOSE 5173

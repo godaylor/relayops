@@ -9,6 +9,13 @@
 		"ignoreUnknown": false,
 		"includes": [
 			"**",
+			"!**/.local",
+			"!**/artifacts",
+			"!**/.codex-temp",
+			"!**/.agents",
+			"!**/.codex",
+			"!**/legacy-app",
+			"!**/legacy-assets",
 			"!**/coverage",
 			"!**/tsconfig*.json",
 			"!**/routeTree.gen.ts",

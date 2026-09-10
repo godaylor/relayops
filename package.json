@@ -1,10 +1,11 @@
 {
-  "name": "kaneo",
+  "name": "relayops",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev",
+    "check:line-endings": "node ./scripts/check-line-endings.mjs",
+    "dev": "turbo dev --filter=@kaneo/api --filter=@kaneo/web",
     "i18n:check": "node ./scripts/i18n/check.mjs",
     "i18n:check:fix": "node ./scripts/i18n/check.mjs --fix",
     "i18n:report": "node ./scripts/i18n/report.mjs",
@@ -14,10 +15,18 @@
     "test": "turbo test",
     "test:integration": "turbo test:integration",
     "typecheck": "turbo typecheck",
-    "prepare": "husky"
+    "prepare": "husky",
+    "smoke:browser": "playwright test --config playwright.config.ts",
+    "local:prepare": "node scripts/local/prepare.mjs",
+    "local:up": "node scripts/local/prepare.mjs && docker compose up -d --build --wait",
+    "local:status": "docker compose ps",
+    "local:stop": "docker compose stop",
+    "release:licenses": "node scripts/release/licenses.mjs",
+    "release:check": "node scripts/release/preflight.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.7",
+    "@playwright/test": "1.55.1",
     "@commitlint/cli": "^21.2.1",
     "@commitlint/config-conventional": "^21.2.0",
     "@semantic-release/changelog": "^6.0.3",

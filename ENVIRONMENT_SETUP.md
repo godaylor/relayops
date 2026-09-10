@@ -1,234 +1,120 @@
-# Environment Setup Guide
+# RelayOps — Windows / Docker Desktop
 
-This guide will help you set up the Kaneo development environment and troubleshoot common issues.
+Все команды выполняются из корня RelayOps. Данные других проектов, процессы и Docker volumes не затрагиваются.
 
-## Quick Start
+## Основной локальный сайт
 
-1. **Create a `.env` file** in the root of the project with the required environment variables (see the [documentation](https://kaneo.app/docs/core/installation/environment-variables) for the complete list).
+Требуются Docker Desktop с Linux containers, Node 24+ и pnpm 10.32.1.
+В этом workspace Node 24.19.0 установлен **локально** в `.local/node-v24.19.0-win-x64`; системная версия не менялась.
 
-2. **Start the development servers**:
-   ```bash
-   pnpm dev
-   ```
+```powershell
+$env:PATH = (Join-Path (Get-Location) '.local/node-v24.19.0-win-x64') + ';C:\Program Files\Git\usr\bin;' + $env:PATH
+./scripts/local/ports.ps1
+pnpm local:prepare
+pnpm local:up
+pnpm local:status
+```
 
-This starts both the API (port 1337) and web app (port 5173). Both will automatically reload when you make changes.
+Открыть http://127.0.0.1:32000. Один контейнер объединяет web, Nginx и API. PostgreSQL доступен только в сети Compose; Redis, S3, SMTP и внешняя авторизация не нужны. Первый вход — регистрация, создание RelayOps workspace, сервиса и помеченного демоинцидента. Демо можно удалить штатной кнопкой; пользовательские данные она не удаляет.
 
-> **Tip**: The web app at http://localhost:5173 will automatically connect to the API at http://localhost:1337
+`local:prepare` сохраняет существующий `.env`. При первом запуске в этом workspace он обнаружил прежний контейнер `relayops-codex-s3-postgres`, сохранил его PostgreSQL 15 image, имя БД и исходный anonymous volume. **Не запускайте старый контейнер одновременно с новым PostgreSQL.** Не меняйте major PostgreSQL поверх существующего volume. Другим клонам без такого контейнера создаётся именованный volume PostgreSQL 16. Ничего не удаляется автоматически.
 
-## Environment Variables
+Остановить только этот проект: `pnpm local:stop`. Не использовать `docker compose down -v`, `docker system prune` или остановку всех контейнеров.
 
-Kaneo uses a **single `.env` file** in the root of the project for all environment variables. This file is shared by both the API and web services.
+## Порты
 
-### Required Variables
+Все опубликованные порты привязаны к 127.0.0.1. Внутренние 5173 / 1337 / 5432 не меняются.
 
-For development, you'll need at minimum:
+| Порт | Назначение |
+|---|---|
+| 32000 | Основной сайт, same-origin API по /api |
+| 32001 | API только в альтернативном split-режиме |
+| 32002 | Резерв для дополнительного proxy / Helm port-forward |
+| 32010 / 32011 | Резерв для доступа Windows к PostgreSQL / Redis; не опубликованы |
+| 32020 | Опциональный dev публичной страницы, не нужен основному сайту |
+| 32040 | Изолированная тестовая PostgreSQL |
+| 32041 | Изолированный bundled браузерный стенд |
+| 32042 / 32043 | Временная split-проверка web / API |
+| 32044–32051 | Временные HTTP/WS abuse-тесты |
+| 32060 | Временный второй bundled API/web для Redis failover-проверки |
+| 32070–32089 | Релизные preview; 32070 — основной резерв |
+| 32090–32099 | Резерв для замены занятого 32000 |
 
-- `KANEO_CLIENT_URL` - The URL of the web application (e.g., `http://localhost:5173`)
-- `KANEO_API_URL` - The URL of the API (e.g., `http://localhost:1337`)
-- `AUTH_SECRET` - Secret key for JWT token generation (**must be at least 32 characters long**; use a long, random value in production)
-- `DEVICE_AUTH_CLIENT_IDS` - **Optional.** Comma-separated list of allowed device-flow OAuth client IDs. When unset, Kaneo implicitly allows `kaneo-cli` and `kaneo-mcp` by default (no extra configuration for the CLI or MCP). Override only when you need additional trusted clients, for example `kaneo-cli,kaneo-mcp,my-desktop-app`.
-- `DATABASE_URL` - PostgreSQL connection string
-- `POSTGRES_DB` - PostgreSQL database name
-- `POSTGRES_USER` - PostgreSQL username
-- `POSTGRES_PASSWORD` - PostgreSQL password
+Проверены Windows IPv4/IPv6 excluded ranges и слушатели: конфликтов в 32000–32099 не было. Фактический выбор записан в `.local/ports.json`. Если 32000 занят при **первой** подготовке, выбирается свободный 32090–32099 и синхронно задаётся public URL. Существующий `.env` не переписывается; перед каждым запуском проверьте порты. Не занимайте порт другого проекта и не отключайте Windows reservations.
 
-If your app uses a device client ID that is not included in the defaults, set `DEVICE_AUTH_CLIENT_IDS` to the full comma-separated list of allowed IDs (including any defaults you still need), so it includes the client ID your app sends to `/api/auth/device/code`.
+## Альтернативный split-режим
 
-### Development-Specific Variables
+Не запускайте одновременно с bundled сайтом на 32000.
 
-For local development, the web app also supports:
-- `VITE_API_URL` - API URL for development (defaults to `http://localhost:1337` if not set)
-- `VITE_APP_URL` - App URL for generating links (optional)
+```powershell
+docker compose stop relayops
+docker compose -f compose.local.yml up -d --build --wait
+```
 
-### Optional Variables
+Web — 127.0.0.1:32000, API — 127.0.0.1:32001. Используются тот же PostgreSQL volume и uploads volume. Для возврата остановите только `api` и `web` в split-compose и запустите обычный Compose.
 
-Kaneo supports many optional configuration options including:
-- `KANEO_INTERNAL_API_URL` - API origin used only for server-side requests from the built-in HTTP MCP endpoint. Defaults to `http://127.0.0.1:1337`; override it only if the API is not reachable there from its own process.
-- SSO providers (GitHub OAuth via `GITHUB_OAUTH_CLIENT_ID` / `GITHUB_OAUTH_CLIENT_SECRET`, Google, Discord, Custom OAuth/OIDC)
-- GitHub repository integration (GitHub App: `GITHUB_APP_ID`, `GITHUB_PRIVATE_KEY`, `GITHUB_WEBHOOK_SECRET`, optional `GITHUB_APP_NAME`), separate from GitHub SSO
-- SMTP configuration for email
-- Access control settings
-- CORS configuration
-- Redis for horizontal scaling
-- Private-network notification receivers (`KANEO_ALLOW_PRIVATE_WEBHOOK_DESTINATIONS=true` lets ntfy/Gotify/webhook destinations resolve to private addresses; off by default to prevent SSRF)
+Native `pnpm dev` запускает только API и web, не маркетинговый сайт, MCP и email preview. Для native API отдельно нужен доступ к dev-БД и явный `DATABASE_URL`; не направляйте его на тестовую БД одновременно с integration-тестами. Если нужен доступ Windows к постоянной локальной БД, добавьте **локальный** override `127.0.0.1:32010:5432` после проверки порта. Не публикуйте БД без необходимости.
 
-#### Redis Configuration
+## URL и секреты
 
-Kaneo supports three Redis deployment modes for WebSocket Pub/Sub. When any Redis mode is configured, WebSocket broadcasts use Redis Pub/Sub, allowing multiple API instances to relay real-time updates. When none are set, an in-memory adapter is used (single-instance only).
+Корневой `.env` — серверные значения. `apps/web/.env.local` — Vite overrides; не копируйте в него секреты.
 
-**Standalone (single server):**
-- `REDIS_URL` - Redis connection string (e.g., `redis://localhost:6379`)
+- `KANEO_CLIENT_URL` — точный browser origin (локально http://127.0.0.1:32000).
+- `KANEO_API_URL` — browser API origin или URL с /api; bundled entrypoint выводит его из client URL.
+- `KANEO_INTERNAL_API_URL` — локальный API для MCP; внутри bundled image это http://127.0.0.1:1337, native — порт `PORT` или 32001.
+- `CORS_ORIGINS` — только явные разрешённые origins. Пустое значение **не разрешает все origins**. Production split требует явного frontend origin.
+- `AUTH_SECRET` — постоянный случайный ключ. Смена инвалидирует сессии.
+- `NOTIFICATION_SECRET_ENCRYPTION_KEY` и `RELAYOPS_WEBHOOK_ENCRYPTION_KEY=hex:<64 hex>` — постоянные ключи; старые версии сохраняются в keyring при ротации. Подробности в README.
+- `HOST` — 127.0.0.1 native, 0.0.0.0 только внутри изолированного контейнера.
+- `DISABLE_EMAIL_OTP_SIGN_IN=true` — локальный вход с паролем без SMTP.
+- SSO, SMTP, Redis, billing, Sentry и Turnstile остаются opt-in. Не включайте `KANEO_CLOUD` для локального демо.
+- Только публичные `KANEO_TURNSTILE_SITE_KEY` и `KANEO_SENTRY_DSN` могут дополнительно подставляться в web bundle; произвольные KANEO_* переменные туда не копируются.
 
-**Sentinel (high-availability with automatic failover):**
-- `REDIS_SENTINELS` - Comma-separated list of Sentinel nodes (e.g., `sentinel-1:26379,sentinel-2:26379,sentinel-3:26379`)
-- `REDIS_SENTINEL_MASTER_NAME` - Name of the Sentinel master group (default: `mymaster`)
-- `REDIS_SENTINEL_PASSWORD` - Password for Sentinel instances, if different from the Redis password (optional)
-- `REDIS_SENTINEL_TLS` - Set to `true` to enable TLS for Sentinel connections (default: `false`)
+## Резервирование / обновление
 
-**Cluster (horizontal sharding):**
-- `REDIS_CLUSTER_NODES` - Comma-separated list of cluster seed nodes (e.g., `node-1:6379,node-2:6379,node-3:6379`)
+`node scripts/local/backup.mjs` сохраняет SQL dump в игнорируемую `.local/backups`.
+До первого S14 старта сохранён исходный dump. Храните вместе SQL, upload volume и отдельную защищённую копию `.env`/keyrings. Не коммитьте их.
+API применяет additive migrations при старте. Legacy→RelayOps включается явно; автоматического преобразования старых задач или dual-write нет. При ошибке остановите **только приложение**, сохраните БД, устраните причину. Не откатывайте схему удалением данных; restore сначала проверяется на отдельной БД.
 
-**Shared (used by Sentinel and Cluster modes):**
-- `REDIS_PASSWORD` - Password for the Redis data nodes (used by both Sentinel and Cluster modes, not for Sentinel auth itself; use `REDIS_SENTINEL_PASSWORD` for that)
+## Проверки
 
-> **Note:** Only one mode should be configured at a time. If multiple are set, the priority is: Cluster > Sentinel > Standalone.
+Выполнять тяжёлые команды последовательно. Git for Windows предоставляет sed для существующего env.sh теста; добавление в PATH выше относится только к текущему PowerShell.
 
-#### SMTP Configuration
+```powershell
+pnpm install --frozen-lockfile
+pnpm exec turbo typecheck --concurrency=1 --force
+pnpm exec turbo test --concurrency=1 --force
+pnpm exec turbo build --concurrency=1 --force
+pnpm i18n:check
+pnpm check:line-endings
+docker compose -p relayops-verify -f compose.verify.yml up -d --wait postgres
+$env:DATABASE_URL = 'postgresql://postgres:relayops-local-verification-only@127.0.0.1:32040/relayops_verify_test'
+pnpm --filter @kaneo/api test:integration
+docker compose -p relayops-verify -f compose.verify.yml up -d --wait app
+pnpm smoke:browser
+```
 
-For sending emails (workspace invitations, magic links, etc.), configure these variables:
-- `SMTP_HOST` - SMTP server hostname
-- `SMTP_PORT` - SMTP server port
-- `SMTP_USER` - SMTP username
-- `SMTP_PASSWORD` - SMTP password
-- `SMTP_FROM` - From email address
-- `SMTP_SECURE` - Use TLS (default: `true`, set to `false` to disable)
-- `SMTP_REQUIRE_TLS` - Require TLS (default: `false`, set to `true` to require)
-- `SMTP_IGNORE_TLS` - Ignore TLS certificate errors (default: `false`, set to `true` for self-signed certificates)
+Тестовый app должен быть остановлен во время integration/performance: его outbox worker иначе вмешивается в fixtures. Тестовая БД в tmpfs; остановка её контейнера удаляет **только disposable fixtures**. Не выполняйте integration-тесты на прежней БД `kaneo_test`, несмотря на её суффикс. Opt-in `RELAYOPS_PERF=1` включает 100k/1M fixtures; после прогона удалите эту переменную из текущего shell.
 
-> **Note:** If you're using an SMTP server with a self-signed or invalid TLS certificate, set `SMTP_IGNORE_TLS=true` to bypass certificate validation.
+Проверка source-release: `pnpm release:licenses`, затем `pnpm release:check`. Это не разрешение публиковать. См. RELEASE_PREFLIGHT.md и PLAN.md.
 
-When SMTP is configured, sign-in uses email verification codes by default. Set `DISABLE_EMAIL_OTP_SIGN_IN=true` to use email/password sign-in instead (workspace invitation emails still use SMTP).
-
-#### Cloud-mode abuse mitigations
-
-Hosted multi-tenant instances should enable the cloud abuse gates. Self-hosted instances can leave these unset.
-
-- `KANEO_CLOUD` - Set to `true` to enable cloud-only protections: disposable-email signup block, Turnstile captcha enforcement, guest-account invite block, and tightened rate limits on `/sign-up/email` and `/organization/invite-member`.
-- `TURNSTILE_SECRET_KEY` - Cloudflare Turnstile secret key (API container, server-side verification). When unset, captcha verification is skipped.
-- `KANEO_TURNSTILE_SITE_KEY` - Cloudflare Turnstile site key, on the **web container**. The production web image bakes the literal placeholder `KANEO_TURNSTILE_SITE_KEY` into the bundle; `apps/web/env.sh` swaps it for the runtime value when the container starts.
-- `VITE_TURNSTILE_SITE_KEY` - Local dev only. Set in `apps/web/.env` when running `pnpm dev`; Vite reads this at build/dev time. Not used in the production image.
-
-#### Sentry (error monitoring)
-
-All Sentry integration is opt-in; leave these unset for zero telemetry.
-
-- `SENTRY_DSN` - Sentry DSN for the API. When unset, the Sentry SDK never initializes.
-- `SENTRY_ENVIRONMENT` - Environment tag for API events (defaults to `NODE_ENV`).
-- `SENTRY_TRACES_SAMPLE_RATE` - Fraction of API requests to trace for performance monitoring, `0`-`1` (default: `0`, tracing off).
-- `KANEO_SENTRY_DSN` - Sentry DSN for the **web container** (browser errors, tracing, session replay). Same runtime-placeholder mechanism as `KANEO_TURNSTILE_SITE_KEY`.
-- `VITE_SENTRY_DSN` - Local dev only. Set in `apps/web/.env` when running `pnpm dev`.
-
-For a complete list of all environment variables, their descriptions, and configuration options, see the [official documentation](https://kaneo.app/docs/core/installation/environment-variables).
-
-## Common Issues & Troubleshooting
-
-### CORS Errors
-
-**Symptoms:**
-- "Failed to fetch" errors in browser console
-- Network errors when making API requests
-- "Access to fetch at '...' from origin '...' has been blocked by CORS policy"
-
-**Solutions:**
-
-1. **Check URL Configuration:**
-   - Ensure `KANEO_API_URL` matches your API server URL
-   - Ensure `KANEO_CLIENT_URL` matches your web app URL
-   - For development, you can also set `VITE_API_URL` in your `.env` file
-
-2. **Configure CORS Origins:**
-   - Add your frontend URL to `CORS_ORIGINS` in your `.env`:
-     ```
-     CORS_ORIGINS=http://localhost:5173,https://yourdomain.com
-     ```
-   - For development, you can leave `CORS_ORIGINS` empty to allow all origins
-   - **Note:** `CORS_ORIGINS` should match `KANEO_CLIENT_URL` for proper authentication
-
-3. **Check Protocol Consistency:**
-   - Ensure both frontend and API use the same protocol (http/https)
-   - Don't mix http and https in development
-
-4. **Verify Server Accessibility:**
-   - Test if the API is accessible: `curl http://localhost:1337/config`
-   - Check if the server is running on the correct port
-
-### Database Connection Issues
-
-**Symptoms:**
-- "Database connection failed" errors
-- API server won't start
-
-**Solutions:**
-
-1. **Check PostgreSQL:**
-   - Ensure PostgreSQL is running
-   - Verify database exists and credentials are correct
-   - Test connection: `psql $DATABASE_URL`
-
-2. **Update DATABASE_URL:**
-   - Ensure the connection string format is correct
-   - Check username, password, host, port, and database name
-
-3. **Match the hostname to where the API runs:**
-   - Use `postgres` only when the API container is on the same Docker Compose network as the Postgres service
-   - Use `localhost` when the API runs directly on your host machine
-   - If you see `getaddrinfo EAI_AGAIN postgres`, the API is trying to resolve the Compose hostname from the wrong network context
-
-4. **Use the right configuration mode:**
-   - For host-native development, prefer an explicit `DATABASE_URL`
-   - If you derive from `POSTGRES_*`, set `POSTGRES_HOST=localhost` when running the API on your host
-   - `POSTGRES_DB` and `POSTGRES_USER` by themselves do not switch Kaneo into derived connection mode
-
-### Authentication Issues
-
-**Symptoms:**
-- "Authentication failed" errors
-- Users can't sign in
-
-**Solutions:**
-
-1. **Check Authentication Configuration:**
-   - Ensure `AUTH_SECRET` is set in your `.env` file
-   - Use a strong secret in production
-   - Verify `KANEO_CLIENT_URL` and `KANEO_API_URL` are correctly configured
-
-2. **Clear Browser Data:**
-   - Clear cookies and local storage
-   - Try in incognito/private mode
-
-### Network Errors
-
-**Symptoms:**
-- "Network error" messages
-- API requests timeout
-
-**Solutions:**
-
-1. **Check Server Status:**
-   - Verify API server is running
-   - Check server logs for errors
-
-2. **Check Firewall/Proxy:**
-   - Ensure ports are not blocked
-   - Check if proxy settings interfere
-
-3. **Verify URLs:**
-   - Check that all URLs are accessible
-   - Test with curl or browser
-
-## Development vs Production
-
-### Development
-- Use `http://localhost` for both frontend and API
-- Leave `CORS_ORIGINS` empty to allow all origins (or set it to match your local URLs)
-- Use simple secrets for `AUTH_SECRET` (not for production)
-- The web app will use `VITE_API_URL` if set, otherwise defaults to `http://localhost:1337`
-
-### Production
-- Use HTTPS for both frontend and API
-- Set specific `CORS_ORIGINS` for security (should match `KANEO_CLIENT_URL`)
-- Use strong, unique secrets for `AUTH_SECRET`
-- Configure proper database credentials
-- Ensure `KANEO_CLIENT_URL` and `KANEO_API_URL` are set to your production URLs
-
-## Getting Help
-
-If you're still experiencing issues:
-
-1. Check the browser console for detailed error messages
-2. Review the API server logs
-3. Verify all environment variables are set correctly
-4. Ensure all services (PostgreSQL, API, Frontend) are running
-5. Consult the [official documentation](https://kaneo.app/docs) for detailed guides and troubleshooting
-
-For the most up-to-date information on environment variables and configuration, always refer to the [official documentation](https://kaneo.app/docs/core/installation/environment-variables).
+Полный browser command запускает `relayops-*.spec.ts`. Исторический `baseline-smoke.spec.ts` сохраняет исходный S0 Kaneo-сценарий; создание Project/Task не является acceptance нового RelayOps.
+
+Временные deployment-матрицы используют только test PostgreSQL, не основной volume:
+
+```powershell
+docker compose -p relayops-verify -f compose.verify.yml stop app
+docker compose -p relayops-verify -f compose.verify.yml -f compose.verify-split.yml up -d --wait split-api split-web
+$env:PLAYWRIGHT_BASE_URL = 'http://127.0.0.1:32042'
+$env:PLAYWRIGHT_API_URL = 'http://127.0.0.1:32043'
+pnpm exec playwright test tests/e2e/relayops-s10.spec.ts tests/e2e/relayops-s14.spec.ts
+Remove-Item Env:PLAYWRIGHT_BASE_URL,Env:PLAYWRIGHT_API_URL
+docker compose -p relayops-verify -f compose.verify.yml -f compose.verify-split.yml stop split-api split-web
+
+docker compose -p relayops-verify -f compose.verify.yml -f compose.verify-redis.yml up -d --wait
+$env:PLAYWRIGHT_SECONDARY_BASE_URL = 'http://127.0.0.1:32060'
+pnpm exec playwright test tests/e2e/relayops-s10.spec.ts --grep 'ten-step'
+Remove-Item Env:PLAYWRIGHT_SECONDARY_BASE_URL
+```
+
+Redis overlay требует Compose с поддержкой `!override` (2.24.4+). Не считайте Redis обязательным: основной Compose его не запускает. При недоступном Redis межсерверная live-доставка деградирует; durable state остаётся в PostgreSQL, reconnect/refetch восстанавливает истину. Failure/recovery evidence и пределы проверки записаны в RELEASE_PREFLIGHT.md.

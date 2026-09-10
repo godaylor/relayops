@@ -9,6 +9,7 @@
 //
 // Preview a range locally:  node scripts/release/notes.mjs v2.20.0 v2.21.0
 import { execFileSync } from "node:child_process";
+import { pathToFileURL } from "node:url";
 
 const SECTIONS = [
   ["feat", "Features"],
@@ -54,7 +55,7 @@ function readCommits(from, to) {
 
 async function resolvePullRequests(commits, { repo, token, logger }) {
   const found = new Map();
-  if (!token) {
+  if (!token || !repo) {
     logger.log("notes: no GitHub token, falling back to commit links");
     return found;
   }
@@ -69,7 +70,7 @@ async function resolvePullRequests(commits, { repo, token, logger }) {
             headers: {
               accept: "application/vnd.github+json",
               authorization: `Bearer ${token}`,
-              "user-agent": "kaneo-release-notes",
+              "user-agent": "relayops-release-notes",
             },
           },
         );
@@ -143,7 +144,9 @@ function render(entries, { repo }) {
     const scope = headline.scope ? `**${headline.scope}:** ` : "";
     const reference = pull
       ? `#${pull.number}`
-      : `[${commit.hash.slice(0, 7)}](${commitUrl(commit.hash)})`;
+      : repo
+        ? `[${commit.hash.slice(0, 7)}](${commitUrl(commit.hash)})`
+        : commit.hash.slice(0, 7);
     const line = `- ${scope}${headline.description}: ${reference}`;
 
     if (commit.breaking) breaking.push(line);
@@ -185,34 +188,24 @@ export async function generateNotes(_pluginConfig, context) {
   return build({
     from: lastRelease?.gitTag || lastRelease?.gitHead,
     to: nextRelease.gitHead || "HEAD",
-    repo: env.GITHUB_REPOSITORY || "usekaneo/kaneo",
+    repo: env.GITHUB_REPOSITORY,
     token: env.GITHUB_TOKEN || env.GH_TOKEN,
     logger,
   });
 }
 
 const invokedDirectly =
-  process.argv[1] && import.meta.url.endsWith(process.argv[1].split("/").pop());
+  process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (invokedDirectly) {
   const [from, to = "HEAD"] = process.argv.slice(2);
-  const token =
-    process.env.GITHUB_TOKEN ||
-    process.env.GH_TOKEN ||
-    (() => {
-      try {
-        return execFileSync("gh", ["auth", "token"], {
-          encoding: "utf8",
-        }).trim();
-      } catch {
-        return "";
-      }
-    })();
   console.log(
     await build({
       from,
       to,
-      repo: "usekaneo/kaneo",
-      token,
+      repo: process.env.GITHUB_REPOSITORY,
+      token: process.env.GITHUB_REPOSITORY
+        ? process.env.GITHUB_TOKEN || process.env.GH_TOKEN
+        : undefined,
       logger: { log: () => {} },
     }),
   );

@@ -29,9 +29,9 @@ Attach the route by setting .Values.gateway.parentRefs to your Gateway listener 
 
 To access the application, set up port forwarding:
 
-$ kubectl port-forward svc/{{ include "kaneo.fullname" . }}-kaneo 5173:{{ .Values.kaneo.service.port }} -n {{ .Release.Namespace }}
+$ kubectl port-forward --address 127.0.0.1 svc/{{ include "kaneo.fullname" . }}-kaneo 32002:{{ .Values.kaneo.service.port }} -n {{ .Release.Namespace }}
 
-Then access the application at http://localhost:5173
+Then access the application at http://127.0.0.1:32002 (check the local port first).
 
 Alternatively, expose the service using an Ingress by setting .Values.ingress.enabled=true
 or Gateway API by setting .Values.gateway.enabled=true

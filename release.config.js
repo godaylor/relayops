@@ -1,8 +1,12 @@
 // RELEASE_TYPE forces the bump instead of deriving it from the commits.
+import { assertDestination } from "./scripts/release/assert-destination.mjs";
+
+const repository = assertDestination();
 const forced = process.env.RELEASE_TYPE;
 const forcedBump = forced && forced !== "auto" ? forced : null;
 
 export default {
+  repositoryUrl: `https://github.com/${repository}.git`,
   branches: ["main"],
   plugins: [
     forcedBump

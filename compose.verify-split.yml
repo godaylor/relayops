@@ -1,0 +1,31 @@
+# Disposable split-host verification. Never mount the main application's volumes.
+services:
+  split-api:
+    image: relayops-api:local
+    ports:
+      - "127.0.0.1:32043:1337"
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: relayops-local-verification-only
+      POSTGRES_DB: relayops_verify_test
+      AUTH_SECRET: relayops-verification-only-not-a-production-secret-123
+      NOTIFICATION_SECRET_ENCRYPTION_KEY: "1111111111111111111111111111111111111111111111111111111111111111"
+      RELAYOPS_WEBHOOK_ENCRYPTION_KEY: "hex:1111111111111111111111111111111111111111111111111111111111111111"
+      KANEO_CLIENT_URL: http://127.0.0.1:32042
+      KANEO_API_URL: http://127.0.0.1:32043
+      CORS_ORIGINS: http://127.0.0.1:32042
+      DISABLE_EMAIL_OTP_SIGN_IN: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+  split-web:
+    image: relayops-web:local
+    ports:
+      - "127.0.0.1:32042:5173"
+    environment:
+      KANEO_API_URL: http://127.0.0.1:32043
+      KANEO_CLIENT_URL: http://127.0.0.1:32042
+    depends_on:
+      split-api:
+        condition: service_healthy

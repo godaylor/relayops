@@ -1,17 +1,16 @@
-# Kaneo on Coolify
+# RelayOps on Coolify
 #
 # Deploy this stack from a Git source with Coolify's "Docker Compose" build pack:
-#   Public Repository -> https://github.com/usekaneo/kaneo
+#   Repository -> your own RelayOps repository (not selected yet)
 #   Build Pack: Docker Compose | Base Directory: / | Compose Location: compose.coolify.yml
 #
-# Assign a domain to the "kaneo" service using its container port, e.g. https://kaneo.example.com:5173
+# Assign your chosen domain to the compatibility-named "kaneo" service using container port 5173.
 # (visitors use the normal HTTPS URL; the port only tells Coolify where to route traffic).
 #
-# The only required environment variable is KANEO_CLIENT_URL (your public URL, without :5173).
+# Required: your verified RELAYOPS_IMAGE, KANEO_CLIENT_URL and persistent encryption secrets below.
 # AUTH_SECRET and the PostgreSQL password are auto-generated via Coolify magic variables.
 # Do NOT set KANEO_API_URL — the entrypoint derives it from KANEO_CLIENT_URL (public URL + /api).
-# The Kaneo image tracks the latest release by default. Set KANEO_IMAGE_TAG to a
-# release tag to hold a deployment on a known version.
+# RELAYOPS_IMAGE must identify your own immutable release; there is no upstream default.
 
 services:
   postgres:
@@ -30,13 +29,13 @@ services:
       retries: 5
 
   kaneo:
-    # Tracks the latest release. The API runs database migrations on startup, so
-    # set KANEO_IMAGE_TAG to a release tag if a redeploy should stay on a known
-    # version rather than pick up whatever is newest.
-    image: ghcr.io/usekaneo/kaneo:${KANEO_IMAGE_TAG:-latest}
+    # Back up data and keyrings before the API applies startup migrations.
+    image: ${RELAYOPS_IMAGE:?Set your own verified RelayOps image and immutable tag}
     environment:
       - KANEO_CLIENT_URL=${KANEO_CLIENT_URL:?}
       - AUTH_SECRET=${SERVICE_HEX_64_KANEO:?}
+      - NOTIFICATION_SECRET_ENCRYPTION_KEY=${NOTIFICATION_SECRET_ENCRYPTION_KEY:?}
+      - RELAYOPS_WEBHOOK_ENCRYPTION_KEY=${RELAYOPS_WEBHOOK_ENCRYPTION_KEY:?}
       # The image derives DATABASE_URL from these POSTGRES_* variables at startup.
       # POSTGRES_PASSWORD is the same generated value shared with the postgres service.
       - POSTGRES_HOST=postgres

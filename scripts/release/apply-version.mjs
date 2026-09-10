@@ -5,7 +5,12 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const version = process.argv[2] ?? "";
+const version =
+  process.argv[2] === "--check"
+    ? JSON.parse(
+        readFileSync(new URL("../../package.json", import.meta.url), "utf8"),
+      ).version
+    : (process.argv[2] ?? "");
 
 if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(version)) {
   console.error(
@@ -29,8 +34,10 @@ function rewrite(relativePath, transform, expected) {
     }
   }
 
-  writeFileSync(path, next);
-  console.log(`apply-version: ${relativePath} -> ${version}`);
+  if (!process.argv.includes("--check")) writeFileSync(path, next);
+  console.log(
+    `apply-version: ${relativePath} -> ${version}${process.argv.includes("--check") ? " (validation only)" : ""}`,
+  );
 }
 
 rewrite(

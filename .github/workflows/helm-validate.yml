@@ -57,7 +57,7 @@ jobs:
         uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5
 
       - name: Lint chart
-        run: helm lint "$CHART_PATH"
+        run: helm lint "$CHART_PATH" --set kaneo.env.authSecret=validation-only-secret-at-least-32-chars --set postgresql.auth.password=validation-only-db-password
 
       - name: Render chart (${{ matrix.name }})
-        run: helm template kaneo "$CHART_PATH" ${{ matrix.args }}
+        run: helm template relayops "$CHART_PATH" --set postgresql.auth.password=validation-only-db-password ${{ matrix.args }}

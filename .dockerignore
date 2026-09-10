@@ -10,3 +10,9 @@
 .env.*
 !apps/web/.env.production
 *.log
+.local
+.codex-temp
+artifacts
+**/*.tsbuildinfo
+**/.cache
+**/out

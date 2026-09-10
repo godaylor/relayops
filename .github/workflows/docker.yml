@@ -15,11 +15,13 @@ on:
 
 jobs:
   build:
+    if: ${{ github.repository != 'usekaneo/kaneo' && vars.RELAYOPS_PUBLISH_ENABLED == 'true' && vars.RELAYOPS_RELEASE_APPROVED == 'true' }}
     permissions:
       contents: read
       packages: write
     uses: ./.github/workflows/build-images.yml
-    secrets: inherit
+    secrets:
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
     with:
       version: ${{ inputs.version }}
       tags: |

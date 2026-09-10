@@ -1,59 +1,51 @@
-# Kaneo Helm Chart
-This Helm chart deploys [Kaneo](https://kaneo.app) - open source project management that works for you, not against you.
-## Introduction
-This chart bootstraps a Kaneo deployment on a Kubernetes cluster using the Helm package manager. It deploys both the API backend and Web frontend components, along with a PostgreSQL database, with optional ingress or Gateway API resources.
-## Prerequisites
-- Kubernetes 1.23+
-- Helm 3.2.0+
-- PV provisioner support in the underlying infrastructure (if persistence is enabled)
-## Quick Start
-### Basic Installation
-Install directly from GHCR:
+# RelayOps Helm Chart
+
+This chart deploys RelayOps, a self-hosted realtime incident-operations product derived from [Kaneo](https://github.com/usekaneo/kaneo). It is not an official or endorsed Kaneo product. Preserve the bundled [MIT license](LICENSE), Andrej Acevski's copyright and [third-party notices](THIRD_PARTY_NOTICES).
+
+## Installation prerequisites and status
+
+Helm 3.2.0+, Kubernetes 1.23+ and a provisioner for persistent volumes are required. Local lint/template/package checks do not prove Kubernetes runtime support; cluster smoke, PVC/upgrade and restore checks remain open before publication.
+
+There is no published RelayOps chart or approved image namespace yet. The default `kaneo.image.repository: relayops` is a placeholder, not a verified registry destination. **Every installation must override it with your own verified RelayOps combined image repository and immutable release tag**, whose image digest, SBOM, license inventory and security reports have been checked. Do not install upstream Kaneo images or charts as RelayOps.
+
+## Install from the reviewed local chart
+
+Prepare a private `deployment-values.yaml` using the examples below. Explicitly configure `kaneo.env.clientUrl`, an auth secret (at least 32 characters or an existing Secret), and PostgreSQL credentials (or an external database). Overlay examples below supplement these required values; they are not standalone installations.
+
+Set `RELAYOPS_IMAGE_REPOSITORY` and `RELAYOPS_IMAGE_TAG` to your own verified values, then:
+
 ```bash
-helm install kaneo oci://ghcr.io/usekaneo/charts/kaneo \
-  --namespace kaneo \
-  --create-namespace
-# Access locally
-kubectl port-forward svc/kaneo-kaneo 5173:5173 -n kaneo
+helm install relayops ./charts/kaneo \
+  --namespace relayops --create-namespace \
+  -f deployment-values.yaml \
+  --set-string kaneo.image.repository="${RELAYOPS_IMAGE_REPOSITORY:?Set your own verified image repository}" \
+  --set-string kaneo.image.tag="${RELAYOPS_IMAGE_TAG:?Set your verified immutable release tag}"
+# Access locally; clientUrl must match this origin for login.
+kubectl port-forward svc/relayops 32002:5173 -n relayops
 ```
-Open [http://localhost:5173](http://localhost:5173) and you're ready to go.
-### Production Setup with Ingress
-For real deployments, you'll want proper ingress:
+
+For the port-forward example use `http://127.0.0.1:32002` as clientUrl. For a target deployment supply your exact HTTPS URL and configure Ingress or Gateway API through the values below.
+
+To review a chart archive locally:
+
 ```bash
-helm install kaneo oci://ghcr.io/usekaneo/charts/kaneo \
-  --namespace kaneo \
-  --create-namespace \
-  --set ingress.enabled=true \
-  --set ingress.className=nginx \
-  --set "ingress.hosts[0].host=pm.yourcompany.com"
+helm package ./charts/kaneo --destination artifacts
 ```
-### Production Setup with Gateway API
-If your cluster already has Gateway API CRDs and a `Gateway` configured, you can expose Kaneo with an `HTTPRoute`:
-```bash
-helm install kaneo oci://ghcr.io/usekaneo/charts/kaneo \
-  --namespace kaneo \
-  --create-namespace \
-  --set gateway.enabled=true \
-  --set "gateway.parentRefs[0].name=main-gateway" \
-  --set "gateway.parentRefs[0].namespace=gateway-system" \
-  --set "gateway.parentRefs[0].sectionName=https" \
-  --set "gateway.hostnames[0]=pm.yourcompany.com"
-```
-## Installing the Chart
-To install the published chart with the release name `my-kaneo`:
-```bash
-helm install my-kaneo oci://ghcr.io/usekaneo/charts/kaneo
-```
-To install from a local checkout instead:
-```bash
-helm install my-kaneo ./charts/kaneo
-```
-The command deploys Kaneo on the Kubernetes cluster with default configuration. The [Parameters](#parameters) section lists the parameters that can be configured during installation.
+
+Install the reviewed local archive using the same required overrides. Own registry publication and target deployment require separate approval.
+
+## Compatibility and existing installations
+
+The path `charts/kaneo`, values under `kaneo.*`, template helpers, service selectors, database defaults and `KANEO_*` environment variables are compatibility identifiers. They are not upstream deployment destinations. Keep the existing release name, namespace, `nameOverride`/`fullnameOverride` and resource/PVC bindings when upgrading an existing installation: the chart name is now `relayops`, so default generated names can differ from the Kaneo chart. Compare rendered names against the existing resources before any upgrade. Do not delete production PVCs or automatically convert legacy project/task data.
+
 ## Uninstalling the Chart
-To uninstall/delete the `my-kaneo` deployment:
+
 ```bash
-helm uninstall my-kaneo
+helm uninstall relayops --namespace relayops
 ```
+
+Review the target release and persistence policy before uninstalling; preserve data and backups.
+
 ## Parameters
 ### Global parameters
 | Name                     | Description                                                                                                        | Value       |
@@ -78,7 +70,7 @@ When CPU autoscaling is enabled, set `kaneo.resources.requests.cpu`; Kubernetes 
 | `postgresql.image.pullPolicy`       | PostgreSQL image pull policy                                                                                      | `IfNotPresent`                  |
 | `postgresql.auth.database`          | PostgreSQL database name                                                                                           | `kaneo`                         |
 | `postgresql.auth.username`          | PostgreSQL username                                                                                                | `kaneo_user`                    |
-| `postgresql.auth.password`          | PostgreSQL password                                                                                                | `kaneo_password`                |
+| `postgresql.auth.password`          | PostgreSQL password                                                                                                | `""` (must be supplied)                |
 | `postgresql.auth.existingSecret`    | Name of existing secret containing PostgreSQL credentials                                                          | `""`                            |
 | `postgresql.persistence.enabled`    | Enable persistence for PostgreSQL data                                                                             | `true`                          |
 | `postgresql.persistence.size`       | PostgreSQL PVC size                                                                                                | `8Gi`                           |
@@ -87,16 +79,16 @@ When CPU autoscaling is enabled, set `kaneo.resources.requests.cpu`; Kubernetes 
 | `postgresql.service.type`           | PostgreSQL service type                                                                                            | `ClusterIP`                     |
 | `postgresql.service.port`           | PostgreSQL service port                                                                                            | `5432`                          |
 | `postgresql.resources`              | Resource requests and limits for PostgreSQL container                                                              | `{}`                            |
-### Kaneo application parameters
+### RelayOps application parameters
 | Name                                | Description                                                                                                        | Value                           |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------- |
-| `kaneo.image.repository`            | Kaneo image repository                                                                                             | `ghcr.io/usekaneo/kaneo`        |
-| `kaneo.image.tag`                   | Kaneo image tag. Defaults to `Chart.appVersion` when empty                                                         | `""`                            |
-| `kaneo.image.pullPolicy`            | Kaneo image pull policy                                                                                            | `IfNotPresent`                  |
+| `kaneo.image.repository`            | RelayOps image repository                                                                                             | `relayops` (placeholder; override required)        |
+| `kaneo.image.tag`                   | RelayOps image tag. Defaults to `Chart.appVersion` when empty                                                         | `""`                            |
+| `kaneo.image.pullPolicy`            | RelayOps image pull policy                                                                                            | `IfNotPresent`                  |
 | `kaneo.service.type`                | Kaneo service type                                                                                                 | `ClusterIP`                     |
 | `kaneo.service.port`                | Kaneo service port                                                                                                 | `5173`                          |
-| `kaneo.service.targetPort`          | Kaneo container port                                                                                               | `5173`                          |
-| `kaneo.env`                         | Environment variables for the Kaneo container                                                                      | See `values.yaml`               |
+| `kaneo.service.targetPort`          | RelayOps container port                                                                                               | `5173`                          |
+| `kaneo.env`                         | Environment variables for the RelayOps container                                                                      | See `values.yaml`               |
 | `kaneo.env.clientUrl`               | Public URL of the Kaneo instance. **Required for any non-localhost deployment**; sets `KANEO_CLIENT_URL`. Omitting this causes "invalid origin" errors on login. Note: this key is case-sensitive (`clientUrl`, not `clientURL`). | `""` |
 | `kaneo.env.corsOrigins`             | Allowed CORS origins as a comma-separated string or YAML list                                                      | `[]`                            |
 | `kaneo.env.authSecret`              | Required Better Auth secret (minimum 32 characters), ignored if existingSecret is enabled                           | `""` |
@@ -115,8 +107,8 @@ When CPU autoscaling is enabled, set `kaneo.resources.requests.cpu`; Kubernetes 
 | `kaneo.env.database.external.existingSecret.enabled` | Use an existing secret for the external database connection URI                             | `false`                         |
 | `kaneo.env.database.external.existingSecret.name` | Name of the secret containing the database connection URI                                    | `""`                            |
 | `kaneo.env.database.external.existingSecret.passwordKey` | Key in the secret whose value is a full PostgreSQL connection URI                       | `postgres_uri`                  |
-| `kaneo.extraEnv`                    | Additional Kubernetes EnvVar entries appended to the Kaneo container                                               | `[]`                            |
-| `kaneo.resources`                   | Resource requests and limits for the Kaneo container (optional, disabled by default)                               | `{}`                            |
+| `kaneo.extraEnv`                    | Additional Kubernetes EnvVar entries appended to the RelayOps container                                               | `[]`                            |
+| `kaneo.resources`                   | Resource requests and limits for the RelayOps container (optional, disabled by default)                               | `{}`                            |
 | `podSecurityContext`                | Security context applied at the Pod level                                                                          | `{}`                            |
 | `securityContext`                   | Security context applied at the container level                                                                    | `{}`                            |
 ### Ingress parameters
@@ -174,7 +166,7 @@ postgresql:
     requests:
       cpu: 100m
       memory: 128Mi
-# Kaneo configuration
+# RelayOps configuration
 kaneo:
   resources:
     limits:
@@ -323,7 +315,7 @@ kaneo:
 The chart deploys PostgreSQL 16 (Alpine) by default with the following configuration:
 - Database name: `kaneo`
 - Username: `kaneo_user`
-- Default password: `kaneo_password` (change this in production!)
+- No default password: supply one explicitly or reference an existing Secret.
 - Persistent storage: 8Gi (configurable)
 The bundled PostgreSQL deployment is intended for development, trials, and small self-hosted installs. For production environments, use an external managed PostgreSQL database by setting `postgresql.enabled=false` and configuring `kaneo.env.database.external`.
 Bundled PostgreSQL credentials are only applied when PostgreSQL initializes an empty data directory. If a PVC already exists, changing `postgresql.auth.password` or `postgresql.auth.existingSecret` updates the Pod environment but does not rotate the password inside the existing database. For local retesting with a new password, uninstall the release and delete the test PVC before reinstalling:
@@ -343,12 +335,12 @@ If you're migrating from a previous SQLite-based installation, you'll need to:
 1. Export your data from SQLite
 2. Deploy the new PostgreSQL-based chart
 3. Import your data into PostgreSQL
-Contact the Kaneo community on [Discord](https://discord.gg/rU4tSyhXXU) for migration assistance.
+This legacy migration outline is not a verified RelayOps migration recipe. Validate a backed-up test copy before selecting any migration path.
 ## Troubleshooting
 ### "invalid origin" error on login
-Kaneo's API validates the `Origin` header on every request against `KANEO_CLIENT_URL`. If `clientUrl` is not set (or is set incorrectly), every login attempt fails with this error.
+RelayOps API validates the `Origin` header on every request against `KANEO_CLIENT_URL`. If `clientUrl` is not set (or is set incorrectly), every login attempt fails with this error.
 
-Set `clientUrl` to the URL users access Kaneo from:
+Set `clientUrl` to the URL users access RelayOps from:
 ```yaml
 kaneo:
   env:
@@ -372,9 +364,9 @@ Common causes:
 On clusters with Pod Security Admission enabled, you may see warnings like `would violate PodSecurity "restricted:latest"`. The chart exposes `podSecurityContext` and `securityContext` to address these. See the [Security](#security) section for recommended values.
 ## Architecture
 This chart deploys the following components:
-1. **Kaneo application**: Serves the web UI and API from the combined Kaneo image
+1. **RelayOps application**: Serves the web UI and API from the combined RelayOps image
 2. **PostgreSQL Database**: Stores all application data with proper relational integrity
-The Kaneo application and PostgreSQL run in separate pods for resource isolation and simpler database lifecycle management.
+The RelayOps application and PostgreSQL run in separate pods for resource isolation and simpler database lifecycle management.
 ## Production Environment
 For production deployments, you should:
 1. Set secure values for `AUTH_SECRET` and PostgreSQL passwords
@@ -416,7 +408,7 @@ gateway:
     - kaneo.example.com
 ```
 By default the chart creates one Gateway API rule:
-1. `/` goes to the Kaneo service
+1. `/` goes to the RelayOps service
 If you need custom matching or multiple backend references, override `gateway.rules` directly. Each `backendRefs` entry follows the same pattern as ingress and uses the chart-specific `service` field (`kaneo`), which is expanded to the release-specific Service name.
 ## Security
 For production deployments, consider the following security recommendations:
