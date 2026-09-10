@@ -27,7 +27,7 @@ COPY packages/libs ./packages/libs
 COPY packages/permissions ./packages/permissions
 COPY i18n ./i18n
 COPY apps/api ./apps/api
-COPY LICENSE THIRD_PARTY_NOTICES ./
+COPY LICENSE LICENSE-RELAYOPS NOTICE THIRD_PARTY_NOTICES ./
 COPY scripts/release/licenses.mjs ./scripts/release/licenses.mjs
 
 # Build email package first. Ignore copied incremental state so runtime entrypoints

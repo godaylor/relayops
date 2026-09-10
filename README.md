@@ -32,7 +32,7 @@ RelayOps — self-hosted платформа для операционного р
 
 Альтернативный split API использует 32001, тестовый стенд — 32040/32041, релизный preview — 32070. Полная схема и безопасное переключение режимов находятся в руководстве среды. Логи проверок и локальные учётные данные не входят в Git.
 
-Состав и точный остаток до публикации: [RELEASE_PREFLIGHT.md](RELEASE_PREFLIGHT.md). `pnpm release:licenses` создаёт manifest SBOM/notices; `pnpm release:check` проверяет локальные source-gates и не разрешает публикацию. GitHub, хостинг и домен не выбраны. Release по умолчанию dry-run; публикационные workflow требуют отдельных opt-in gates и запрещают upstream.
+Состав и точный остаток до публикации: [RELEASE_PREFLIGHT.md](RELEASE_PREFLIGHT.md). `pnpm release:licenses` создаёт manifest SBOM/notices; `pnpm release:check` проверяет локальные source-gates. Release по умолчанию dry-run; публикационные workflow требуют отдельных opt-in gates и запрещают upstream.
 
 ## CI и бесплатный portfolio deploy
 
@@ -62,6 +62,6 @@ GitHub Actions запускают lint, i18n, typecheck, unit/integration tests,
 
 RelayOps создан на основе [Kaneo](https://github.com/usekaneo/kaneo), разработанного Andrej Acevski и сообществом Kaneo. Этот проект не является официальным продуктом Kaneo и не имеет официального одобрения Kaneo.
 
-Исходный код сохраняет лицензию MIT и авторское уведомление исходного проекта — см. [LICENSE](LICENSE). Сведения о сторонних компонентах, шрифтах и artifact-level attribution должны оставаться в составе будущего распространяемого артефакта.
+Исходные части Kaneo сохраняют MIT-лицензию и авторское уведомление исходного проекта — см. [LICENSE](LICENSE). Новый код, документация и source-defined brand assets RelayOps принадлежат Maxeem и доступны по отдельной [MIT-лицензии RelayOps](LICENSE-RELAYOPS). Граница авторства и обязательные ссылки собраны в [NOTICE](NOTICE), а сведения о сторонних компонентах и шрифтах — в [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES). Эти файлы входят в генерируемые artifact-level inventories.
 
 Публичное имя RelayOps утверждено владельцем этого репозитория для некоммерческого portfolio/demo release. Это утверждение не означает, что была проведена формальная юридическая проверка товарного знака или домена.

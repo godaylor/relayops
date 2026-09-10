@@ -1,6 +1,6 @@
 # RelayOps Helm Chart
 
-This chart deploys RelayOps, a self-hosted realtime incident-operations product derived from [Kaneo](https://github.com/usekaneo/kaneo). It is not an official or endorsed Kaneo product. Preserve the bundled [MIT license](LICENSE), Andrej Acevski's copyright and [third-party notices](THIRD_PARTY_NOTICES).
+This chart deploys RelayOps, a self-hosted realtime incident-operations product derived from [Kaneo](https://github.com/usekaneo/kaneo). It is not an official or endorsed Kaneo product. Preserve the bundled [upstream MIT license](LICENSE), [RelayOps MIT license](LICENSE-RELAYOPS), [attribution notice](NOTICE), Andrej Acevski's copyright and [third-party notices](THIRD_PARTY_NOTICES).
 
 ## Installation prerequisites and status
 

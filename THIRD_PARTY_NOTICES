@@ -4,8 +4,9 @@ Derived from Kaneo (https://github.com/usekaneo/kaneo), originally copyright
 (c) 2024 Andrej Acevski, licensed under the MIT License. This project is
 independently maintained and is not an official or endorsed Kaneo product.
 
-The original MIT license is preserved in LICENSE. Package-specific notices
-and apps/docs/LICENSE remain applicable to the corresponding original material.
+The original MIT license is preserved in LICENSE. RelayOps-specific original
+work is identified in NOTICE and licensed under LICENSE-RELAYOPS. Files with
+package-specific notices remain governed by those notices.
 
 Geist / Geist Mono: Copyright 2024 The Geist Project Authors
 (https://github.com/vercel/geist-font). Distributed under SIL OFL 1.1.
@@ -13,8 +14,8 @@ Exact Fontsource 5.3.0 license texts are copied into licenses/fonts.
 Font variants and npm dependency inventories are generated for each build.
 
 The generated /licenses directory in each image/static bundle includes full
-available npm LICENSE, COPYING and NOTICE texts, the upstream MIT notice,
-this file, and a CycloneDX manifest dependency inventory. DOMPurify's
+available npm LICENSE, COPYING and NOTICE texts, both project MIT licenses,
+the project NOTICE, this file, and a CycloneDX manifest dependency inventory. DOMPurify's
 Apache-2.0 option is selected where its dual-license expression permits it.
 Installed OS package inventories are recorded separately by image scanning.
 An inventory is not a legal opinion or a security clearance.
@@ -26,3 +27,7 @@ It is not copied from that SDK. No real billing provider was exercised.
 Kaneo-era marketing screenshots, badges and claims are not assets of the
 RelayOps application. The new RelayOps SVG mark is source-defined in
 scripts/release/brand.mjs; its raster variants are generated from that SVG.
+
+The private legacy Planka importer remains under its unmodified directory-level
+MIT license. It is not part of RelayOps release artifacts and is not presented
+as new RelayOps work.

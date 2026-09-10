@@ -31,7 +31,7 @@
 | RU/EN | clean RU onboarding, localized filters, RU→EN→RU persistence, no page errors |
 | A11y automation | axe serious/critical gate, keyboard path, focus restore, 200/400% text zoom, reduced motion и forced colors входят в S10 E2E |
 | Security dependencies | `pnpm audit` — 0 advisories; Trivy reports — 0 findings на трёх просканированных образах |
-| Licenses | source inventory 1469 packages, 0 unresolved metadata; root MIT byte-identical upstream |
+| Licenses | release-source inventory 1468 packages, 0 unresolved metadata; root MIT text matches upstream after EOL normalization; separate RelayOps MIT/NOTICE added |
 | Deployment | bundled, split and optional Redis topologies; Helm lint + 6 template modes, без Kubernetes cluster runtime |
 | Текущий runtime | container `relayops-relayops-1`, image `relayops:local`, healthy, loopback `127.0.0.1:32000->5173` |
 
@@ -63,7 +63,7 @@
 | Native build затронутых consumers | **5/5 tasks** (3 cached); .local/audit-fix-build-native.log; API/web пересобраны, существующие chunk warnings сохранены |
 | Docker build | bundled/API/web пересобраны; .local/audit-fix-build-{bundled,api,web}.log |
 | Helm 3.19.0 | lint + 6 template modes passed; .local/audit-fix-helm.log; новый artifacts/helm/relayops-2.22.0.tgz, без cluster runtime |
-| Source/API/web manifest inventories | **1469 / 309 / 548 packages**, во всех 0 unresolved metadata; artifacts/licenses/{source,api,web}/ |
+| Source/API/web manifest inventories | **1468 / 309 / 548 packages**, во всех 0 unresolved metadata; artifacts/licenses/{source,api,web}/ |
 | Exact-image inventories/scans | Для каждого ID ниже извлечён встроенный /licenses, создан Trivy CycloneDX SBOM и JSON vuln/license report; **0 reported vulnerabilities** на каждом |
 | Artifact inspection | artifacts/audit-fix/verification.json: SHA-256, совпадение image notices с рабочими оригиналами, byte match README/LICENSE/notices внутри chart, OpenAPI |
 | Formatting / preflight / whitespace | 8 изменённых файлов: 0 Biome errors (3 warnings, 12 infos); pnpm release:check PASS; git diff --check PASS с CRLF→LF warnings |
@@ -80,7 +80,7 @@
 
 Source candidate artifacts/relayops-source-candidate.tar.gz пересоздан с актуальным FINAL_AUDIT.md, source SBOM/review и file-hash manifest. Hash и число файлов записаны отдельно в .local/audit-fix-source-candidate.json; архив проверен на включение актуального аудита и исключение private local state/Planka importer. Это review package, не clean commit или разрешение на публикацию.
 
-Основной relayops:local и сохранённые пользовательские данные не заменялись. Test fixtures созданы только в verify stack на 32040/32041; stack остановлен после проверок. Временные контейнеры для извлечения licenses удалены по конкретным IDs. Созданы пять локальных commits; push, tag, PR и deploy не выполнялись.
+Основной relayops:local и сохранённые пользовательские данные не заменялись. Test fixtures созданы только в verify stack на 32040/32041; stack остановлен после проверок. Временные контейнеры для извлечения licenses удалены по конкретным IDs. Созданы шесть локальных commits; push, tag, PR и deploy не выполнялись.
 
 
 ## Publication preparation — 2026-09-10
@@ -89,7 +89,7 @@ Source candidate artifacts/relayops-source-candidate.tar.gz пересоздан
 - Точный Git index проверен Gitleaks 8.30.1 (container digest `sha256:c00b6ae320ec3720ee2b70d30dd271f0bf5879910996e64c430113053239ef69`): `13.02 MB`, **0 leaks**.
 - Точный Git index проверен Semgrep 1.175.1 (`p/default`, затем severity `ERROR`). Найденные ошибки mutable GitHub Actions, `secrets: inherit`, AES-GCM без явной длины tag и insecure WebSocket test fixture устранены; повторная целевая проверка последнего файла дала **0 findings**. Legacy INFO/WARNING и parser warnings остаются review evidence, а не скрываются allowlist-ом.
 - Добавлен fail-closed GitHub security workflow: Gitleaks, CodeQL `security-extended` и dependency review. Все используемые внешние Actions закреплены на immutable commit SHA; workflow с ненужными правами и upstream publish/notification automation удалены.
-- Локальный GitHub-сеанс отсутствует (`gh` не установлен, браузер показывает Sign in), поэтому собственный remote не создан и upstream `origin` не менялся.
+- GitHub-сеанс в браузере аутентифицирован как `godaylor`; `gh` не установлен. Собственный public remote не создавался до закрытия manual accessibility gate; upstream `origin` не менялся.
 - Gitleaks повторно проверил диапазон `8100f3b1..HEAD`: **5 commits, 3.03 MB, 0 leaks**.
 
 ## Обязательные исправления до публикации
@@ -99,9 +99,9 @@ Source candidate artifacts/relayops-source-candidate.tar.gz пересоздан
 | P0 | Независимые scans требуют подтверждения в clean GitHub CI | Локальные Gitleaks/Semgrep scans завершены и критичные findings исправлены; CodeQL/dependency-review ещё не выполнялись на GitHub runner. | После создания собственного repository дождаться green security workflow и сохранить ссылку на run. |
 | P0 | Не завершён manual accessibility gate | Manual screen-reader/assistive-technology pass не выполнялся. Автоматические axe/keyboard/zoom проверки не закрывают требование PLAN/ROP-013. | Выполнить краткий NVDA/VoiceOver-проход основных сценариев, зафиксировать браузер/AT/результат и исправить blockers. |
 | P0 | Publication digests ещё не выбраны | Локальная stale-evidence проблема закрыта: новые image IDs совпадают со scanned IDs; SBOM/license inventory обновлены. Это не выбранные публичные digests. | Подтвердить соответствие выбранных publication artifacts проверенным IDs; при rebuild повторить SBOM/licenses/Trivy и выполнить независимый secret scan. |
-| P0 | Публикационная точка назначения отсутствует | `origin` всё ещё `https://github.com/usekaneo/kaneo.git`; release guards намеренно запрещают публикацию; собственные repo/owner/domain/hosting не выбраны. | Создать собственный repository/namespace, проверить весь diff, настроить exact public URLs/CORS/OAuth/HTTPS/WSS/secrets, затем выполнить GitHub CI и release dry-run. Не push в upstream. |
-| P0 | Публикационная Git-история ещё не подтверждена удалённым CI | Локальная ветка содержит пять смысловых commits поверх исходного Kaneo без переписывания истории; Gitleaks commit-range scan: 0 leaks. | Выполнить CI после push в собственный repository; никогда не отправлять эту ветку в upstream. |
-| P1 | Неясный holder в legacy Planka importer блокирует публикацию всего дерева | `packages/planka-import/LICENSE`: `Copyright (c) 2026 Kaneo MCP contributors`; локальная история недостаточна для авторитетного исправления. Package private и исключён из source candidate, но присутствует в полном repository. | Получить подтверждение provenance/holder либо юридически корректно определить scope публичного source artifact так, чтобы пакет не выдавался за очищенный. Не угадывать holder и не удалять исходный notice. |
+| P0 | Public repository и Pages ещё не созданы | GitHub owner `godaylor` аутентифицирован; `origin` всё ещё `https://github.com/usekaneo/kaneo.git`; release guards намеренно запрещают upstream. | После manual AT создать отдельный public repository/remote, включить fail-closed Pages variables, дождаться green CI/security и проверить выданный HTTPS URL. |
+| P0 | Публикационная Git-история ещё не подтверждена удалённым CI | Локальная ветка содержит шесть смысловых commits поверх исходного Kaneo без переписывания истории; Gitleaks commit-range scan: 0 leaks. | Выполнить CI после push в собственный repository; никогда не отправлять эту ветку в upstream. |
+| RESOLVED | Legacy Planka importer имеет отдельный holder notice | `packages/planka-import/LICENSE` сохранён без изменений; package private, снабжён scope NOTICE, исключён из RelayOps Docker/static/Helm/source-candidate artifacts и не выдаётся за новый код. | Не удалять и не заменять исходный notice; не публиковать этот private package как RelayOps npm artifact. |
 | P1 | Не выполнен реальный target deployment | Нет Kubernetes runtime, production restore/upgrade, public DNS/HTTPS/WSS и manual release workflow dry-run в собственном repo. | Проверить только выбранные поддерживаемые поверхности на целевом окружении; если Helm заявляется поддерживаемым — выполнить cluster smoke и PVC/upgrade review. |
 
 Для локального mobile demo проверен новый relayops:audit-fix; сохраняется оговорка «local portfolio build». Прежний runtime relayops:local на 32000 автоматически не обновлялся. Для публичного source/site/image/chart release обязательны все P0 и применимые P1 выше. Для коммерческого/full-production выпуска дополнительно обязательна формальная trademark/domain review имени RelayOps.
@@ -161,27 +161,26 @@ Source candidate artifacts/relayops-source-candidate.tar.gz пересоздан
 ## Лицензии и обязательные уведомления
 
 - Root LICENSE не редактировался; Copyright (c) 2024 Andrej Acevski и полный MIT text сохранены. Уточнение прежнего byte-identical утверждения: рабочий файл имеет CRLF, HEAD:LICENSE — LF; текст совпадает после нормализации переводов строк. Git blob equality не доказывает равенства сырых байтов рабочего файла. Notices новых image/chart artifacts проверены против соответствующих файлов рабочего дерева.
-- `THIRD_PARTY_NOTICES` содержит upstream URL, MIT attribution и явный disclaimer independent/not official or endorsed.
+- `THIRD_PARTY_NOTICES` содержит upstream URL, MIT attribution и явный disclaimer independent/not official or endorsed. `LICENSE-RELAYOPS` оформляет новый код и source-defined brand assets как Copyright (c) 2026 Maxeem; `NOTICE` фиксирует границу авторства.
 - Attribution видим в README, docs, RelayOps shell footer и portfolio footer.
 - Geist/Geist Mono OFL 1.1 texts присутствуют в `licenses/fonts` и inventories.
-- Source inventory: 1469 packages, zero unresolved metadata; Creem SDK отсутствует в manifest/lock/artifacts.
+- Release-source inventory: 1468 packages, zero unresolved metadata; private Planka importer имеет собственную сохранённую лицензию и исключён из release scope; Creem SDK отсутствует в manifest/lock/artifacts.
 - LICENSE и notices доступны из текущего bundled runtime с HTTP 200 и включены в Helm/source artifacts.
 
-Это хорошая база, но не юридическое заключение. Публикация полного repository остаётся заблокирована holder-вопросом Planka importer и оставшимися внешними gates; public instructions/metadata исправлены в этом проходе. Ничего из исходных notices в ходе аудита не удалялось и не исправлялось.
+Это хорошая база, но не юридическое заключение. Исходные notices Kaneo, Planka importer и Geist/OFL сохранены; ни один сторонний copyright не удалялся и не переписывался. Новый код лицензирован отдельно, а release artifacts исключают private legacy importer и неиспользуемые Kaneo marketing assets.
 
 ## Сохранённое состояние и ограничения аудита
 
 - Назначенные порты из `RELEASE_PREFLIGHT.md` сохранены. Во время финального среза из RelayOps host-published только `32000`; PostgreSQL `relayops-postgres-1` остаётся internal-only и healthy. Другие проекты/контейнеры не останавливались.
 - Сохранённый volume и backups не трогались; `.env`, database rows, uploads и credentials не изменялись.
 - Windows browser automation дважды не стартовала из-за sandbox error `apply deny-read ACLs`. Поэтому desktop оценка основана на свежих сохранённых screenshots и browser logs, а недостающий mobile app pass выполнен отдельным headless Chromium read-only context.
-- Manual screen-reader, secret scan, SAST, live external integrations, Kubernetes runtime, public deployment и GitHub release dry-run не выполнялись и не считаются готовыми.
+- Manual screen-reader review, GitHub-hosted security runs и public deployment не выполнялись. Независимые локальные Gitleaks/Semgrep scans завершены; live optional integrations и Kubernetes runtime не заявляются частью статического demo-deploy.
 - Source candidate и image inventories обновлены для этих исправлений. После будущих изменений их потребуется пересоздать; текущий архив не доказывает соответствие будущему commit/publication digest.
 
 ## Оставшийся путь к публикации
 
-1. Выполнить manual AT, независимый secret scan и SAST; сохранить реальные результаты.
-2. Выбрать собственные repository/image/chart/site namespace и target hosting; подтвердить holder либо юридически корректный scope Planka importer, не исправляя notice по догадке.
-3. После появления собственного remote отправить готовые reviewable commits и выполнить GitHub CI/release dry-run. Push в этом проходе не выполнялся.
-4. Для выбранных publication digests подтвердить актуальность SBOM/licenses/Trivy/secret scans; проверить target deployment, DNS/HTTPS/WSS, restore/upgrade и Kubernetes runtime, если Helm заявляется поддерживаемым.
-5. Только после отдельного approval публиковать tag/image/chart/site. Формальная trademark/domain review остаётся обязательной для коммерческого/full-production выпуска.
+1. Выполнить обязательный manual NVDA/VoiceOver pass основных сценариев и сохранить результат.
+2. Создать public repository под аутентифицированным GitHub owner `godaylor`, добавить отдельный remote и push reviewable commits без изменения прежней истории.
+3. Включить fail-closed Pages variables, дождаться green CI/security workflows и проверить статический demo по выданному HTTPS URL.
+4. Images/chart/full runtime остаются отдельным production release: для них потребуются актуальные digests, target secrets, restore/upgrade и Kubernetes checks. Статический Pages demo их не заявляет.
 

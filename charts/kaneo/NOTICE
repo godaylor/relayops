@@ -1,0 +1,17 @@
+RelayOps attribution notice
+
+RelayOps is an independent derivative of Kaneo
+(https://github.com/usekaneo/kaneo). Original Kaneo portions remain
+Copyright (c) 2024 Andrej Acevski and are distributed under the MIT terms in
+LICENSE. RelayOps-specific original code, documentation and source-defined
+brand assets are Copyright (c) 2026 Maxeem and are distributed under the MIT
+terms in LICENSE-RELAYOPS.
+
+Files that carry their own copyright or license notice remain governed by
+those notices. This includes the preserved legacy Planka importer notice and
+the SIL Open Font License texts under licenses/fonts. Dependency and artifact
+attribution is recorded in THIRD_PARTY_NOTICES and generated /licenses
+inventories.
+
+RelayOps is not an official Kaneo product and is not endorsed by Kaneo or its
+contributors.

@@ -18,7 +18,12 @@ const out = resolve(
   process.argv[3] ?? join(root, `artifacts/licenses/${scope}`),
 );
 mkdirSync(out, { recursive: true });
-for (const name of ["LICENSE", "THIRD_PARTY_NOTICES"])
+for (const name of [
+  "LICENSE",
+  "LICENSE-RELAYOPS",
+  "NOTICE",
+  "THIRD_PARTY_NOTICES",
+])
   copyFileSync(join(root, name), join(out, name));
 const starts =
   scope === "api"
@@ -36,7 +41,6 @@ const starts =
             "packages/libs",
             "packages/permissions",
             "packages/mcp",
-            "packages/planka-import",
           ];
 const seen = new Set();
 const components = new Map();

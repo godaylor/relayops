@@ -1,0 +1,4 @@
+This private compatibility utility is retained from the Kaneo source history.
+It is not relicensed as RelayOps code and is not included in RelayOps Docker,
+static-site, Helm, or source-candidate release artifacts. Its original MIT
+license and copyright notice are preserved in this directory's LICENSE file.

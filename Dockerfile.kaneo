@@ -22,7 +22,7 @@ COPY packages/libs ./packages/libs
 COPY packages/permissions ./packages/permissions
 COPY i18n ./i18n
 COPY apps/api ./apps/api
-COPY LICENSE THIRD_PARTY_NOTICES ./
+COPY LICENSE LICENSE-RELAYOPS NOTICE THIRD_PARTY_NOTICES ./
 COPY scripts/release/licenses.mjs ./scripts/release/licenses.mjs
 
 WORKDIR /app/packages/email
@@ -81,7 +81,7 @@ COPY packages/libs ./packages/libs
 COPY packages/permissions ./packages/permissions
 COPY i18n ./i18n
 COPY apps/web ./apps/web
-COPY LICENSE THIRD_PARTY_NOTICES ./
+COPY LICENSE LICENSE-RELAYOPS NOTICE THIRD_PARTY_NOTICES ./
 COPY scripts/release/licenses.mjs ./scripts/release/licenses.mjs
 
 WORKDIR /app/packages/permissions
@@ -121,7 +121,7 @@ RUN chmod +x /docker-entrypoint.d/env.sh /usr/local/bin/kaneo-entrypoint.sh
 COPY --from=api-builder /app/licenses/api /licenses/api
 COPY --from=web-builder /app/licenses/web /licenses/web
 COPY --from=web-builder /app/licenses/web /usr/share/nginx/html/licenses
-COPY LICENSE THIRD_PARTY_NOTICES /licenses/
+COPY LICENSE LICENSE-RELAYOPS NOTICE THIRD_PARTY_NOTICES /licenses/
 ARG RELAYOPS_SOURCE_URL
 ARG RELAYOPS_REVISION=local
 LABEL org.opencontainers.image.title="RelayOps" org.opencontainers.image.licenses="MIT" org.opencontainers.image.source=$RELAYOPS_SOURCE_URL org.opencontainers.image.revision=$RELAYOPS_REVISION

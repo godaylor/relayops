@@ -34,7 +34,7 @@ COPY packages/libs ./packages/libs
 COPY packages/permissions ./packages/permissions
 COPY i18n ./i18n
 COPY apps/web ./apps/web
-COPY LICENSE THIRD_PARTY_NOTICES ./
+COPY LICENSE LICENSE-RELAYOPS NOTICE THIRD_PARTY_NOTICES ./
 COPY scripts/release/licenses.mjs ./scripts/release/licenses.mjs
 
 # Build the permissions package first

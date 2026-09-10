@@ -101,9 +101,7 @@ export function Portfolio({ copy, locale }: Props) {
       </main>
       <footer className="portfolio-footer">
         <p>{copy.provenance}</p>
-        <a href={withBasePath("/licenses/THIRD_PARTY_NOTICES")}>
-          {copy.licenses}
-        </a>
+        <a href={withBasePath("/licenses/NOTICE")}>{copy.licenses}</a>
         <a href="https://github.com/usekaneo/kaneo">{copy.upstream}</a>
       </footer>
     </div>

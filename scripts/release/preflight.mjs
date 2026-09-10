@@ -6,6 +6,7 @@ import { resolve } from "node:path";
 process.chdir(resolve(import.meta.dirname, "../.."));
 const read = (name) => readFileSync(name, "utf8");
 const pkg = JSON.parse(read("package.json"));
+const upstreamBaseline = "8100f3b1ab47a0b49c7ac6deabe64eb0d1d9970d";
 assert.equal(pkg.name, "relayops");
 assert.equal(pkg.packageManager, "pnpm@10.32.1");
 assert.ok(
@@ -14,12 +15,15 @@ assert.ok(
 );
 assert.equal(
   read("LICENSE").replaceAll("\r\n", "\n"),
-  execFileSync("git", ["show", "HEAD:LICENSE"], {
+  execFileSync("git", ["show", `${upstreamBaseline}:LICENSE`], {
     encoding: "utf8",
   }).replaceAll("\r\n", "\n"),
   "Original MIT license must be preserved",
 );
 assert.ok(read("LICENSE").includes("Andrej Acevski"));
+assert.ok(read("LICENSE-RELAYOPS").includes("Copyright (c) 2026 Maxeem"));
+assert.ok(read("NOTICE").includes("independent derivative of Kaneo"));
+assert.ok(read("NOTICE").includes("not endorsed by Kaneo"));
 assert.ok(
   read("THIRD_PARTY_NOTICES").includes(
     "not an official or endorsed Kaneo product",
@@ -41,11 +45,16 @@ for (const file of [
   "apps/api/Dockerfile",
   "apps/web/Dockerfile",
 ]) {
-  assert.ok(
-    read(file).includes("THIRD_PARTY_NOTICES") &&
-      read(file).includes("/licenses"),
-    file + " must carry notices",
-  );
+  const dockerfile = read(file);
+  for (const name of [
+    "LICENSE",
+    "LICENSE-RELAYOPS",
+    "NOTICE",
+    "THIRD_PARTY_NOTICES",
+  ]) {
+    assert.ok(dockerfile.includes(name), `${file} must carry ${name}`);
+  }
+  assert.ok(dockerfile.includes("/licenses"), file + " must carry notices");
 }
 for (const file of ["compose.yml", "compose.local.yml", "compose.verify.yml"]) {
   const published = read(file)
@@ -79,8 +88,20 @@ for (const name of ["mcp", "planka-import"]) {
     continue;
   assert.equal(JSON.parse(read(`packages/${name}/package.json`)).private, true);
 }
-for (const name of ["LICENSE", "THIRD_PARTY_NOTICES"])
-  assert.ok(existsSync("charts/kaneo/" + name));
+for (const name of [
+  "LICENSE",
+  "LICENSE-RELAYOPS",
+  "NOTICE",
+  "THIRD_PARTY_NOTICES",
+]) {
+  const chartCopy = "charts/kaneo/" + name;
+  assert.ok(existsSync(chartCopy));
+  assert.equal(
+    read(chartCopy).replaceAll("\r\n", "\n"),
+    read(name).replaceAll("\r\n", "\n"),
+    `${chartCopy} must match the root notice`,
+  );
+}
 const openapi = JSON.parse(read("apps/docs/openapi.json"));
 assert.equal(openapi.info.title, "RelayOps API");
 assert.ok(openapi.info.description.includes("append-only timelines"));
@@ -102,5 +123,5 @@ assert.equal(
 );
 console.log("Local source preflight: PASS. This is not release approval.");
 console.log(
-  "Publication remains disabled until own repository, hosting/domain, manual accessibility/brand review and final deployment approval are supplied.",
+  "Public push remains disabled until the required manual accessibility review passes; GitHub CI and Pages verification follow that push.",
 );
