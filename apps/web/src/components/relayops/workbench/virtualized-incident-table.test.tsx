@@ -34,7 +34,11 @@ describe("VirtualizedIncidentTable", () => {
     const renderedRows = screen.getAllByTestId("workbench-row");
     expect(renderedRows.length).toBeLessThan(20);
     expect(renderedRows.length).toBeGreaterThanOrEqual(4);
-    fireEvent.keyDown(renderedRows[0]!, { key: "Enter" });
+    const firstRow = renderedRows[0];
+    if (!firstRow) {
+      throw new Error("Expected the virtualized table to render a row");
+    }
+    fireEvent.keyDown(firstRow, { key: "Enter" });
     expect(onSelect).toHaveBeenCalledWith(
       "incident-0",
       expect.any(HTMLTableRowElement),
@@ -61,12 +65,14 @@ describe("VirtualizedIncidentTable", () => {
     );
 
     const scroller = screen.getByRole("table").parentElement;
-    expect(scroller).not.toBeNull();
-    Object.defineProperties(scroller!, {
+    if (!scroller) {
+      throw new Error("Expected the virtualized table to expose a scroller");
+    }
+    Object.defineProperties(scroller, {
       clientHeight: { configurable: true, value: 176 },
       scrollHeight: { configurable: true, value: 4_400 },
     });
-    fireEvent.scroll(scroller!, { target: { scrollTop: 4_250 } });
+    fireEvent.scroll(scroller, { target: { scrollTop: 4_250 } });
     expect(onLoadMore).toHaveBeenCalledTimes(1);
     expect(screen.getAllByTestId("workbench-row").length).toBeLessThan(20);
   });
