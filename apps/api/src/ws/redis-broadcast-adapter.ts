@@ -5,6 +5,7 @@ import type {
   BroadcastAdapter,
   BroadcastMessage,
   UserBroadcast,
+  WorkspaceBroadcast,
 } from "./broadcast-adapter";
 
 const CHANNEL_PREFIX = "kaneo:ws:";
@@ -13,6 +14,8 @@ const CHANNEL_PATTERN = `${CHANNEL_PREFIX}*${CHANNEL_SUFFIX}`;
 
 const USER_CHANNEL_PREFIX = "kaneo:ws-user:";
 const USER_CHANNEL_PATTERN = `${USER_CHANNEL_PREFIX}*${CHANNEL_SUFFIX}`;
+const WORKSPACE_CHANNEL_PREFIX = "kaneo:ws-workspace:";
+const WORKSPACE_CHANNEL_PATTERN = `${WORKSPACE_CHANNEL_PREFIX}*${CHANNEL_SUFFIX}`;
 
 const broadcastMessageSchema = v.object({
   projectId: v.string(),
@@ -32,6 +35,13 @@ const userBroadcastSchema = v.object({
   origin: v.optional(v.string()),
 });
 
+const workspaceBroadcastSchema = v.object({
+  workspaceId: v.string(),
+  message: v.looseObject({ type: v.string() }),
+  excludeUserId: v.optional(v.string()),
+  origin: v.optional(v.string()),
+});
+
 export class RedisBroadcastAdapter implements BroadcastAdapter {
   private subscribed = false;
   private userSubscribed = false;
@@ -42,6 +52,10 @@ export class RedisBroadcastAdapter implements BroadcastAdapter {
     | ((pattern: string, channel: string, data: string) => void)
     | null = null;
 
+  private workspaceSubscribed = false;
+  private workspaceMessageHandler:
+    | ((pattern: string, channel: string, data: string) => void)
+    | null = null;
   async publish(msg: BroadcastMessage): Promise<void> {
     await getRedisPub().publish(
       this.channelForProject(msg.projectId),
@@ -52,6 +66,13 @@ export class RedisBroadcastAdapter implements BroadcastAdapter {
   async publishToUser(msg: UserBroadcast): Promise<void> {
     await getRedisPub().publish(
       this.channelForUser(msg.userId),
+      JSON.stringify(msg),
+    );
+  }
+
+  async publishToWorkspace(msg: WorkspaceBroadcast): Promise<void> {
+    await getRedisPub().publish(
+      this.channelForWorkspace(msg.workspaceId),
       JSON.stringify(msg),
     );
   }
@@ -112,6 +133,32 @@ export class RedisBroadcastAdapter implements BroadcastAdapter {
     await getRedisSub().psubscribe(USER_CHANNEL_PATTERN);
   }
 
+  async subscribeToWorkspace(
+    handler: (msg: WorkspaceBroadcast) => void,
+  ): Promise<void> {
+    if (this.workspaceSubscribed) return;
+    this.workspaceSubscribed = true;
+    this.workspaceMessageHandler = (pattern, channel, data) => {
+      if (pattern !== WORKSPACE_CHANNEL_PATTERN) return;
+      try {
+        const parsed = v.safeParse(workspaceBroadcastSchema, JSON.parse(data));
+        if (!parsed.success) {
+          console.error("Invalid workspace broadcast message");
+          return;
+        }
+        if (channel !== this.channelForWorkspace(parsed.output.workspaceId)) {
+          console.error("Workspace broadcast channel and payload disagree");
+          return;
+        }
+        handler(parsed.output as WorkspaceBroadcast);
+      } catch {
+        console.error("Failed to parse workspace broadcast message");
+      }
+    };
+    (getRedisSub() as Redis).on("pmessage", this.workspaceMessageHandler);
+    await getRedisSub().psubscribe(WORKSPACE_CHANNEL_PATTERN);
+  }
+
   async shutdown(): Promise<void> {
     const sub = getRedisSub() as Redis;
 
@@ -124,11 +171,17 @@ export class RedisBroadcastAdapter implements BroadcastAdapter {
       this._userPmessageHandler = null;
     }
 
+    if (this.workspaceMessageHandler) {
+      sub.off("pmessage", this.workspaceMessageHandler);
+      this.workspaceMessageHandler = null;
+    }
     // Unsubscribe from the pattern, which covers all project channels
     await getRedisSub().punsubscribe(CHANNEL_PATTERN);
     await getRedisSub().punsubscribe(USER_CHANNEL_PATTERN);
     this.subscribed = false;
     this.userSubscribed = false;
+    this.workspaceSubscribed = false;
+    await getRedisSub().punsubscribe(WORKSPACE_CHANNEL_PATTERN);
     await closeRedis();
   }
 
@@ -138,5 +191,9 @@ export class RedisBroadcastAdapter implements BroadcastAdapter {
 
   private channelForUser(userId: string): string {
     return `${USER_CHANNEL_PREFIX}${userId}${CHANNEL_SUFFIX}`;
+  }
+
+  private channelForWorkspace(workspaceId: string): string {
+    return `${WORKSPACE_CHANNEL_PREFIX}${workspaceId}${CHANNEL_SUFFIX}`;
   }
 }

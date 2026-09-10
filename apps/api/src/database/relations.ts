@@ -4,16 +4,28 @@ import {
   activityTable,
   apikeyTable,
   assetTable,
+  authorizationAuditEventTable,
   columnTable,
   commentTable,
   externalLinkTable,
   githubIntegrationTable,
+  incidentAffectedServiceTable,
+  incidentEventTable,
+  incidentResponderTable,
+  incidentSignalTable,
+  incidentTable,
   integrationTable,
   invitationTable,
   labelTable,
   notificationTable,
+  outboxEventTable,
   projectTable,
+  savedViewTable,
+  serviceTable,
   sessionTable,
+  signalIngestionAttemptTable,
+  signalSourceTable,
+  signalTable,
   taskRelationTable,
   taskReminderSentTable,
   taskTable,
@@ -46,6 +58,17 @@ export const userTableRelations = relations(userTable, ({ many, one }) => ({
   notificationWorkspaceRules: many(userNotificationWorkspaceRuleTable),
   sentInvitations: many(invitationTable),
   apikeys: many(apikeyTable),
+  createdIncidents: many(incidentTable),
+  incidentEvents: many(incidentEventTable),
+  incidentResponses: many(incidentResponderTable),
+  incidentSignalAttachments: many(incidentSignalTable),
+  savedViews: many(savedViewTable),
+  authorizationAuditEventsAuthored: many(authorizationAuditEventTable, {
+    relationName: "authorizationAuditActor",
+  }),
+  authorizationAuditEventsTargeted: many(authorizationAuditEventTable, {
+    relationName: "authorizationAuditTarget",
+  }),
 }));
 
 export const sessionTableRelations = relations(sessionTable, ({ one }) => ({
@@ -76,6 +99,217 @@ export const workspaceTableRelations = relations(
     assets: many(assetTable),
     invitations: many(invitationTable),
     notificationWorkspaceRules: many(userNotificationWorkspaceRuleTable),
+    services: many(serviceTable),
+    incidents: many(incidentTable),
+    incidentEvents: many(incidentEventTable),
+    incidentSignals: many(incidentSignalTable),
+    outboxEvents: many(outboxEventTable),
+    savedViews: many(savedViewTable),
+    signals: many(signalTable),
+    signalSources: many(signalSourceTable),
+    signalIngestionAttempts: many(signalIngestionAttemptTable),
+    authorizationAuditEvents: many(authorizationAuditEventTable),
+  }),
+);
+
+export const authorizationAuditEventTableRelations = relations(
+  authorizationAuditEventTable,
+  ({ one }) => ({
+    workspace: one(workspaceTable, {
+      fields: [authorizationAuditEventTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+    actor: one(userTable, {
+      fields: [authorizationAuditEventTable.actorUserId],
+      references: [userTable.id],
+      relationName: "authorizationAuditActor",
+    }),
+    target: one(userTable, {
+      fields: [authorizationAuditEventTable.targetUserId],
+      references: [userTable.id],
+      relationName: "authorizationAuditTarget",
+    }),
+  }),
+);
+
+export const serviceTableRelations = relations(
+  serviceTable,
+  ({ one, many }) => ({
+    workspace: one(workspaceTable, {
+      fields: [serviceTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+    ownerTeam: one(teamTable, {
+      fields: [serviceTable.workspaceId, serviceTable.ownerTeamId],
+      references: [teamTable.workspaceId, teamTable.id],
+    }),
+    incidents: many(incidentTable),
+    signals: many(signalTable),
+    affectedIncidents: many(incidentAffectedServiceTable),
+  }),
+);
+
+export const incidentTableRelations = relations(
+  incidentTable,
+  ({ one, many }) => ({
+    workspace: one(workspaceTable, {
+      fields: [incidentTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+    service: one(serviceTable, {
+      fields: [incidentTable.workspaceId, incidentTable.serviceId],
+      references: [serviceTable.workspaceId, serviceTable.id],
+    }),
+    creator: one(userTable, {
+      fields: [incidentTable.createdBy],
+      references: [userTable.id],
+    }),
+    commander: one(userTable, {
+      fields: [incidentTable.commanderId],
+      references: [userTable.id],
+    }),
+    affectedServices: many(incidentAffectedServiceTable),
+    responders: many(incidentResponderTable),
+    events: many(incidentEventTable),
+    signals: many(incidentSignalTable),
+  }),
+);
+
+export const incidentAffectedServiceTableRelations = relations(
+  incidentAffectedServiceTable,
+  ({ one }) => ({
+    incident: one(incidentTable, {
+      fields: [
+        incidentAffectedServiceTable.workspaceId,
+        incidentAffectedServiceTable.incidentId,
+      ],
+      references: [incidentTable.workspaceId, incidentTable.id],
+    }),
+    service: one(serviceTable, {
+      fields: [
+        incidentAffectedServiceTable.workspaceId,
+        incidentAffectedServiceTable.serviceId,
+      ],
+      references: [serviceTable.workspaceId, serviceTable.id],
+    }),
+  }),
+);
+
+export const incidentResponderTableRelations = relations(
+  incidentResponderTable,
+  ({ one }) => ({
+    incident: one(incidentTable, {
+      fields: [
+        incidentResponderTable.workspaceId,
+        incidentResponderTable.incidentId,
+      ],
+      references: [incidentTable.workspaceId, incidentTable.id],
+    }),
+    user: one(userTable, {
+      fields: [incidentResponderTable.userId],
+      references: [userTable.id],
+    }),
+  }),
+);
+
+export const savedViewTableRelations = relations(savedViewTable, ({ one }) => ({
+  workspace: one(workspaceTable, {
+    fields: [savedViewTable.workspaceId],
+    references: [workspaceTable.id],
+  }),
+  owner: one(userTable, {
+    fields: [savedViewTable.ownerUserId],
+    references: [userTable.id],
+  }),
+}));
+
+export const signalSourceTableRelations = relations(
+  signalSourceTable,
+  ({ one, many }) => ({
+    workspace: one(workspaceTable, {
+      fields: [signalSourceTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+    ingestionAttempts: many(signalIngestionAttemptTable),
+  }),
+);
+
+export const signalTableRelations = relations(signalTable, ({ one, many }) => ({
+  workspace: one(workspaceTable, {
+    fields: [signalTable.workspaceId],
+    references: [workspaceTable.id],
+  }),
+  service: one(serviceTable, {
+    fields: [signalTable.workspaceId, signalTable.serviceId],
+    references: [serviceTable.workspaceId, serviceTable.id],
+  }),
+  incidents: many(incidentSignalTable),
+}));
+
+export const signalIngestionAttemptTableRelations = relations(
+  signalIngestionAttemptTable,
+  ({ one }) => ({
+    workspace: one(workspaceTable, {
+      fields: [signalIngestionAttemptTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+    source: one(signalSourceTable, {
+      fields: [
+        signalIngestionAttemptTable.workspaceId,
+        signalIngestionAttemptTable.sourceId,
+      ],
+      references: [signalSourceTable.workspaceId, signalSourceTable.id],
+    }),
+  }),
+);
+
+export const incidentSignalTableRelations = relations(
+  incidentSignalTable,
+  ({ one }) => ({
+    workspace: one(workspaceTable, {
+      fields: [incidentSignalTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+    incident: one(incidentTable, {
+      fields: [incidentSignalTable.workspaceId, incidentSignalTable.incidentId],
+      references: [incidentTable.workspaceId, incidentTable.id],
+    }),
+    signal: one(signalTable, {
+      fields: [incidentSignalTable.workspaceId, incidentSignalTable.signalId],
+      references: [signalTable.workspaceId, signalTable.id],
+    }),
+    attachedBy: one(userTable, {
+      fields: [incidentSignalTable.attachedBy],
+      references: [userTable.id],
+    }),
+  }),
+);
+
+export const incidentEventTableRelations = relations(
+  incidentEventTable,
+  ({ one }) => ({
+    workspace: one(workspaceTable, {
+      fields: [incidentEventTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
+    incident: one(incidentTable, {
+      fields: [incidentEventTable.workspaceId, incidentEventTable.incidentId],
+      references: [incidentTable.workspaceId, incidentTable.id],
+    }),
+    actor: one(userTable, {
+      fields: [incidentEventTable.actorUserId],
+      references: [userTable.id],
+    }),
+  }),
+);
+
+export const outboxEventTableRelations = relations(
+  outboxEventTable,
+  ({ one }) => ({
+    workspace: one(workspaceTable, {
+      fields: [outboxEventTable.workspaceId],
+      references: [workspaceTable.id],
+    }),
   }),
 );
 

@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/node";
-import { assertPublicDestination } from "../../../utils/assert-public-destination";
+import { safeOutboundFetch } from "../../../utils/safe-outbound-fetch";
 import type { GiteaConfig } from "../config";
 import { normalizeGiteaBaseUrl } from "../config";
 
@@ -78,52 +78,34 @@ export async function giteaFetch<T>(
   const root = normalizeGiteaBaseUrl(baseUrl);
   const url = `${root}/api/v1${path.startsWith("/") ? path : `/${path}`}`;
 
-  await assertPublicDestination(root, "Gitea");
-
-  const controller = new AbortController();
-  let timedOut = false;
-  const timeoutId = setTimeout(() => {
-    timedOut = true;
-    controller.abort();
-  }, GITEA_FETCH_TIMEOUT_MS);
-  if (init?.signal) {
-    if (init.signal.aborted) {
-      controller.abort();
-    } else {
-      init.signal.addEventListener("abort", () => controller.abort(), {
-        once: true,
-      });
-    }
-  }
-
   try {
     Sentry.addBreadcrumb({
       category: "integration",
       level: "info",
       data: { integration: "gitea" },
     });
-    const res = await fetch(url, {
+    const res = await safeOutboundFetch(url, {
       ...init,
-      signal: controller.signal,
-      // Following redirects would let a public host bounce the request to an
-      // internal address after the destination check has already passed.
-      redirect: "manual",
+      timeoutMs: GITEA_FETCH_TIMEOUT_MS,
+      maxResponseBytes: 1024 * 1024,
+      maxRedirects: 3,
+      label: "Gitea",
       headers: {
         ...authHeaders(token),
         ...init?.headers,
       },
     });
 
+    const text = await res.text();
+
     if (res.status >= 300 && res.status < 400) {
       throw new GiteaApiError(
-        `Gitea request was redirected (HTTP ${res.status})`,
+        `Gitea API redirected with status ${res.status}`,
         res.status,
         "REDIRECT",
+        text,
       );
     }
-
-    const text = await res.text();
-    clearTimeout(timeoutId);
 
     if (!res.ok) {
       throw new GiteaApiError(
@@ -149,19 +131,15 @@ export async function giteaFetch<T>(
       );
     }
   } catch (error) {
-    clearTimeout(timeoutId);
     if (error instanceof GiteaApiError) {
       throw error;
     }
-    if (error instanceof Error && error.name === "AbortError") {
-      if (timedOut) {
-        throw new GiteaApiError(
-          `Gitea request timed out after ${GITEA_FETCH_TIMEOUT_MS}ms`,
-          408,
-          "TIMEOUT",
-        );
-      }
-      throw error;
+    if (error instanceof Error && error.message.includes("timed out")) {
+      throw new GiteaApiError(
+        `Gitea request timed out after ${GITEA_FETCH_TIMEOUT_MS}ms`,
+        408,
+        "TIMEOUT",
+      );
     }
     throw error;
   }

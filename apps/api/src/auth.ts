@@ -9,6 +9,8 @@ import {
   DEFAULT_ROLE_NAMES,
   defaultRolePayloads,
   owner,
+  RELAYOPS_ROLE_TEMPLATE_NAMES,
+  relayOpsRoleTemplatePayloads,
 } from "@kaneo/permissions";
 import bcrypt from "bcryptjs";
 import { betterAuth } from "better-auth";
@@ -41,6 +43,7 @@ import {
 import { syncWorkspaceSeats } from "./billing/controllers/sync-seats";
 import db, { schema } from "./database";
 import { publishEvent } from "./events";
+import { recordWorkspaceRoleChanged } from "./relayops/authorization-audit";
 import deleteAccountData from "./user/controllers/delete-account-data";
 import { checkRegistrationAllowed } from "./utils/check-registration-allowed";
 import { checkWorkspaceName } from "./utils/check-workspace-name";
@@ -80,8 +83,8 @@ function isOAuthCallbackPath(path: unknown): boolean {
   return path.startsWith("/callback/") || path.startsWith("/oauth2/callback/");
 }
 
-const apiUrl = process.env.KANEO_API_URL || "http://localhost:1337";
-const clientUrl = process.env.KANEO_CLIENT_URL || "http://localhost:5173";
+const apiUrl = process.env.KANEO_API_URL || "http://127.0.0.1:32001";
+const clientUrl = process.env.KANEO_CLIENT_URL || "http://127.0.0.1:32000";
 
 const trustedOrigins = [clientUrl];
 try {
@@ -416,30 +419,34 @@ export const auth = betterAuth({
           // Seed the editable default roles for this workspace. Each
           // role's permissions are derived from the compiled-in defaults
           // in `@kaneo/permissions`; admins can later replace them in the
-          // Roles UI. We skip names that somehow already exist (this hook
-          // is best-effort idempotent; the boot-time backfill is the
-          // belt-and-braces path).
+          // Roles UI. The unique workspace+role constraint makes this
+          // hook race-safe; the boot-time backfill is the recovery path.
           try {
-            const existing = await db
-              .select({ role: schema.workspaceRoleTable.role })
-              .from(schema.workspaceRoleTable)
-              .where(
-                eq(schema.workspaceRoleTable.workspaceId, organization.id),
-              );
-            const taken = new Set(existing.map((r) => r.role));
+            const templates = {
+              ...defaultRolePayloads,
+              ...relayOpsRoleTemplatePayloads,
+            };
             const now = new Date();
-            const rows = DEFAULT_ROLE_NAMES.filter(
-              (name) => !taken.has(name),
-            ).map((name) => ({
+            const names = [
+              ...DEFAULT_ROLE_NAMES,
+              ...RELAYOPS_ROLE_TEMPLATE_NAMES,
+            ].filter((name, index, all) => all.indexOf(name) === index);
+            const rows = names.map((name) => ({
               workspaceId: organization.id,
               role: name,
-              permission: JSON.stringify(defaultRolePayloads[name]),
+              permission: JSON.stringify(templates[name]),
               createdAt: now,
               updatedAt: now,
             }));
-            if (rows.length > 0) {
-              await db.insert(schema.workspaceRoleTable).values(rows);
-            }
+            await db
+              .insert(schema.workspaceRoleTable)
+              .values(rows)
+              .onConflictDoNothing({
+                target: [
+                  schema.workspaceRoleTable.workspaceId,
+                  schema.workspaceRoleTable.role,
+                ],
+              });
           } catch (error) {
             console.error(
               "Failed to seed default workspace roles for workspace",
@@ -478,6 +485,18 @@ export const auth = betterAuth({
               console.error("Seat sync after member remove failed:", error);
             });
           }
+        },
+        afterUpdateMemberRole: async ({
+          member,
+          previousRole,
+          organization,
+        }) => {
+          await recordWorkspaceRoleChanged({
+            workspaceId: organization.id,
+            targetUserId: member.userId,
+            previousRole,
+            nextRole: member.role,
+          });
         },
       },
       async sendInvitationEmail(data) {

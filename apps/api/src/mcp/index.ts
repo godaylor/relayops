@@ -28,11 +28,12 @@ import {
 } from "./schemas";
 import { registerMcpTools, toMcpToolRegistrar } from "./tools";
 
-const publicApiUrl = (process.env.KANEO_API_URL || "http://localhost:1337")
+const publicApiUrl = (process.env.KANEO_API_URL || "http://127.0.0.1:32001")
   .replace(/\/api\/?$/, "")
   .replace(/\/+$/, "");
 const internalApiUrl = (
-  process.env.KANEO_INTERNAL_API_URL || "http://127.0.0.1:1337"
+  process.env.KANEO_INTERNAL_API_URL ||
+  `http://127.0.0.1:${process.env.PORT || 32001}`
 )
   .replace(/\/api\/?$/, "")
   .replace(/\/+$/, "");
@@ -40,9 +41,65 @@ const internalApiUrl = (
 type McpSession = {
   transport: WebStandardStreamableHTTPServerTransport;
   userId: string;
+  lastUsedAt: number;
+  expiresAt: number;
 };
 
 const sessions = new Map<string, McpSession>();
+const pendingSessionsByUser = new Map<string, number>();
+let pendingSessionCount = 0;
+const publicRateBuckets = new Map<
+  string,
+  { startedAt: number; count: number }
+>();
+const MAX_PUBLIC_RATE_BUCKETS = 5_000;
+
+function boundedMcpSetting(name: string, fallback: number, maximum: number) {
+  const value = Number.parseInt(process.env[name] ?? "", 10);
+  return Number.isFinite(value) && value > 0
+    ? Math.min(value, maximum)
+    : fallback;
+}
+
+function mcpSessionLimits() {
+  return {
+    maximum: boundedMcpSetting("KANEO_MCP_MAX_SESSIONS", 500, 5_000),
+    perUser: boundedMcpSetting("KANEO_MCP_MAX_SESSIONS_PER_USER", 8, 100),
+    ttlMs: boundedMcpSetting(
+      "KANEO_MCP_SESSION_TTL_MS",
+      30 * 60 * 1000,
+      24 * 60 * 60 * 1000,
+    ),
+  };
+}
+
+function cleanupMcpSessions(now = Date.now()) {
+  for (const [sessionId, session] of sessions) {
+    if (session.expiresAt > now) continue;
+    sessions.delete(sessionId);
+    void session.transport.close().catch(() => undefined);
+  }
+}
+
+function allowPublicMcpRequest(key: string, now = Date.now()) {
+  if (publicRateBuckets.size >= MAX_PUBLIC_RATE_BUCKETS) {
+    for (const [bucketKey, bucket] of publicRateBuckets) {
+      if (now - bucket.startedAt >= 60_000) publicRateBuckets.delete(bucketKey);
+    }
+  }
+  const bucket = publicRateBuckets.get(key);
+  if (!bucket || now - bucket.startedAt >= 60_000) {
+    if (!bucket && publicRateBuckets.size >= MAX_PUBLIC_RATE_BUCKETS) {
+      return false;
+    }
+    publicRateBuckets.set(key, { startedAt: now, count: 1 });
+    return true;
+  }
+  bucket.count += 1;
+  return bucket.count <= 60;
+}
+
+setInterval(() => cleanupMcpSessions(), 60_000).unref();
 
 function createMcpServerForUser(token: string): LegacyMcpServer {
   const server = new LegacyMcpServer({
@@ -71,6 +128,26 @@ async function validateBearerToken(
 }
 
 const mcp = apiRouter();
+
+mcp.use("/mcp/*", async (c, next) => {
+  if (
+    !["/mcp/register", "/mcp/authorize", "/mcp/token"].some((path) =>
+      c.req.path.endsWith(path),
+    )
+  ) {
+    return next();
+  }
+  const forwarded =
+    process.env.KANEO_TRUST_PROXY === "true"
+      ? c.req.header("x-forwarded-for")?.split(",")[0]?.trim()
+      : undefined;
+  const key = `${c.req.path}:${forwarded || "direct"}`;
+  if (!allowPublicMcpRequest(key)) {
+    c.header("Retry-After", "60");
+    return c.json({ error: "rate_limited" }, 429);
+  }
+  return next();
+});
 
 const jsonError = (description: string) =>
   jsonResponse(description, oauthErrorSchema);
@@ -202,10 +279,13 @@ mcp.all("/mcp", async (c) => {
   const sessionId = c.req.header("mcp-session-id");
 
   if (sessionId) {
+    cleanupMcpSessions();
     const existing = sessions.get(sessionId);
     // A mismatched owner is reported as missing rather than forbidden so the
     // response cannot confirm that someone else's session id is valid.
     if (existing && existing.userId === authResult.userId) {
+      existing.lastUsedAt = Date.now();
+      existing.expiresAt = existing.lastUsedAt + mcpSessionLimits().ttlMs;
       return existing.transport.handleRequest(c.req.raw);
     }
     return c.json({ error: "Session not found" }, 404);
@@ -224,28 +304,60 @@ mcp.all("/mcp", async (c) => {
     return modern.fetch(c.req.raw);
   }
 
-  const transport = new WebStandardStreamableHTTPServerTransport({
-    sessionIdGenerator: () => randomUUID(),
-  });
-
-  transport.onclose = () => {
-    if (transport.sessionId) {
-      sessions.delete(transport.sessionId);
-    }
-  };
-
-  const server = createMcpServerForUser(authResult.token);
-  await server.connect(transport);
-  const response = await transport.handleRequest(c.req.raw);
-
-  if (transport.sessionId) {
-    sessions.set(transport.sessionId, {
-      transport,
-      userId: authResult.userId,
-    });
+  cleanupMcpSessions();
+  const sessionLimits = mcpSessionLimits();
+  const userSessionCount = [...sessions.values()].filter(
+    (session) => session.userId === authResult.userId,
+  ).length;
+  const pendingUserSessionCount =
+    pendingSessionsByUser.get(authResult.userId) ?? 0;
+  if (
+    sessions.size + pendingSessionCount >= sessionLimits.maximum ||
+    userSessionCount + pendingUserSessionCount >= sessionLimits.perUser
+  ) {
+    c.header("Retry-After", "60");
+    return c.json({ error: "session_capacity_exceeded" }, 429);
   }
 
-  return response;
+  pendingSessionCount += 1;
+  pendingSessionsByUser.set(authResult.userId, pendingUserSessionCount + 1);
+
+  try {
+    const transport = new WebStandardStreamableHTTPServerTransport({
+      sessionIdGenerator: () => randomUUID(),
+    });
+
+    transport.onclose = () => {
+      if (transport.sessionId) {
+        sessions.delete(transport.sessionId);
+      }
+    };
+
+    const server = createMcpServerForUser(authResult.token);
+    await server.connect(transport);
+    const response = await transport.handleRequest(c.req.raw);
+
+    if (transport.sessionId) {
+      const now = Date.now();
+      sessions.set(transport.sessionId, {
+        transport,
+        userId: authResult.userId,
+        lastUsedAt: now,
+        expiresAt: now + sessionLimits.ttlMs,
+      });
+    }
+
+    return response;
+  } finally {
+    pendingSessionCount -= 1;
+    const remainingPending =
+      (pendingSessionsByUser.get(authResult.userId) ?? 1) - 1;
+    if (remainingPending === 0) {
+      pendingSessionsByUser.delete(authResult.userId);
+    } else {
+      pendingSessionsByUser.set(authResult.userId, remainingPending);
+    }
+  }
 });
 
 mcp.post("/mcp/token", async (c) => {
@@ -304,69 +416,6 @@ mcp.get("/.well-known/oauth-authorization-server/api", (c) =>
     token_endpoint_auth_methods_supported: ["none"],
   }),
 );
-
-mcp.all("/mcp", async (c) => {
-  const authResult = await validateBearerToken(c.req.raw);
-  if (!authResult) {
-    const prmUrl = `${publicApiUrl}/api/.well-known/oauth-protected-resource/api/mcp`;
-    c.header("WWW-Authenticate", `Bearer resource_metadata="${prmUrl}"`);
-    return c.json(
-      {
-        error: "invalid_token",
-        error_description: "Missing or invalid token",
-      },
-      401,
-    );
-  }
-
-  const sessionId = c.req.header("mcp-session-id");
-
-  if (sessionId) {
-    const existing = sessions.get(sessionId);
-    // A mismatched owner is reported as missing rather than forbidden so the
-    // response cannot confirm that someone else's session id is valid.
-    if (existing && existing.userId === authResult.userId) {
-      return existing.transport.handleRequest(c.req.raw);
-    }
-    return c.json({ error: "Session not found" }, 404);
-  }
-
-  if (c.req.method !== "POST") {
-    return c.json({ error: "Method not allowed" }, 405);
-  }
-
-  if (!isJsonContentType(c.req.header("content-type"))) {
-    return c.json({ error: "Unsupported Media Type" }, 415);
-  }
-
-  if (!(await isLegacyRequest(c.req.raw.clone()))) {
-    const modern = createModernMcpHandler(authResult.token, internalApiUrl);
-    return modern.fetch(c.req.raw);
-  }
-
-  const transport = new WebStandardStreamableHTTPServerTransport({
-    sessionIdGenerator: () => randomUUID(),
-  });
-
-  transport.onclose = () => {
-    if (transport.sessionId) {
-      sessions.delete(transport.sessionId);
-    }
-  };
-
-  const server = createMcpServerForUser(authResult.token);
-  await server.connect(transport);
-  const response = await transport.handleRequest(c.req.raw);
-
-  if (transport.sessionId) {
-    sessions.set(transport.sessionId, {
-      transport,
-      userId: authResult.userId,
-    });
-  }
-
-  return response;
-});
 
 export default mcp;
 

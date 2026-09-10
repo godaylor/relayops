@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { and, eq, gt, isNull, or } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import db, { schema } from "../database";
 
 async function hashApiKey(key: string): Promise<string> {
@@ -38,49 +38,83 @@ function parsePermissions(raw: string | null): Record<string, string[]> | null {
 
 export async function verifyApiKey(key: string) {
   const hashedKey = await hashApiKey(key);
+  const now = new Date();
 
-  const [apiKey] = await db
-    .select()
-    .from(schema.apikeyTable)
-    .where(
-      and(
-        eq(schema.apikeyTable.key, hashedKey),
-        eq(schema.apikeyTable.enabled, true),
-        or(
-          isNull(schema.apikeyTable.expiresAt),
-          gt(schema.apikeyTable.expiresAt, new Date()),
-        ),
-      ),
-    )
-    .limit(1);
+  return db.transaction(async (tx) => {
+    const [apiKey] = await tx
+      .select()
+      .from(schema.apikeyTable)
+      .where(eq(schema.apikeyTable.key, hashedKey))
+      .for("update")
+      .limit(1);
 
-  if (!apiKey) {
-    return null;
-  }
+    if (
+      !apiKey ||
+      apiKey.enabled !== true ||
+      (apiKey.expiresAt !== null && apiKey.expiresAt <= now)
+    ) {
+      return null;
+    }
 
-  return {
-    valid: true,
-    key: {
-      id: apiKey.id,
-      userId: apiKey.referenceId ?? apiKey.userId ?? "",
-      name: apiKey.name,
-      prefix: apiKey.prefix,
-      start: apiKey.start,
-      enabled: apiKey.enabled ?? false,
-      expiresAt: apiKey.expiresAt,
-      permissions: parsePermissions(apiKey.permissions),
-      refillInterval: apiKey.refillInterval,
-      refillAmount: apiKey.refillAmount,
-      lastRefillAt: apiKey.lastRefillAt,
-      rateLimitEnabled: apiKey.rateLimitEnabled,
-      rateLimitTimeWindow: apiKey.rateLimitTimeWindow,
-      rateLimitMax: apiKey.rateLimitMax,
-      requestCount: apiKey.requestCount,
-      remaining: apiKey.remaining,
-      lastRequest: apiKey.lastRequest,
-      metadata: apiKey.metadata
-        ? (JSON.parse(apiKey.metadata) as Record<string, unknown>)
-        : null,
-    },
-  };
+    let requestCount = apiKey.requestCount ?? 0;
+    let remaining = apiKey.remaining;
+    if (apiKey.rateLimitEnabled !== false) {
+      const windowMs = Math.max(apiKey.rateLimitTimeWindow ?? 60_000, 1_000);
+      const maximum = Math.max(apiKey.rateLimitMax ?? 100, 1);
+      const windowExpired =
+        !apiKey.lastRequest ||
+        now.getTime() - apiKey.lastRequest.getTime() >= windowMs;
+      requestCount = windowExpired ? 1 : requestCount + 1;
+      remaining = Math.max(0, maximum - requestCount);
+
+      if (requestCount > maximum) {
+        const retryAfterSeconds = Math.max(
+          1,
+          Math.ceil(
+            (windowMs -
+              (now.getTime() -
+                (apiKey.lastRequest?.getTime() ?? now.getTime()))) /
+              1_000,
+          ),
+        );
+        return {
+          valid: false as const,
+          reason: "rate_limited" as const,
+          retryAfterSeconds,
+        };
+      }
+
+      await tx
+        .update(schema.apikeyTable)
+        .set({ requestCount, remaining, lastRequest: now, updatedAt: now })
+        .where(eq(schema.apikeyTable.id, apiKey.id));
+    }
+
+    return {
+      valid: true as const,
+      key: {
+        id: apiKey.id,
+        userId: apiKey.referenceId ?? apiKey.userId ?? "",
+        name: apiKey.name,
+        prefix: apiKey.prefix,
+        start: apiKey.start,
+        enabled: apiKey.enabled ?? false,
+        expiresAt: apiKey.expiresAt,
+        permissions: parsePermissions(apiKey.permissions),
+        refillInterval: apiKey.refillInterval,
+        refillAmount: apiKey.refillAmount,
+        lastRefillAt: apiKey.lastRefillAt,
+        rateLimitEnabled: apiKey.rateLimitEnabled,
+        rateLimitTimeWindow: apiKey.rateLimitTimeWindow,
+        rateLimitMax: apiKey.rateLimitMax,
+        requestCount,
+        remaining,
+        lastRequest:
+          apiKey.rateLimitEnabled === false ? apiKey.lastRequest : now,
+        metadata: apiKey.metadata
+          ? (JSON.parse(apiKey.metadata) as Record<string, unknown>)
+          : null,
+      },
+    };
+  });
 }

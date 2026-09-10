@@ -11,24 +11,23 @@ import {
   userTable,
   workspaceTable,
 } from "../database/schema";
-import { assertPublicWebhookDestination } from "../plugins/generic-webhook/config";
+import { safeErrorForLog } from "../utils/redact-sensitive";
+import { safeOutboundFetch } from "../utils/safe-outbound-fetch";
 import { decryptSecret } from "./secrets";
-
-const DEFAULT_OUTBOUND_FETCH_TIMEOUT_MS = 15_000;
 
 async function fetchWithTimeout(
   url: string,
   init: RequestInit & { timeoutMs?: number },
 ): Promise<Response> {
-  const timeoutMs = init.timeoutMs ?? DEFAULT_OUTBOUND_FETCH_TIMEOUT_MS;
+  const timeoutMs = init.timeoutMs;
   const { timeoutMs: _timeout, ...rest } = init;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    return await fetch(url, { ...rest, signal: controller.signal });
-  } finally {
-    clearTimeout(timer);
-  }
+  return safeOutboundFetch(url, {
+    ...rest,
+    timeoutMs,
+    maxResponseBytes: 64 * 1024,
+    maxRedirects: 3,
+    label: "Notification destination",
+  });
 }
 
 type ResolvedNotificationContext = {
@@ -47,7 +46,7 @@ type DeliveryContent = {
 };
 
 function buildTaskUrl(workspaceId: string, projectId: string, taskId: string) {
-  const clientUrl = process.env.KANEO_CLIENT_URL || "http://localhost:5173";
+  const clientUrl = process.env.KANEO_CLIENT_URL || "http://127.0.0.1:32000";
   return `${clientUrl}/dashboard/workspace/${workspaceId}/project/${projectId}/task/${taskId}`;
 }
 
@@ -282,8 +281,6 @@ async function sendNtfyNotification(input: {
   body: string;
   clickUrl?: string | null;
 }) {
-  await assertPublicWebhookDestination(input.serverUrl);
-
   const response = await fetchWithTimeout(
     `${input.serverUrl.replace(/\/+$/, "")}/${encodeURIComponent(input.topic)}`,
     {
@@ -311,8 +308,6 @@ async function sendGotifyNotification(input: {
   body: string;
   clickUrl?: string | null;
 }) {
-  await assertPublicWebhookDestination(input.serverUrl);
-
   // Gotify expects the app token in the query string; that can surface in logs, proxies, and browser history, so factor this into Gotify placement and log handling.
   const response = await fetchWithTimeout(
     `${input.serverUrl.replace(/\/+$/, "")}/message?token=${encodeURIComponent(
@@ -355,8 +350,6 @@ async function sendWebhookNotification(input: {
   secret?: string | null;
   payload: Record<string, unknown>;
 }) {
-  await assertPublicWebhookDestination(input.webhookUrl);
-
   const body = JSON.stringify(input.payload);
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -571,7 +564,7 @@ export async function deliverNotification(
     if (result.status === "rejected") {
       console.error("Notification delivery failed", {
         notificationId,
-        error: result.reason,
+        error: safeErrorForLog(result.reason),
       });
     }
   }

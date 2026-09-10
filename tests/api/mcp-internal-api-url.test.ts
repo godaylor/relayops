@@ -41,9 +41,10 @@ function toolRequest() {
   });
 }
 
-async function loadMcpRoutes(internalApiUrl?: string) {
+async function loadMcpRoutes(internalApiUrl?: string, port?: string) {
   vi.stubEnv("KANEO_API_URL", "http://public.test:5273/api");
   vi.stubEnv("KANEO_INTERNAL_API_URL", internalApiUrl);
+  vi.stubEnv("PORT", port);
   vi.resetModules();
   return (await import("../../apps/api/src/mcp")).default;
 }
@@ -56,34 +57,40 @@ afterEach(() => {
 });
 
 describe("MCP API URLs", () => {
-  it("advertises the public URL while fetching tools through the internal URL", async () => {
-    const apiFetch = vi.fn(async () =>
-      Response.json({ user: { id: "test-user" } }),
-    );
-    vi.stubGlobal("fetch", apiFetch);
-    const mcpRoutes = await loadMcpRoutes();
+  it.each([
+    [undefined, 32001],
+    ["1337", 1337],
+  ])(
+    "keeps public metadata while using local API port %s (%s)",
+    async (port, expectedPort) => {
+      const apiFetch = vi.fn(async () =>
+        Response.json({ user: { id: "test-user" } }),
+      );
+      vi.stubGlobal("fetch", apiFetch);
+      const mcpRoutes = await loadMcpRoutes(undefined, port);
 
-    const metadataResponse = await mcpRoutes.request(
-      "/.well-known/oauth-authorization-server/api",
-    );
-    const metadata = (await metadataResponse.json()) as {
-      issuer: string;
-      authorization_endpoint: string;
-    };
+      const metadataResponse = await mcpRoutes.request(
+        "/.well-known/oauth-authorization-server/api",
+      );
+      const metadata = (await metadataResponse.json()) as {
+        issuer: string;
+        authorization_endpoint: string;
+      };
 
-    expect(metadata).toMatchObject({
-      issuer: "http://public.test:5273/api",
-      authorization_endpoint: "http://public.test:5273/api/mcp/authorize",
-    });
+      expect(metadata).toMatchObject({
+        issuer: "http://public.test:5273/api",
+        authorization_endpoint: "http://public.test:5273/api/mcp/authorize",
+      });
 
-    const toolResponse = await mcpRoutes.request(toolRequest());
+      const toolResponse = await mcpRoutes.request(toolRequest());
 
-    expect(toolResponse.status).toBe(200);
-    expect(apiFetch).toHaveBeenCalledOnce();
-    expect(String(apiFetch.mock.calls[0]?.[0])).toBe(
-      "http://127.0.0.1:1337/api/auth/get-session",
-    );
-  });
+      expect(toolResponse.status).toBe(200);
+      expect(apiFetch).toHaveBeenCalledOnce();
+      expect(String(apiFetch.mock.calls[0]?.[0])).toBe(
+        `http://127.0.0.1:${expectedPort}/api/auth/get-session`,
+      );
+    },
+  );
 
   it.each(["http://api.internal:1337/api/", "http://api.internal:1337/"])(
     "uses the configured internal URL %s without duplicate slashes",

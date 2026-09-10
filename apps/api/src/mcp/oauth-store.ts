@@ -1,4 +1,4 @@
-import { and, count, desc, eq, lt, notInArray } from "drizzle-orm";
+import { and, count, desc, eq, lt, notInArray, sql } from "drizzle-orm";
 import db from "../database";
 import { mcpOauthStateTable } from "../database/schema";
 
@@ -11,6 +11,33 @@ export async function putState(
   expiresAt: Date,
 ): Promise<void> {
   await db.insert(mcpOauthStateTable).values({ kind, key, payload, expiresAt });
+}
+
+export async function putStateBounded(
+  kind: OauthStateKind,
+  key: string,
+  payload: unknown,
+  expiresAt: Date,
+  maxRows: number,
+): Promise<void> {
+  await db.transaction(async (tx) => {
+    await tx.execute(
+      sql`SELECT pg_advisory_xact_lock(hashtext(${`relayops:mcp-oauth:${kind}`}))`,
+    );
+    await tx
+      .delete(mcpOauthStateTable)
+      .where(lt(mcpOauthStateTable.expiresAt, new Date()));
+    const [countRow] = await tx
+      .select({ pending: count() })
+      .from(mcpOauthStateTable)
+      .where(eq(mcpOauthStateTable.kind, kind));
+    if ((countRow?.pending ?? 0) >= maxRows) {
+      throw new Error(`MCP OAuth ${kind} capacity exceeded`);
+    }
+    await tx
+      .insert(mcpOauthStateTable)
+      .values({ kind, key, payload, expiresAt });
+  });
 }
 
 export async function getState<T>(

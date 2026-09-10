@@ -314,6 +314,73 @@ describe("API integration: device authorization (RFC 8628)", () => {
     expect(rows.length).toBe(1);
   });
 
+  it("enforces API key rate limits atomically before the handler", async () => {
+    const member = await createWorkspaceMember();
+    const rawKey = `kaneo_rate_${randomUUID()}`;
+    const hashed = await hashApiKeyForTest(rawKey);
+    const now = new Date();
+
+    await db.insert(schema.apikeyTable).values({
+      referenceId: member.user.id,
+      userId: member.user.id,
+      key: hashed,
+      name: "atomic rate limit",
+      start: rawKey.slice(0, 12),
+      prefix: "kaneo",
+      rateLimitEnabled: true,
+      rateLimitTimeWindow: 60_000,
+      rateLimitMax: 1,
+      requestCount: 0,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    const { app } = createApp();
+    const url = `/api/project?workspaceId=${encodeURIComponent(member.workspace.id)}`;
+    const responses = await Promise.all([
+      app.request(url, { headers: { "x-api-key": rawKey } }),
+      app.request(url, { headers: { "x-api-key": rawKey } }),
+    ]);
+
+    expect(responses.map((response) => response.status).sort()).toEqual([
+      200, 429,
+    ]);
+    const limited = responses.find((response) => response.status === 429);
+    expect(Number(limited?.headers.get("retry-after"))).toBeGreaterThan(0);
+
+    const [persisted] = await db
+      .select({ requestCount: schema.apikeyTable.requestCount })
+      .from(schema.apikeyTable)
+      .where(eq(schema.apikeyTable.key, hashed));
+    expect(persisted?.requestCount).toBe(1);
+  });
+
+  it.each([
+    { enabled: false, expiresAt: null, label: "disabled" },
+    { enabled: true, expiresAt: new Date(0), label: "expired" },
+  ])("rejects $label API keys", async ({ enabled, expiresAt }) => {
+    const member = await createWorkspaceMember();
+    const rawKey = `kaneo_invalid_${randomUUID()}`;
+    const hashed = await hashApiKeyForTest(rawKey);
+    const now = new Date();
+    await db.insert(schema.apikeyTable).values({
+      referenceId: member.user.id,
+      userId: member.user.id,
+      key: hashed,
+      enabled,
+      expiresAt,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    const { app } = createApp();
+    const response = await app.request(
+      `/api/project?workspaceId=${encodeURIComponent(member.workspace.id)}`,
+      { headers: { "x-api-key": rawKey } },
+    );
+    expect(response.status).toBe(401);
+  });
+
   it("accepts a created API key Bearer on auth routes", async () => {
     const member = await createWorkspaceMember();
     const rawKey =

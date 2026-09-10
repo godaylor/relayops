@@ -136,7 +136,7 @@ export async function handleIssueOpened(payload: IssueOpenedPayload) {
       continue;
     }
 
-    const clientUrl = process.env.KANEO_CLIENT_URL || "http://localhost:5173";
+    const clientUrl = process.env.KANEO_CLIENT_URL || "http://127.0.0.1:32000";
     const taskUrl = `${clientUrl}/dashboard/workspace/${project.workspaceId}/project/${projectId}/task/${createdTask.id}`;
     const taskIdentifier = `${project.slug.toUpperCase()}-${createdTask.number}`;
 

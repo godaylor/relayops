@@ -5,6 +5,7 @@ import {
   enforceStateCap,
   getState,
   putState,
+  putStateBounded,
 } from "../../apps/api/src/mcp/oauth-store";
 import { resetTestDatabase } from "./helpers/database";
 
@@ -62,5 +63,25 @@ describe("mcp oauth store", () => {
     await expect(getState("request", "cap-mid")).resolves.toEqual(payload);
     await expect(getState("request", "cap-new")).resolves.toEqual(payload);
     await expect(getState("client", "cap-client")).resolves.toEqual(payload);
+  });
+
+  it("keeps the cap atomic under concurrent inserts", async () => {
+    await resetTestDatabase();
+    const expiresAt = new Date(Date.now() + 60_000);
+    const results = await Promise.allSettled([
+      putStateBounded("code", "bounded-a", { value: "a" }, expiresAt, 1),
+      putStateBounded("code", "bounded-b", { value: "b" }, expiresAt, 1),
+    ]);
+    expect(
+      results.filter((result) => result.status === "fulfilled"),
+    ).toHaveLength(1);
+    expect(
+      results.filter((result) => result.status === "rejected"),
+    ).toHaveLength(1);
+    const persisted = await Promise.all([
+      getState("code", "bounded-a"),
+      getState("code", "bounded-b"),
+    ]);
+    expect(persisted.filter(Boolean)).toHaveLength(1);
   });
 });

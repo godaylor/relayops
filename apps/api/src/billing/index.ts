@@ -1,4 +1,3 @@
-import { constructWebhookEvent } from "creem/webhooks.js";
 import { and, eq, inArray } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../database";
@@ -27,6 +26,7 @@ import {
   workspaceBillingSchema,
 } from "./response";
 import { createCheckoutBody, workspaceIdParam } from "./schema";
+import { constructWebhookEvent } from "./verify-webhook";
 
 async function requireBillingManager(userId: string, workspaceId: string) {
   await validateWorkspaceAccess(userId, workspaceId);

@@ -1,5 +1,6 @@
 import "./instrument";
 
+import { randomUUID } from "node:crypto";
 import { dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { serve } from "@hono/node-server";
@@ -7,12 +8,15 @@ import { createNodeWebSocket } from "@hono/node-ws";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import * as Sentry from "@sentry/node";
 import type { Session, User } from "better-auth/types";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Hono } from "hono";
+import { bodyLimit } from "hono/body-limit";
 import { compress } from "hono/compress";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
+import { timeout } from "hono/timeout";
+import type { WSContext } from "hono/ws";
 import activity from "./activity";
 import { auth } from "./auth";
 import { organizationRoutes } from "./auth-openapi";
@@ -44,6 +48,13 @@ import { initializePlugins } from "./plugins";
 import { migrateGitHubIntegration } from "./plugins/github/migration";
 import project from "./project";
 import { getPublicProject } from "./project/controllers/get-public-project";
+import relayops from "./relayops";
+import {
+  startRelayOpsOutboxWorker,
+  stopRelayOpsOutboxWorker,
+} from "./relayops/outbox-worker";
+import { relayOpsPresence } from "./relayops/presence";
+import { publicSignalWebhookRouter } from "./relayops/signals";
 import { initializeScheduler, shutdownScheduler } from "./scheduler";
 import search from "./search";
 import slackIntegration from "./slack-integration";
@@ -59,9 +70,14 @@ import { authorizeAssetAccess } from "./utils/authorize-asset-access";
 import { getInvitationDetails } from "./utils/check-registration-allowed";
 import { migrateApiKeyReferenceId } from "./utils/migrate-apikey-reference-id";
 import { migrateNotificationPreferencesSchema } from "./utils/migrate-notification-preferences-schema";
+import {
+  migrateNotificationSecrets,
+  migrateSignalSourceSecrets,
+} from "./utils/migrate-notification-secrets";
 import { migrateSessionColumn } from "./utils/migrate-session-column";
 import { migrateWorkspaceUserEmail } from "./utils/migrate-workspace-user-email";
 import { normalizeApiServerUrl } from "./utils/openapi-spec";
+import { safeErrorForLog } from "./utils/redact-sensitive";
 import { seedDefaultWorkspaceRoles } from "./utils/seed-default-workspace-roles";
 import { validateWorkspaceAccess } from "./utils/validate-workspace-access";
 import workflowRule from "./workflow-rule";
@@ -70,6 +86,7 @@ import {
   addConnection,
   addUserConnection,
   initializeWebSocketAdapter,
+  publishWorkspaceBroadcast,
   removeConnection,
   removeUserConnection,
   shutdownWebSocketAdapter,
@@ -113,6 +130,65 @@ const SAFE_INLINE_ASSET_TYPES = new Set([
   "image/webp",
 ]);
 
+const DEFAULT_HTTP_BODY_LIMIT_BYTES = 10 * 1024 * 1024;
+const DEFAULT_HTTP_TIMEOUT_MS = 30_000;
+const WS_MESSAGE_LIMIT_BYTES = 16 * 1024;
+const WS_MESSAGES_PER_MINUTE = 120;
+const WS_IDLE_TIMEOUT_MS = 75_000;
+const WS_CONNECTIONS_PER_USER = 8;
+const WS_CONNECTIONS_PER_INSTANCE = 1_000;
+const wsConnectionsByUser = new Map<string, number>();
+let wsConnectionCount = 0;
+
+function boundedInteger(
+  raw: string | undefined,
+  fallback: number,
+  maximum: number,
+) {
+  const parsed = Number.parseInt(raw ?? "", 10);
+  return Number.isFinite(parsed) && parsed > 0
+    ? Math.min(parsed, maximum)
+    : fallback;
+}
+
+function reserveWebSocket(
+  userId: string,
+  connectionsPerUser: number,
+  connectionsPerInstance: number,
+) {
+  const userCount = wsConnectionsByUser.get(userId) ?? 0;
+  if (
+    userCount >= connectionsPerUser ||
+    wsConnectionCount >= connectionsPerInstance
+  ) {
+    return false;
+  }
+  wsConnectionsByUser.set(userId, userCount + 1);
+  wsConnectionCount += 1;
+  return true;
+}
+
+function releaseWebSocket(userId: string) {
+  const userCount = wsConnectionsByUser.get(userId) ?? 0;
+  if (userCount <= 1) wsConnectionsByUser.delete(userId);
+  else wsConnectionsByUser.set(userId, userCount - 1);
+  wsConnectionCount = Math.max(0, wsConnectionCount - 1);
+}
+
+function createMessageQuota(messagesPerMinute: number) {
+  let windowStartedAt = Date.now();
+  let count = 0;
+  return () => {
+    const now = Date.now();
+    if (now - windowStartedAt >= 60_000) {
+      windowStartedAt = now;
+      count = 0;
+    }
+    count += 1;
+    return count <= messagesPerMinute;
+  };
+}
+
 function buildContentDisposition(filename: string, inline: boolean) {
   const normalized = filename
     .normalize("NFC")
@@ -153,18 +229,43 @@ export function createApp() {
   });
   const nodeWs = createNodeWebSocket({ app });
   const { upgradeWebSocket, injectWebSocket } = nodeWs;
-  const corsOriginSource = [
-    process.env.CORS_ORIGINS,
-    process.env.KANEO_CLIENT_URL,
-  ].find((value) => value?.trim());
-  const corsOrigins = corsOriginSource
-    ?.split(",")
+  const wsMessageLimitBytes = boundedInteger(
+    process.env.KANEO_WS_MESSAGE_LIMIT_BYTES,
+    WS_MESSAGE_LIMIT_BYTES,
+    1024 * 1024,
+  );
+  const wsMessagesPerMinute = boundedInteger(
+    process.env.KANEO_WS_MESSAGES_PER_MINUTE,
+    WS_MESSAGES_PER_MINUTE,
+    10_000,
+  );
+  const wsIdleTimeoutMs = boundedInteger(
+    process.env.KANEO_WS_IDLE_TIMEOUT_MS,
+    WS_IDLE_TIMEOUT_MS,
+    10 * 60_000,
+  );
+  const wsConnectionsPerUser = boundedInteger(
+    process.env.KANEO_WS_CONNECTIONS_PER_USER,
+    WS_CONNECTIONS_PER_USER,
+    100,
+  );
+  const wsConnectionsPerInstance = boundedInteger(
+    process.env.KANEO_WS_CONNECTIONS_PER_INSTANCE,
+    WS_CONNECTIONS_PER_INSTANCE,
+    10_000,
+  );
+  nodeWs.wss.options.maxPayload = wsMessageLimitBytes;
+  const corsOrigins = [process.env.CORS_ORIGINS, process.env.KANEO_CLIENT_URL]
+    .filter((value): value is string => Boolean(value?.trim()))
+    .flatMap((value) => value.split(","))
     .map((origin) => origin.trim())
     .filter(Boolean);
+  if (process.env.NODE_ENV !== "production") {
+    corsOrigins.push("http://localhost:32000", "http://127.0.0.1:32000");
+  }
+  const allowedOrigins = new Set(corsOrigins);
 
-  const reflectUnconfiguredOrigins = process.env.NODE_ENV !== "production";
-
-  if (!corsOrigins && !reflectUnconfiguredOrigins) {
+  if (allowedOrigins.size === 0) {
     console.warn(
       "[cors] Neither CORS_ORIGINS nor KANEO_CLIENT_URL is set, so cross-origin requests are refused. Same-origin deployments (the bundled image) are unaffected; set KANEO_CLIENT_URL if the web app is served from another origin.",
     );
@@ -177,18 +278,74 @@ export function createApp() {
       origin: (origin) => {
         // Reflecting an arbitrary origin alongside credentials lets any site
         // read authenticated responses, so it stays a development convenience.
-        if (!corsOrigins) {
-          return reflectUnconfiguredOrigins ? origin || "*" : null;
-        }
-
         if (!origin) {
           return null;
         }
-
-        return corsOrigins.includes(origin) ? origin : null;
+        return allowedOrigins.has(origin) ? origin : null;
       },
     }),
   );
+
+  app.use("*", async (c, next) => {
+    const suppliedRequestId = c.req.header("x-request-id");
+    const requestId =
+      suppliedRequestId && /^[A-Za-z0-9._:-]{1,128}$/.test(suppliedRequestId)
+        ? suppliedRequestId
+        : randomUUID();
+    c.header("X-Request-Id", requestId);
+    c.header("X-Content-Type-Options", "nosniff");
+    c.header("Referrer-Policy", "no-referrer");
+    await next();
+  });
+
+  const maxBodySize = boundedInteger(
+    process.env.KANEO_MAX_REQUEST_BODY_BYTES,
+    DEFAULT_HTTP_BODY_LIMIT_BYTES,
+    50 * 1024 * 1024,
+  );
+  app.use(
+    "/api/*",
+    bodyLimit({
+      maxSize: maxBodySize,
+      onError: (c) => c.json({ message: "Request body too large" }, 413),
+    }),
+  );
+  const requestTimeout = timeout(
+    boundedInteger(
+      process.env.KANEO_REQUEST_TIMEOUT_MS,
+      DEFAULT_HTTP_TIMEOUT_MS,
+      120_000,
+    ),
+  );
+  app.use("/api/*", (c, next) =>
+    c.req.header("upgrade")?.toLowerCase() === "websocket"
+      ? next()
+      : requestTimeout(c, next),
+  );
+  app.use("/api/*", async (c, next) => {
+    if (!["POST", "PUT", "PATCH"].includes(c.req.method)) return next();
+    const contentLength = Number.parseInt(
+      c.req.header("content-length") ?? "0",
+      10,
+    );
+    const hasBody =
+      contentLength > 0 ||
+      c.req.header("transfer-encoding")?.toLowerCase().includes("chunked");
+    const contentType = c.req.header("content-type")?.toLowerCase() ?? "";
+    if (
+      hasBody &&
+      ![
+        "application/json",
+        "application/x-www-form-urlencoded",
+        "multipart/form-data",
+        "text/plain",
+        "application/octet-stream",
+      ].some((allowed) => contentType.startsWith(allowed))
+    ) {
+      return c.json({ message: "Unsupported Media Type" }, 415);
+    }
+    return next();
+  });
 
   // Large boards return multi-MB JSON (board/task list responses embed
   // labels and external links per task); gzip cuts that by 85-95% since
@@ -336,7 +493,7 @@ export function createApp() {
           },
         });
       } catch (error) {
-        console.error("Failed to stream asset:", error);
+        console.error("Failed to stream asset:", safeErrorForLog(error));
         throw new HTTPException(404, { message: "Asset object not found" });
       }
     },
@@ -403,17 +560,15 @@ export function createApp() {
     const document = api.getOpenAPI31Document({
       openapi: "3.1.0",
       info: {
-        title: "Kaneo API",
+        title: "RelayOps API",
         version: "1.0.0",
         description:
-          "Kaneo Project Management API - Manage projects, tasks, labels, and more",
+          "RelayOps incident operations API — services, signals, incidents, append-only timelines and reliability analytics. Includes retained legacy Kaneo compatibility routes. Independent MIT-licensed derivative of Kaneo; not an official or endorsed Kaneo product.",
       },
       servers: [
         {
-          url: normalizeApiServerUrl(
-            process.env.KANEO_API_URL || "https://cloud.kaneo.app",
-          ),
-          description: "Kaneo API Server",
+          url: normalizeApiServerUrl(process.env.KANEO_API_URL || "/api"),
+          description: "RelayOps API server (same origin unless configured)",
         },
       ],
       security: [{ bearerAuth: [] }],
@@ -496,7 +651,7 @@ export function createApp() {
       // Optional `ui=1` forces redirect when Sec-Fetch-* headers are missing (e.g. some clients).
       if (forceUiRedirect || secFetchDest === "document") {
         const clientUrl = (
-          process.env.KANEO_CLIENT_URL || "http://localhost:5173"
+          process.env.KANEO_CLIENT_URL || "http://127.0.0.1:32000"
         ).replace(/\/$/, "");
         const deviceUrl = new URL(`${clientUrl}/device`);
         if (userCode) {
@@ -539,6 +694,7 @@ export function createApp() {
   });
 
   api.route("/", mcpRoutes);
+  const relayopsWebhookApi = api.route("/webhooks", publicSignalWebhookRouter);
 
   api.use("*", async (c, next) => {
     const path = c.req.path;
@@ -559,7 +715,7 @@ export function createApp() {
         return await eventContext.run({ initiatorId }, next);
       } catch (error) {
         if (!(error instanceof HTTPException)) {
-          console.error("API authentication failed:", error);
+          console.error("API authentication failed:", safeErrorForLog(error));
           throw new HTTPException(500, { message: "Internal Server Error" });
         }
         throw error;
@@ -573,6 +729,7 @@ export function createApp() {
 
   const billingApi = api.route("/billing", billing);
   const projectApi = api.route("/project", project);
+  const relayopsApi = api.route("/relayops", relayops);
   const taskApi = api.route("/task", task);
   const columnApi = api.route("/column", column);
   const activityApi = api.route("/activity", activity);
@@ -613,7 +770,7 @@ export function createApp() {
   app.route(
     "/",
     mcpWellKnownRoutes(
-      (process.env.KANEO_API_URL || "http://localhost:1337").replace(
+      (process.env.KANEO_API_URL || "http://127.0.0.1:32001").replace(
         /\/api\/?$/,
         "",
       ),
@@ -625,45 +782,149 @@ export function createApp() {
   api.get(
     "/ws/user",
     upgradeWebSocket(async (c) => {
+      const origin = c.req.header("origin");
+      if (!origin || !allowedOrigins.has(origin)) {
+        throw new HTTPException(403, { message: "Untrusted WebSocket origin" });
+      }
       try {
         await authenticateApiRequest(c);
       } catch (error) {
         if (error instanceof HTTPException) {
           throw error;
         }
-        console.error("API authentication failed:", error);
+        console.error("API authentication failed:", safeErrorForLog(error));
         throw new HTTPException(500, { message: "Internal Server Error" });
       }
 
       const userId = c.get("userId");
       let conn: ReturnType<typeof addUserConnection> | null = null;
+      const memberships = await db
+        .select({ workspaceId: schema.workspaceUserTable.workspaceId })
+        .from(schema.workspaceUserTable)
+        .where(eq(schema.workspaceUserTable.userId, userId));
+      const workspaceIds = memberships.map((row) => row.workspaceId);
+      const displayName =
+        c.get("user")?.name ?? c.get("userEmail") ?? "RelayOps user";
+      const authorizedPresenceIncidents = new Set<string>();
+      const consumeMessage = createMessageQuota(wsMessagesPerMinute);
+      let idleTimer: ReturnType<typeof setTimeout> | null = null;
+      let reserved = false;
+      const resetIdle = (ws: WSContext) => {
+        if (idleTimer) clearTimeout(idleTimer);
+        idleTimer = setTimeout(
+          () => ws.close(1001, "Idle timeout"),
+          wsIdleTimeoutMs,
+        );
+      };
 
       return {
         onOpen(_evt, ws) {
+          reserved =
+            Boolean(userId) &&
+            reserveWebSocket(
+              userId,
+              wsConnectionsPerUser,
+              wsConnectionsPerInstance,
+            );
+          if (!reserved) {
+            ws.close(1013, "Connection limit exceeded");
+            return;
+          }
+          resetIdle(ws);
           if (userId) {
-            conn = addUserConnection(userId, ws);
+            conn = addUserConnection(userId, ws, workspaceIds);
           }
         },
-        onMessage(evt) {
+        async onMessage(evt, ws) {
           try {
-            const raw =
-              typeof evt.data === "string"
-                ? evt.data
-                : Buffer.isBuffer(evt.data)
-                  ? evt.data.toString()
-                  : null;
-            if (raw) {
-              const msg = JSON.parse(raw) as { type?: string };
-              if (msg?.type === "ping") {
-                // keepalive, no-op
-              }
+            resetIdle(ws);
+            if (!consumeMessage()) {
+              ws.close(1008, "Message rate limit exceeded");
+              return;
             }
+            const data = evt.data;
+            let raw: string | null = null;
+            if (typeof data === "string") {
+              raw = data;
+            } else if (Buffer.isBuffer(data)) {
+              raw = data.toString();
+            } else if (data instanceof ArrayBuffer) {
+              raw = Buffer.from(data).toString();
+            } else if (ArrayBuffer.isView(data)) {
+              raw = Buffer.from(
+                new Uint8Array(data.buffer, data.byteOffset, data.byteLength),
+              ).toString();
+            } else if (data instanceof Blob) {
+              raw = await data.text();
+            }
+            if (!raw) return;
+            if (Buffer.byteLength(raw) > wsMessageLimitBytes) {
+              ws.close(1009, "Message too large");
+              return;
+            }
+            const msg = JSON.parse(raw) as {
+              v?: number;
+              type?: string;
+              workspaceId?: string;
+              incidentId?: string;
+              action?: string;
+            };
+            if (msg.type === "ping") return;
+            if (
+              !conn ||
+              msg.v !== 1 ||
+              msg.type !== "RELAYOPS_PRESENCE" ||
+              (msg.action !== "heartbeat" && msg.action !== "leave") ||
+              typeof msg.workspaceId !== "string" ||
+              typeof msg.incidentId !== "string" ||
+              !conn.workspaceIds.has(msg.workspaceId)
+            ) {
+              return;
+            }
+
+            if (msg.action === "leave") {
+              const leave = relayOpsPresence.leave(conn.id);
+              if (leave) {
+                await publishWorkspaceBroadcast(leave.workspaceId, leave);
+              }
+              return;
+            }
+
+            const scopeKey = `${msg.workspaceId}:${msg.incidentId}`;
+            if (!authorizedPresenceIncidents.has(scopeKey)) {
+              const [incident] = await db
+                .select({ id: schema.incidentTable.id })
+                .from(schema.incidentTable)
+                .where(
+                  and(
+                    eq(schema.incidentTable.workspaceId, msg.workspaceId),
+                    eq(schema.incidentTable.id, msg.incidentId),
+                  ),
+                )
+                .limit(1);
+              if (!incident) return;
+              authorizedPresenceIncidents.add(scopeKey);
+            }
+            const heartbeat = relayOpsPresence.heartbeat({
+              connectionId: conn.id,
+              workspaceId: msg.workspaceId,
+              incidentId: msg.incidentId,
+              userId,
+              displayName,
+            });
+            await publishWorkspaceBroadcast(msg.workspaceId, heartbeat);
           } catch {
-            // Ignore malformed messages
+            // Presence is best-effort and never participates in authorization.
           }
         },
         onClose() {
+          if (idleTimer) clearTimeout(idleTimer);
+          if (reserved) releaseWebSocket(userId);
           if (conn && userId) {
+            const leave = relayOpsPresence.leave(conn.id);
+            if (leave) {
+              void publishWorkspaceBroadcast(leave.workspaceId, leave);
+            }
             removeUserConnection(userId, conn);
           }
         },
@@ -674,6 +935,10 @@ export function createApp() {
   api.get(
     "/ws/:projectId",
     upgradeWebSocket(async (c) => {
+      const origin = c.req.header("origin");
+      if (!origin || !allowedOrigins.has(origin)) {
+        throw new HTTPException(403, { message: "Untrusted WebSocket origin" });
+      }
       const projectId = c.req.param("projectId");
 
       try {
@@ -682,7 +947,7 @@ export function createApp() {
         if (error instanceof HTTPException) {
           throw error;
         }
-        console.error("API authentication failed:", error);
+        console.error("API authentication failed:", safeErrorForLog(error));
         throw new HTTPException(500, { message: "Internal Server Error" });
       }
 
@@ -705,23 +970,52 @@ export function createApp() {
       const windowId = c.req.query("windowId");
       const initiatorId = windowId ? `${userId}:${windowId}` : userId;
       let conn: ReturnType<typeof addConnection> | null = null;
+      const consumeMessage = createMessageQuota(wsMessagesPerMinute);
+      let idleTimer: ReturnType<typeof setTimeout> | null = null;
+      let reserved = false;
+      const resetIdle = (ws: WSContext) => {
+        if (idleTimer) clearTimeout(idleTimer);
+        idleTimer = setTimeout(
+          () => ws.close(1001, "Idle timeout"),
+          wsIdleTimeoutMs,
+        );
+      };
 
       return {
         onOpen(_evt, ws) {
+          reserved = reserveWebSocket(
+            userId,
+            wsConnectionsPerUser,
+            wsConnectionsPerInstance,
+          );
+          if (!reserved) {
+            ws.close(1013, "Connection limit exceeded");
+            return;
+          }
+          resetIdle(ws);
           if (projectId) {
             conn = addConnection(projectId, ws, userId, initiatorId);
           }
         },
-        onMessage(evt) {
+        onMessage(evt, ws) {
           // Respond to client keepalive pings (sent every 30s to prevent
           // Cloudflare from closing idle connections at 100s timeout)
           try {
+            resetIdle(ws);
+            if (!consumeMessage()) {
+              ws.close(1008, "Message rate limit exceeded");
+              return;
+            }
             const raw =
               typeof evt.data === "string"
                 ? evt.data
                 : Buffer.isBuffer(evt.data)
                   ? evt.data.toString()
                   : null;
+            if (raw && Buffer.byteLength(raw) > wsMessageLimitBytes) {
+              ws.close(1009, "Message too large");
+              return;
+            }
             if (raw) {
               const msg = JSON.parse(raw) as { type?: string };
               if (msg?.type === "ping") {
@@ -734,6 +1028,8 @@ export function createApp() {
           }
         },
         onClose() {
+          if (idleTimer) clearTimeout(idleTimer);
+          if (reserved) releaseWebSocket(userId);
           if (conn && projectId) {
             removeConnection(projectId, conn);
           }
@@ -764,6 +1060,8 @@ export function createApp() {
     notificationApi,
     notificationPreferencesApi,
     projectApi,
+    relayopsApi,
+    relayopsWebhookApi,
     publicProjectApi,
     searchApi,
     slackIntegrationApi,
@@ -806,6 +1104,8 @@ export async function runStartupTasks() {
   await migrateApiKeyReferenceId();
 
   await migrateNotificationPreferencesSchema();
+  await migrateNotificationSecrets();
+  await migrateSignalSourceSecrets();
   await migrateGitHubIntegration();
   await migrateColumns();
   await seedDefaultWorkspaceRoles();
@@ -813,16 +1113,17 @@ export async function runStartupTasks() {
   initializePlugins();
   initializeScheduler();
   await initializeWebSocketAdapter();
+  startRelayOpsOutboxWorker();
 }
 
 export async function startServer(
   injectWebSocket: ReturnType<typeof createNodeWebSocket>["injectWebSocket"],
-  port = 1337,
+  port = Number(process.env.PORT ?? 32001),
 ) {
   try {
     await runStartupTasks();
   } catch (error) {
-    console.error("❌ Database migration failed!", error);
+    console.error("❌ Database migration failed!", safeErrorForLog(error));
     process.exit(1);
   }
 
@@ -832,13 +1133,16 @@ export async function startServer(
     {
       fetch: app.fetch,
       port,
+      hostname: process.env.HOST ?? "127.0.0.1",
     },
     () => {
       console.log(
-        `⚡ API is running at ${process.env.KANEO_API_URL || "http://localhost:1337"}`,
+        `⚡ API is running at ${process.env.KANEO_API_URL || "http://127.0.0.1:32001"}`,
       );
     },
   );
+
+  configureServerTimeouts(server);
 
   injectWebSocket(server);
 
@@ -848,6 +1152,7 @@ export async function startServer(
 
     console.log("🛑 Shutting down gracefully...");
     shutdownScheduler();
+    stopRelayOpsOutboxWorker();
     await shutdownWebSocketAdapter();
     server.close();
     process.exit(0);
@@ -860,6 +1165,40 @@ export async function startServer(
   process.on("SIGINT", () => {
     void gracefulShutdown();
   });
+}
+
+export function configureServerTimeouts(server: object) {
+  const requestTimeout = boundedInteger(
+    process.env.KANEO_REQUEST_TIMEOUT_MS,
+    DEFAULT_HTTP_TIMEOUT_MS,
+    120_000,
+  );
+  if ("requestTimeout" in server) {
+    (server as { requestTimeout: number }).requestTimeout = requestTimeout;
+  }
+  if ("headersTimeout" in server) {
+    (server as { headersTimeout: number }).headersTimeout = Math.min(
+      requestTimeout,
+      15_000,
+    );
+  }
+  if ("keepAliveTimeout" in server) {
+    (server as { keepAliveTimeout: number }).keepAliveTimeout = 5_000;
+  }
+  if ("setTimeout" in server && typeof server.setTimeout === "function") {
+    (
+      server as {
+        setTimeout: (
+          timeoutMs: number,
+          callback: (socket: { end: (payload: string) => void }) => void,
+        ) => unknown;
+      }
+    ).setTimeout(requestTimeout, (socket) => {
+      socket.end(
+        "HTTP/1.1 408 Request Timeout\r\nConnection: close\r\nContent-Length: 0\r\n\r\n",
+      );
+    });
+  }
 }
 
 const createdApp = createApp();
@@ -882,6 +1221,8 @@ const {
   notificationApi,
   notificationPreferencesApi,
   projectApi,
+  relayopsApi,
+  relayopsWebhookApi,
   publicProjectApi,
   searchApi,
   slackIntegrationApi,
@@ -909,6 +1250,8 @@ export type AppType =
   | typeof billingApi
   | typeof configApi
   | typeof projectApi
+  | typeof relayopsApi
+  | typeof relayopsWebhookApi
   | typeof taskApi
   | typeof columnApi
   | typeof activityApi

@@ -36,14 +36,19 @@ describe("API integration: CORS origin policy", () => {
     expect(await originHeaderFor("https://attacker.example")).toBeNull();
   });
 
-  it("still reflects the origin in development", async () => {
+  it("allows only explicit local development origins", async () => {
     process.env.NODE_ENV = "development";
     delete process.env.KANEO_CLIENT_URL;
     delete process.env.CORS_ORIGINS;
 
-    expect(await originHeaderFor("http://localhost:5173")).toBe(
-      "http://localhost:5173",
+    expect(await originHeaderFor("http://localhost:32000")).toBe(
+      "http://localhost:32000",
     );
+    expect(await originHeaderFor("http://127.0.0.1:32000")).toBe(
+      "http://127.0.0.1:32000",
+    );
+    expect(await originHeaderFor("http://localhost:5173")).toBeNull();
+    expect(await originHeaderFor("https://attacker.example")).toBeNull();
   });
 
   it("allows the configured client URL and refuses everything else", async () => {

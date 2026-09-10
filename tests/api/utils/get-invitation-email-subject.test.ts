@@ -2,24 +2,8 @@ import { describe, expect, it } from "vitest";
 import { getInvitationEmailSubject } from "../../../apps/api/src/utils/get-invitation-email-subject";
 
 describe("getInvitationEmailSubject", () => {
-  it("uses French copy for regional French locales", () => {
-    const locale = "fr-FR";
-    const inviterName = "Alice";
-    const workspaceName = "Équipe produit";
-
-    const subject = getInvitationEmailSubject(
-      locale,
-      inviterName,
-      workspaceName,
-    );
-
-    expect(subject).toBe(
-      "Alice vous invite à rejoindre Équipe produit sur Kaneo",
-    );
-  });
-
-  it("keeps the German translation unchanged", () => {
-    const locale = "de-DE";
+  it("uses English copy only for English locales", () => {
+    const locale = "en-GB";
     const inviterName = "Alice";
     const workspaceName = "Produkt";
 
@@ -29,15 +13,13 @@ describe("getInvitationEmailSubject", () => {
       workspaceName,
     );
 
-    expect(subject).toBe(
-      "Alice hat dich eingeladen, Produkt auf Kaneo beizutreten",
-    );
+    expect(subject).toBe("Alice invited you to join Produkt on RelayOps");
   });
 
-  it("uses Brazilian Portuguese copy for regional Portuguese locales", () => {
-    const locale = "pt-BR";
+  it("uses Russian copy for Russian locales", () => {
+    const locale = "ru-RU";
     const inviterName = "Alice";
-    const workspaceName = "Equipe produto";
+    const workspaceName = "Продукт";
 
     const subject = getInvitationEmailSubject(
       locale,
@@ -46,27 +28,11 @@ describe("getInvitationEmailSubject", () => {
     );
 
     expect(subject).toBe(
-      "Alice convidou você para participar de Equipe produto no Kaneo",
+      "Alice приглашает вас присоединиться к Продукт в RelayOps",
     );
   });
 
-  it("uses Japanese copy for Japanese locales", () => {
-    const locale = "ja-JP";
-    const inviterName = "Alice";
-    const workspaceName = "プロダクト";
-
-    const subject = getInvitationEmailSubject(
-      locale,
-      inviterName,
-      workspaceName,
-    );
-
-    expect(subject).toBe(
-      "Alice さんが Kaneo の「プロダクト」にあなたを招待しました",
-    );
-  });
-
-  it("uses the English fallback for unsupported locales", () => {
+  it("uses the Russian fallback for unsupported locales", () => {
     const locale = "es-ES";
     const inviterName = "Alice";
     const workspaceName = "Producto";
@@ -77,6 +43,8 @@ describe("getInvitationEmailSubject", () => {
       workspaceName,
     );
 
-    expect(subject).toBe("Alice invited you to join Producto on Kaneo");
+    expect(subject).toBe(
+      "Alice приглашает вас присоединиться к Producto в RelayOps",
+    );
   });
 });

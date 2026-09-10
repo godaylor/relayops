@@ -7,6 +7,7 @@ import {
   jsonResponse,
   z,
 } from "../openapi";
+import { requireLegacyWriteAccess } from "../utils/require-legacy-write-access";
 import { requireWorkspacePermission } from "../utils/require-workspace-permission";
 import { workspaceAccess } from "../utils/workspace-access-middleware";
 import archiveProjectCtrl from "./controllers/archive-project";
@@ -54,6 +55,7 @@ const createProjectRoute = createRoute({
     "Create a project in a workspace. The slug becomes the prefix of its task identifiers.",
   middleware: [
     workspaceAccess.fromBody(),
+    requireLegacyWriteAccess,
     requireWorkspacePermission({ project: ["create"] }),
     requireEntitlement,
   ] as const,
@@ -100,6 +102,7 @@ const reorderProjectsRoute = createRoute({
     "Set the sidebar order of a workspace's projects. The given positions express relative order only -- the workspace is renumbered to 0..n-1.",
   middleware: [
     workspaceAccess.fromQuery(),
+    requireLegacyWriteAccess,
     requireWorkspacePermission({ project: ["update"] }),
   ] as const,
   request: {
@@ -130,6 +133,7 @@ const updateProjectRoute = createRoute({
     "Replace a project's name, icon, slug, description, and visibility.",
   middleware: [
     workspaceAccess.fromProject(),
+    requireLegacyWriteAccess,
     requireWorkspacePermission({ project: ["update"] }),
   ] as const,
   request: {
@@ -158,6 +162,7 @@ const deleteProjectRoute = createRoute({
     "Permanently delete a project and everything in it. Archive it instead to keep the data.",
   middleware: [
     workspaceAccess.fromProject(),
+    requireLegacyWriteAccess,
     requireWorkspacePermission({ project: ["delete"] }),
   ] as const,
   request: { params: projectParam },
@@ -182,6 +187,7 @@ const archiveProjectRoute = createRoute({
     "Hide a project from the default list without deleting it. Reversible with unarchive.",
   middleware: [
     workspaceAccess.fromProject(),
+    requireLegacyWriteAccess,
     requireWorkspacePermission({ project: ["update"] }),
   ] as const,
   request: { params: projectParam },
@@ -205,6 +211,7 @@ const unarchiveProjectRoute = createRoute({
   description: "Return an archived project to the default list.",
   middleware: [
     workspaceAccess.fromProject(),
+    requireLegacyWriteAccess,
     requireWorkspacePermission({ project: ["update"] }),
   ] as const,
   request: { params: projectParam },

@@ -8,6 +8,7 @@ import type {
   ProjectBroadcastMessage,
   UserBroadcast,
   UserBroadcastMessage,
+  WorkspaceBroadcast,
 } from "./broadcast-adapter";
 import { InMemoryBroadcastAdapter } from "./in-memory-broadcast-adapter";
 import { RedisBroadcastAdapter } from "./redis-broadcast-adapter";
@@ -21,6 +22,9 @@ type ProjectConnection = {
 };
 
 type UserConnection = {
+  id: string;
+  userId: string;
+  workspaceIds: ReadonlySet<string>;
   ws: WSContext;
 };
 
@@ -30,11 +34,20 @@ type UserConnection = {
  */
 const userConnections = new Map<string, Set<UserConnection>>();
 
-export function addUserConnection(userId: string, ws: WSContext) {
+export function addUserConnection(
+  userId: string,
+  ws: WSContext,
+  workspaceIds: readonly string[] = [],
+) {
   if (!userConnections.has(userId)) {
     userConnections.set(userId, new Set());
   }
-  const conn: UserConnection = { ws };
+  const conn: UserConnection = {
+    id: randomUUID(),
+    userId,
+    workspaceIds: new Set(workspaceIds),
+    ws,
+  };
   userConnections.get(userId)?.add(conn);
   return conn;
 }
@@ -50,17 +63,22 @@ export function removeUserConnection(userId: string, conn: UserConnection) {
 }
 
 export function broadcastToUser(userId: string, message: UserBroadcastMessage) {
+  void publishUserBroadcast(userId, message).catch((err) => {
+    console.error("Failed to publish a user broadcast:", err);
+  });
+}
+
+export async function publishUserBroadcast(
+  userId: string,
+  message: UserBroadcastMessage,
+) {
   deliverToLocalUserConnections(userId, message);
-
-  if (!adapter) {
-    return;
+  if (!adapter) return;
+  try {
+    await adapter.publishToUser({ userId, message, origin: INSTANCE_ID });
+  } catch {
+    console.error("Optional WebSocket adapter failed for a user broadcast");
   }
-
-  void adapter
-    .publishToUser({ userId, message, origin: INSTANCE_ID })
-    .catch((err) => {
-      console.error("Failed to publish a user broadcast:", err);
-    });
 }
 
 function deliverToLocalUserConnections(
@@ -80,6 +98,53 @@ function deliverToLocalUserConnections(
   }
   if (connections.size === 0) {
     userConnections.delete(userId);
+  }
+}
+
+function deliverToLocalWorkspaceConnections(
+  workspaceId: string,
+  message: UserBroadcastMessage,
+  excludeUserId?: string,
+) {
+  const payload = JSON.stringify(message);
+  for (const [userId, connections] of userConnections) {
+    if (excludeUserId === userId) continue;
+    for (const conn of connections) {
+      if (!conn.workspaceIds.has(workspaceId)) continue;
+      try {
+        conn.ws.send(payload);
+      } catch {
+        connections.delete(conn);
+      }
+    }
+    if (connections.size === 0) userConnections.delete(userId);
+  }
+}
+
+export async function publishWorkspaceBroadcast(
+  workspaceId: string,
+  message: UserBroadcastMessage,
+  options?: { excludeUserId?: string },
+) {
+  deliverToLocalWorkspaceConnections(
+    workspaceId,
+    message,
+    options?.excludeUserId,
+  );
+  if (!adapter) return;
+  try {
+    await adapter.publishToWorkspace({
+      workspaceId,
+      message,
+      excludeUserId: options?.excludeUserId,
+      origin: INSTANCE_ID,
+    });
+  } catch {
+    // Redis is coordination only; local clients remain correct and reconnect
+    // performs an authoritative PostgreSQL refetch.
+    console.error(
+      "Optional WebSocket adapter failed for a workspace broadcast",
+    );
   }
 }
 
@@ -124,6 +189,14 @@ export async function initializeWebSocketAdapter() {
         return;
       }
       deliverToLocalUserConnections(msg.userId, msg.message);
+    });
+    await nextAdapter.subscribeToWorkspace((msg: WorkspaceBroadcast) => {
+      if (msg.origin === INSTANCE_ID) return;
+      deliverToLocalWorkspaceConnections(
+        msg.workspaceId,
+        msg.message,
+        msg.excludeUserId,
+      );
     });
   } catch (err) {
     await nextAdapter.shutdown().catch(() => {});
@@ -343,6 +416,16 @@ subscribeToEvent<{ notificationId: string; userId: string }>(
   },
 );
 
+subscribeToEvent<{ workspaceId: string; targetUserId: string }>(
+  "workspace.role_changed",
+  async (data) => {
+    if (!data.workspaceId || !data.targetUserId) return;
+    broadcastToUser(data.targetUserId, {
+      type: "WORKSPACE_ROLE_CHANGED",
+      workspaceId: data.workspaceId,
+    });
+  },
+);
 for (const eventName of taskUpdateEvents) {
   subscribeToEvent<TaskEvent>(eventName, async (data) => {
     const { projectId, initiatorId } = data;

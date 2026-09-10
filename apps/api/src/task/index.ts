@@ -22,6 +22,7 @@ import {
   validateTaskAssetUploadInput,
 } from "../storage/s3";
 import { normalizeApiServerUrl } from "../utils/openapi-spec";
+import { assertLegacyWriteAccess } from "../utils/require-legacy-write-access";
 import { requireWorkspacePermission } from "../utils/require-workspace-permission";
 import {
   validateAndParseDate,
@@ -553,6 +554,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     return c.json(tasks, 200);
   })
   .openapi(bulkUpdateTasksRoute, async (c) => {
+    await assertLegacyWriteAccess(c.get("workspaceId"));
     const { taskIds, operation, value } = c.req.valid("json");
     const userId = c.get("userId");
 
@@ -580,6 +582,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     return c.json(result, 200);
   })
   .openapi(createTaskRoute, async (c) => {
+    await assertLegacyWriteAccess(c.get("workspaceId"));
     const { projectId } = c.req.param();
     const { title, description, startDate, dueDate, priority, status, userId } =
       c.req.valid("json");
@@ -617,6 +620,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     return c.json(task, 200);
   })
   .openapi(moveTaskRoute, async (c) => {
+    await assertLegacyWriteAccess(c.get("workspaceId"));
     const { id } = c.req.valid("param");
     const { destinationProjectId, destinationStatus } = c.req.valid("json");
     const currentUserId = c.get("userId");
@@ -631,6 +635,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     return c.json(result, 200);
   })
   .openapi(updateTaskRoute, async (c) => {
+    await assertLegacyWriteAccess(c.get("workspaceId"));
     const { id } = c.req.valid("param");
     const {
       title,
@@ -681,6 +686,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     return c.json(exportData, 200);
   })
   .openapi(importTasksRoute, async (c) => {
+    await assertLegacyWriteAccess(c.get("workspaceId"));
     const { projectId } = c.req.valid("param");
     const { tasks } = c.req.valid("json");
     const currentUserId = c.get("userId");
@@ -690,6 +696,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     return c.json(result, 200);
   })
   .openapi(deleteTaskRoute, async (c) => {
+    await assertLegacyWriteAccess(c.get("workspaceId"));
     const { id } = c.req.valid("param");
 
     const currentUserId = c.get("userId");
@@ -698,6 +705,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     return c.json(task, 200);
   })
   .openapi(updateTaskStatusRoute, async (c) => {
+    await assertLegacyWriteAccess(c.get("workspaceId"));
     const { id } = c.req.valid("param");
     const { status } = c.req.valid("json");
     const currentUserId = c.get("userId");
@@ -707,6 +715,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     return c.json(task, 200);
   })
   .openapi(updateTaskPriorityRoute, async (c) => {
+    await assertLegacyWriteAccess(c.get("workspaceId"));
     const { id } = c.req.valid("param");
     const { priority } = c.req.valid("json");
     const currentUserId = c.get("userId");
@@ -716,6 +725,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     return c.json(task, 200);
   })
   .openapi(updateTaskAssigneeRoute, async (c) => {
+    await assertLegacyWriteAccess(c.get("workspaceId"));
     const { id } = c.req.valid("param");
     const { userId } = c.req.valid("json");
     const currentUserId = c.get("userId");
@@ -725,6 +735,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     return c.json(task, 200);
   })
   .openapi(updateTaskDueDateRoute, async (c) => {
+    await assertLegacyWriteAccess(c.get("workspaceId"));
     const { id } = c.req.valid("param");
     const { dueDate = null } = c.req.valid("json");
     const currentUserId = c.get("userId");
@@ -738,6 +749,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     return c.json(task, 200);
   })
   .openapi(updateTaskTitleRoute, async (c) => {
+    await assertLegacyWriteAccess(c.get("workspaceId"));
     const { id } = c.req.valid("param");
     const { title } = c.req.valid("json");
     const currentUserId = c.get("userId");
@@ -747,6 +759,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     return c.json(task, 200);
   })
   .openapi(createTaskImageUploadRoute, async (c) => {
+    await assertLegacyWriteAccess(c.get("workspaceId"));
     const { id } = c.req.valid("param");
     const { filename, contentType, size, surface } = c.req.valid("json");
 
@@ -801,6 +814,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     }
   })
   .openapi(finalizeTaskImageUploadRoute, async (c) => {
+    await assertLegacyWriteAccess(c.get("workspaceId"));
     const { id } = c.req.valid("param");
     const { key, filename, contentType, size, surface } = c.req.valid("json");
     const userId = c.get("userId");
@@ -909,6 +923,7 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     );
   })
   .openapi(updateTaskDescriptionRoute, async (c) => {
+    await assertLegacyWriteAccess(c.get("workspaceId"));
     const { id } = c.req.valid("param");
     const { description } = c.req.valid("json");
     const currentUserId = c.get("userId");

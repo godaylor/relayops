@@ -1,5 +1,11 @@
-import { DEFAULT_ROLE_NAMES, defaultRolePayloads } from "@kaneo/permissions";
-import { and, inArray, sql } from "drizzle-orm";
+import {
+  DEFAULT_ROLE_NAMES,
+  defaultRolePayloads,
+  isPreS7GeneratedViewerPayload,
+  RELAYOPS_ROLE_TEMPLATE_NAMES,
+  relayOpsRoleTemplatePayloads,
+} from "@kaneo/permissions";
+import { eq, inArray, sql } from "drizzle-orm";
 import db, { schema } from "../database";
 
 /**
@@ -44,58 +50,74 @@ export async function seedDefaultWorkspaceRoles() {
       return;
     }
 
-    const workspaceIds = workspaces.map((w) => w.id);
+    const now = new Date();
+    const BATCH_SIZE = 1000;
 
-    const existingRows = await db
+    const existingViewers = await db
       .select({
-        workspaceId: schema.workspaceRoleTable.workspaceId,
-        role: schema.workspaceRoleTable.role,
+        id: schema.workspaceRoleTable.id,
+        permission: schema.workspaceRoleTable.permission,
       })
       .from(schema.workspaceRoleTable)
-      .where(
-        and(
-          inArray(schema.workspaceRoleTable.workspaceId, workspaceIds),
+      .where(eq(schema.workspaceRoleTable.role, "viewer"));
+    const viewerRoleUpgradeIds = existingViewers
+      .filter((row) => isPreS7GeneratedViewerPayload(row.permission))
+      .map((row) => row.id);
+    for (let i = 0; i < viewerRoleUpgradeIds.length; i += BATCH_SIZE) {
+      await db
+        .update(schema.workspaceRoleTable)
+        .set({
+          permission: JSON.stringify(relayOpsRoleTemplatePayloads.viewer),
+          updatedAt: now,
+        })
+        .where(
           inArray(
-            schema.workspaceRoleTable.role,
-            DEFAULT_ROLE_NAMES as unknown as string[],
+            schema.workspaceRoleTable.id,
+            viewerRoleUpgradeIds.slice(i, i + BATCH_SIZE),
           ),
-        ),
-      );
+        );
+    }
 
-    const present = new Set(
-      existingRows.map((r) => `${r.workspaceId}:${r.role}`),
-    );
-
-    const now = new Date();
+    const templates = {
+      ...defaultRolePayloads,
+      ...relayOpsRoleTemplatePayloads,
+    };
+    const names = [
+      ...DEFAULT_ROLE_NAMES,
+      ...RELAYOPS_ROLE_TEMPLATE_NAMES,
+    ].filter((name, index, all) => all.indexOf(name) === index);
     const rows: Array<typeof schema.workspaceRoleTable.$inferInsert> = [];
-    for (const workspaceId of workspaceIds) {
-      for (const name of DEFAULT_ROLE_NAMES) {
-        if (present.has(`${workspaceId}:${name}`)) continue;
+    for (const workspace of workspaces) {
+      for (const name of names) {
         rows.push({
-          workspaceId,
+          workspaceId: workspace.id,
           role: name,
-          permission: JSON.stringify(defaultRolePayloads[name]),
+          permission: JSON.stringify(templates[name]),
           createdAt: now,
           updatedAt: now,
         });
       }
     }
 
-    if (rows.length === 0) {
-      return;
-    }
-
     // Postgres' bind protocol caps parameters at 65535 per query, so insert
     // in chunks. 6 columns × 1000 rows = 6000 params per batch, leaving ample
     // headroom even for instances with tens of thousands of workspaces.
-    const BATCH_SIZE = 1000;
+    let insertedCount = 0;
     for (let i = 0; i < rows.length; i += BATCH_SIZE) {
-      await db
+      const inserted = await db
         .insert(schema.workspaceRoleTable)
-        .values(rows.slice(i, i + BATCH_SIZE));
+        .values(rows.slice(i, i + BATCH_SIZE))
+        .onConflictDoNothing({
+          target: [
+            schema.workspaceRoleTable.workspaceId,
+            schema.workspaceRoleTable.role,
+          ],
+        })
+        .returning({ id: schema.workspaceRoleTable.id });
+      insertedCount += inserted.length;
     }
     console.log(
-      `✅ Seeded ${rows.length} default workspace role row(s) across ${workspaceIds.length} workspace(s).`,
+      `✅ Seeded ${insertedCount} missing workspace role row(s), upgraded ${viewerRoleUpgradeIds.length} generated viewer row(s), across ${workspaces.length} workspace(s).`,
     );
   } catch (error) {
     console.error("❌ Failed to seed default workspace roles:", error);

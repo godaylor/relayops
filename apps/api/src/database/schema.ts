@@ -2,6 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { relations, sql } from "drizzle-orm";
 import {
   boolean,
+  check,
   customType,
   foreignKey,
   index,
@@ -138,17 +139,27 @@ export const verificationTable = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
-export const workspaceTable = pgTable("workspace", {
-  id: text("id")
-    .$defaultFn(() => createId())
-    .primaryKey(),
-  name: text("name").notNull(),
-  slug: text("slug").notNull().unique(),
-  logo: text("logo"),
-  metadata: text("metadata"),
-  description: text("description"),
-  createdAt: timestamp("created_at", { mode: "date" }).notNull(),
-});
+export const workspaceTable = pgTable(
+  "workspace",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull().unique(),
+    logo: text("logo"),
+    metadata: text("metadata"),
+    description: text("description"),
+    productMode: text("product_mode").notNull().default("legacy"),
+    createdAt: timestamp("created_at", { mode: "date" }).notNull(),
+  },
+  (table) => [
+    check(
+      "workspace_product_mode_valid",
+      sql`${table.productMode} IN ('legacy', 'relayops')`,
+    ),
+  ],
+);
 
 export const workspaceUserTable = pgTable(
   "workspace_member",
@@ -235,7 +246,10 @@ export const teamTable = pgTable(
       () => /* @__PURE__ */ new Date(),
     ),
   },
-  (table) => [index("team_workspaceId_idx").on(table.workspaceId)],
+  (table) => [
+    unique("team_workspace_id_id_unique").on(table.workspaceId, table.id),
+    index("team_workspaceId_idx").on(table.workspaceId),
+  ],
 );
 
 export const teamMemberTable = pgTable(
@@ -304,10 +318,61 @@ export const workspaceRoleTable = pgTable(
   },
   (table) => [
     index("workspace_role_workspaceId_idx").on(table.workspaceId),
+    unique("workspace_role_workspace_role_unique").on(
+      table.workspaceId,
+      table.role,
+    ),
     index("workspace_role_role_idx").on(table.role),
   ],
 );
 
+export const authorizationAuditEventTable = pgTable(
+  "authorization_audit_event",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    eventType: text("event_type").notNull(),
+    actorUserId: text("actor_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    targetUserId: text("target_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    previousRole: text("previous_role").notNull(),
+    nextRole: text("next_role").notNull(),
+    requestId: text("request_id").notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "date",
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    check(
+      "authorization_audit_event_type_valid",
+      sql`${table.eventType} IN ('workspace.role_changed')`,
+    ),
+    index("authorization_audit_workspace_created_idx").on(
+      table.workspaceId,
+      table.createdAt,
+      table.id,
+    ),
+    index("authorization_audit_target_created_idx").on(
+      table.targetUserId,
+      table.createdAt,
+    ),
+  ],
+);
 export const projectTable = pgTable(
   "project",
   {
@@ -1078,6 +1143,751 @@ export const mcpOauthStateTable = pgTable(
   (table) => [
     uniqueIndex("mcp_oauth_state_kind_key_uidx").on(table.kind, table.key),
     index("mcp_oauth_state_expiresAt_idx").on(table.expiresAt),
+  ],
+);
+
+export const serviceTable = pgTable(
+  "service",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    slug: text("slug").notNull(),
+    name: text("name").notNull(),
+    description: text("description"),
+    tier: text("tier").notNull().default("standard"),
+    health: text("health").notNull().default("operational"),
+    ownerTeamId: text("owner_team_id"),
+    repositoryUrl: text("repository_url"),
+    runbookUrl: text("runbook_url"),
+    archivedAt: timestamp("archived_at", {
+      mode: "date",
+      withTimezone: true,
+    }),
+    demoDataSetId: text("demo_data_set_id"),
+    createdAt: timestamp("created_at", {
+      mode: "date",
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", {
+      mode: "date",
+      withTimezone: true,
+    })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    unique("service_workspace_id_id_unique").on(table.workspaceId, table.id),
+    uniqueIndex("service_workspace_active_slug_unique")
+      .on(table.workspaceId, table.slug)
+      .where(sql`${table.archivedAt} IS NULL`),
+    foreignKey({
+      name: "service_workspace_owner_team_fk",
+      columns: [table.workspaceId, table.ownerTeamId],
+      foreignColumns: [teamTable.workspaceId, teamTable.id],
+    })
+      .onDelete("set null")
+      .onUpdate("cascade"),
+    check(
+      "service_tier_valid",
+      sql`${table.tier} IN ('critical', 'high', 'standard', 'low')`,
+    ),
+    check(
+      "service_health_valid",
+      sql`${table.health} IN ('operational', 'degraded', 'major_outage', 'maintenance')`,
+    ),
+    index("service_workspace_id_created_at_idx").on(
+      table.workspaceId,
+      table.createdAt,
+      table.id,
+    ),
+    index("service_workspace_health_idx").on(
+      table.workspaceId,
+      table.health,
+      table.archivedAt,
+    ),
+    index("service_workspace_demo_idx").on(
+      table.workspaceId,
+      table.demoDataSetId,
+    ),
+  ],
+);
+
+export const incidentTable = pgTable(
+  "incident",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    number: integer("number").notNull(),
+    title: text("title").notNull(),
+    summary: text("summary"),
+    status: text("status").notNull().default("detected"),
+    severity: text("severity").notNull().default("unknown"),
+    impact: text("impact").notNull().default("unknown"),
+    serviceId: text("service_id").notNull(),
+    commanderId: text("commander_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    resolutionSummary: text("resolution_summary"),
+    version: integer("version").notNull().default(1),
+    creationIdempotencyKey: text("creation_idempotency_key").notNull(),
+    demoDataSetId: text("demo_data_set_id"),
+    createdBy: text("created_by").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    detectedAt: timestamp("detected_at", {
+      mode: "date",
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+    acknowledgedAt: timestamp("acknowledged_at", {
+      mode: "date",
+      withTimezone: true,
+    }),
+    mitigatedAt: timestamp("mitigated_at", {
+      mode: "date",
+      withTimezone: true,
+    }),
+    resolvedAt: timestamp("resolved_at", {
+      mode: "date",
+      withTimezone: true,
+    }),
+    dismissedAt: timestamp("dismissed_at", {
+      mode: "date",
+      withTimezone: true,
+    }),
+    lastUpdateAt: timestamp("last_update_at", {
+      mode: "date",
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "date",
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", {
+      mode: "date",
+      withTimezone: true,
+    })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    unique("incident_workspace_id_id_unique").on(table.workspaceId, table.id),
+    unique("incident_workspace_id_number_unique").on(
+      table.workspaceId,
+      table.number,
+    ),
+    unique("incident_workspace_id_creation_key_unique").on(
+      table.workspaceId,
+      table.creationIdempotencyKey,
+    ),
+    foreignKey({
+      name: "incident_workspace_service_fk",
+      columns: [table.workspaceId, table.serviceId],
+      foreignColumns: [serviceTable.workspaceId, serviceTable.id],
+    })
+      .onDelete("restrict")
+      .onUpdate("cascade"),
+    check("incident_number_positive", sql`${table.number} > 0`),
+    check("incident_version_positive", sql`${table.version} > 0`),
+    check(
+      "incident_status_valid",
+      sql`${table.status} IN ('detected', 'triaging', 'mitigating', 'monitoring', 'resolved', 'dismissed')`,
+    ),
+    check(
+      "incident_severity_valid",
+      sql`${table.severity} IN ('unknown', 'sev1', 'sev2', 'sev3', 'sev4')`,
+    ),
+    check(
+      "incident_impact_valid",
+      sql`${table.impact} IN ('unknown', 'none', 'degraded', 'partial_outage', 'full_outage')`,
+    ),
+    index("incident_workspace_detected_idx").on(
+      table.workspaceId,
+      table.detectedAt,
+      table.id,
+    ),
+    index("incident_workspace_service_detected_idx").on(
+      table.workspaceId,
+      table.serviceId,
+      table.detectedAt,
+      table.id,
+    ),
+    index("incident_workspace_status_severity_detected_idx").on(
+      table.workspaceId,
+      table.status,
+      table.severity,
+      table.detectedAt,
+      table.id,
+    ),
+    index("incident_workspace_commander_idx").on(
+      table.workspaceId,
+      table.commanderId,
+      table.status,
+    ),
+    index("incident_workspace_last_update_idx").on(
+      table.workspaceId,
+      table.lastUpdateAt,
+      table.id,
+    ),
+    index("incident_workspace_demo_idx").on(
+      table.workspaceId,
+      table.demoDataSetId,
+    ),
+  ],
+);
+
+export const incidentAffectedServiceTable = pgTable(
+  "incident_affected_service",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    incidentId: text("incident_id").notNull(),
+    serviceId: text("service_id").notNull(),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    foreignKey({
+      name: "incident_affected_service_incident_fk",
+      columns: [table.workspaceId, table.incidentId],
+      foreignColumns: [incidentTable.workspaceId, incidentTable.id],
+    })
+      .onDelete("cascade")
+      .onUpdate("cascade"),
+    foreignKey({
+      name: "incident_affected_service_service_fk",
+      columns: [table.workspaceId, table.serviceId],
+      foreignColumns: [serviceTable.workspaceId, serviceTable.id],
+    })
+      .onDelete("restrict")
+      .onUpdate("cascade"),
+    unique("incident_affected_service_unique").on(
+      table.workspaceId,
+      table.incidentId,
+      table.serviceId,
+    ),
+    index("incident_affected_service_workspace_service_idx").on(
+      table.workspaceId,
+      table.serviceId,
+      table.incidentId,
+    ),
+  ],
+);
+
+export const incidentResponderTable = pgTable(
+  "incident_responder",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    incidentId: text("incident_id").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => userTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    foreignKey({
+      name: "incident_responder_incident_fk",
+      columns: [table.workspaceId, table.incidentId],
+      foreignColumns: [incidentTable.workspaceId, incidentTable.id],
+    })
+      .onDelete("cascade")
+      .onUpdate("cascade"),
+    unique("incident_responder_workspace_incident_user_unique").on(
+      table.workspaceId,
+      table.incidentId,
+      table.userId,
+    ),
+    index("incident_responder_workspace_user_idx").on(
+      table.workspaceId,
+      table.userId,
+      table.incidentId,
+    ),
+  ],
+);
+
+export const savedViewTable = pgTable(
+  "saved_view",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    ownerUserId: text("owner_user_id")
+      .notNull()
+      .references(() => userTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    name: text("name").notNull(),
+    visibility: text("visibility").notNull().default("private"),
+    definition: jsonb("definition").$type<Record<string, unknown>>().notNull(),
+    schemaVersion: integer("schema_version").notNull().default(1),
+    version: integer("version").notNull().default(1),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    unique("saved_view_workspace_owner_name_unique").on(
+      table.workspaceId,
+      table.ownerUserId,
+      table.name,
+    ),
+    check(
+      "saved_view_visibility_valid",
+      sql`${table.visibility} IN ('private', 'workspace')`,
+    ),
+    check(
+      "saved_view_schema_version_supported",
+      sql`${table.schemaVersion} = 1`,
+    ),
+    check("saved_view_version_positive", sql`${table.version} > 0`),
+    index("saved_view_workspace_visibility_updated_idx").on(
+      table.workspaceId,
+      table.visibility,
+      table.updatedAt,
+      table.id,
+    ),
+    index("saved_view_workspace_owner_updated_idx").on(
+      table.workspaceId,
+      table.ownerUserId,
+      table.updatedAt,
+      table.id,
+    ),
+  ],
+);
+
+export const signalSourceTable = pgTable(
+  "signal_source",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    name: text("name").notNull(),
+    source: text("source").notNull().default("generic_webhook"),
+    encryptedSecret: text("encrypted_secret").notNull(),
+    nonce: text("nonce").notNull(),
+    keyVersion: integer("key_version").notNull().default(1),
+    enabled: boolean("enabled").notNull().default(true),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    unique("signal_source_workspace_id_unique").on(table.workspaceId, table.id),
+    unique("signal_source_workspace_name_unique").on(
+      table.workspaceId,
+      table.name,
+    ),
+    check("signal_source_type_valid", sql`${table.source} = 'generic_webhook'`),
+    check("signal_source_key_version_positive", sql`${table.keyVersion} > 0`),
+    index("signal_source_workspace_created_idx").on(
+      table.workspaceId,
+      table.createdAt,
+      table.id,
+    ),
+  ],
+);
+
+export const signalTable = pgTable(
+  "signal",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    source: text("source").notNull(),
+    externalId: text("external_id"),
+    fingerprint: text("fingerprint").notNull(),
+    deduplicationKey: text("deduplication_key").notNull(),
+    serviceId: text("service_id"),
+    title: text("title").notNull(),
+    summary: text("summary"),
+    observedAt: timestamp("observed_at", {
+      mode: "date",
+      withTimezone: true,
+    }).notNull(),
+    severityHint: text("severity_hint").notNull().default("unknown"),
+    redactedPayload: jsonb("redacted_payload")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default({}),
+    ingestionStatus: text("ingestion_status").notNull().default("new"),
+    demoDataSetId: text("demo_data_set_id"),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    unique("signal_workspace_id_unique").on(table.workspaceId, table.id),
+    uniqueIndex("signal_workspace_source_external_unique")
+      .on(table.workspaceId, table.source, table.externalId)
+      .where(sql`${table.externalId} IS NOT NULL`),
+    foreignKey({
+      name: "signal_workspace_service_fk",
+      columns: [table.workspaceId, table.serviceId],
+      foreignColumns: [serviceTable.workspaceId, serviceTable.id],
+    })
+      .onDelete("restrict")
+      .onUpdate("cascade"),
+    check(
+      "signal_severity_hint_valid",
+      sql`${table.severityHint} IN ('unknown', 'sev1', 'sev2', 'sev3', 'sev4')`,
+    ),
+    check(
+      "signal_ingestion_status_valid",
+      sql`${table.ingestionStatus} IN ('new', 'attached')`,
+    ),
+    index("signal_workspace_observed_idx").on(
+      table.workspaceId,
+      table.observedAt,
+      table.id,
+    ),
+    index("signal_workspace_status_observed_idx").on(
+      table.workspaceId,
+      table.ingestionStatus,
+      table.observedAt,
+      table.id,
+    ),
+    index("signal_workspace_service_observed_idx").on(
+      table.workspaceId,
+      table.serviceId,
+      table.observedAt,
+      table.id,
+    ),
+  ],
+);
+
+export const signalIngestionAttemptTable = pgTable(
+  "signal_ingestion_attempt",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    sourceId: text("source_id").notNull(),
+    requestId: text("request_id").notNull(),
+    payloadHash: text("payload_hash"),
+    bodySize: integer("body_size").notNull().default(0),
+    outcome: text("outcome").notNull().default("received"),
+    errorCode: text("error_code"),
+    receivedAt: timestamp("received_at", {
+      mode: "date",
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+    completedAt: timestamp("completed_at", {
+      mode: "date",
+      withTimezone: true,
+    }),
+  },
+  (table) => [
+    foreignKey({
+      name: "signal_ingestion_attempt_workspace_source_fk",
+      columns: [table.workspaceId, table.sourceId],
+      foreignColumns: [signalSourceTable.workspaceId, signalSourceTable.id],
+    })
+      .onDelete("cascade")
+      .onUpdate("cascade"),
+    unique("signal_ingestion_attempt_workspace_source_request_unique").on(
+      table.workspaceId,
+      table.sourceId,
+      table.requestId,
+    ),
+    check(
+      "signal_ingestion_attempt_body_size_valid",
+      sql`${table.bodySize} >= 0`,
+    ),
+    check(
+      "signal_ingestion_attempt_outcome_valid",
+      sql`${table.outcome} IN ('received', 'accepted', 'deduplicated', 'rejected', 'rate_limited')`,
+    ),
+    index("signal_ingestion_attempt_rate_idx").on(
+      table.workspaceId,
+      table.sourceId,
+      table.receivedAt,
+    ),
+  ],
+);
+
+export const incidentSignalTable = pgTable(
+  "incident_signal",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    incidentId: text("incident_id").notNull(),
+    signalId: text("signal_id").notNull(),
+    attachedBy: text("attached_by").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    attachedAt: timestamp("attached_at", {
+      mode: "date",
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    foreignKey({
+      name: "incident_signal_workspace_incident_fk",
+      columns: [table.workspaceId, table.incidentId],
+      foreignColumns: [incidentTable.workspaceId, incidentTable.id],
+    })
+      .onDelete("cascade")
+      .onUpdate("cascade"),
+    foreignKey({
+      name: "incident_signal_workspace_signal_fk",
+      columns: [table.workspaceId, table.signalId],
+      foreignColumns: [signalTable.workspaceId, signalTable.id],
+    })
+      .onDelete("cascade")
+      .onUpdate("cascade"),
+    unique("incident_signal_workspace_incident_signal_unique").on(
+      table.workspaceId,
+      table.incidentId,
+      table.signalId,
+    ),
+    index("incident_signal_workspace_signal_idx").on(
+      table.workspaceId,
+      table.signalId,
+      table.incidentId,
+    ),
+  ],
+);
+
+export const incidentEventTable = pgTable(
+  "incident_event",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    incidentId: text("incident_id").notNull(),
+    incidentVersion: integer("incident_version").notNull(),
+    type: text("type").notNull(),
+    actorUserId: text("actor_user_id").references(() => userTable.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    occurredAt: timestamp("occurred_at", {
+      mode: "date",
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+    payload: jsonb("payload").$type<Record<string, unknown>>().notNull(),
+    idempotencyKey: text("idempotency_key").notNull(),
+  },
+  (table) => [
+    foreignKey({
+      name: "incident_event_workspace_incident_fk",
+      columns: [table.workspaceId, table.incidentId],
+      foreignColumns: [incidentTable.workspaceId, incidentTable.id],
+    })
+      .onDelete("cascade")
+      .onUpdate("cascade"),
+    unique("incident_event_workspace_incident_key_unique").on(
+      table.workspaceId,
+      table.incidentId,
+      table.idempotencyKey,
+    ),
+    unique("incident_event_incident_version_type_unique").on(
+      table.incidentId,
+      table.incidentVersion,
+      table.type,
+    ),
+    check("incident_event_version_positive", sql`${table.incidentVersion} > 0`),
+    check(
+      "incident_event_type_valid",
+      sql`${table.type} IN ('incident.created', 'incident.status_changed', 'incident.severity_changed', 'incident.assignment_changed', 'incident.update_published', 'incident.timestamps_corrected', 'incident.resolved', 'incident.dismissed', 'incident.reopened', 'incident.signal_attached')`,
+    ),
+    index("incident_event_workspace_incident_occurred_idx").on(
+      table.workspaceId,
+      table.incidentId,
+      table.occurredAt,
+      table.id,
+    ),
+    index("incident_event_workspace_type_incident_occurred_idx").on(
+      table.workspaceId,
+      table.type,
+      table.incidentId,
+      table.occurredAt,
+    ),
+  ],
+);
+
+export type RelayOpsOutboxPayload = {
+  actorUserId: string;
+  workspaceId: string;
+  incidentId: string;
+  version: number;
+  type:
+    | "incident.created"
+    | "incident.status_changed"
+    | "incident.severity_changed"
+    | "incident.assignment_changed"
+    | "incident.update_published"
+    | "incident.timestamps_corrected"
+    | "incident.resolved"
+    | "incident.dismissed"
+    | "incident.reopened"
+    | "incident.signal_attached";
+};
+
+export const outboxEventTable = pgTable(
+  "outbox_event",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaceTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    aggregateType: text("aggregate_type").notNull(),
+    aggregateId: text("aggregate_id").notNull(),
+    aggregateVersion: integer("aggregate_version").notNull(),
+    eventType: text("event_type").notNull(),
+    payload: jsonb("payload").$type<RelayOpsOutboxPayload>().notNull(),
+    demoDataSetId: text("demo_data_set_id"),
+    attempts: integer("attempts").notNull().default(0),
+    availableAt: timestamp("available_at", {
+      mode: "date",
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+    claimedAt: timestamp("claimed_at", {
+      mode: "date",
+      withTimezone: true,
+    }),
+    claimedBy: text("claimed_by"),
+    publishedAt: timestamp("published_at", {
+      mode: "date",
+      withTimezone: true,
+    }),
+    lastError: text("last_error"),
+    createdAt: timestamp("created_at", {
+      mode: "date",
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    unique("outbox_event_aggregate_version_type_unique").on(
+      table.aggregateType,
+      table.aggregateId,
+      table.aggregateVersion,
+      table.eventType,
+    ),
+    index("outbox_event_workspace_demo_idx").on(
+      table.workspaceId,
+      table.demoDataSetId,
+    ),
+    check("outbox_event_attempts_non_negative", sql`${table.attempts} >= 0`),
+    check(
+      "outbox_event_aggregate_version_positive",
+      sql`${table.aggregateVersion} > 0`,
+    ),
+    index("outbox_event_unpublished_claim_idx")
+      .on(table.availableAt, table.createdAt, table.id)
+      .where(sql`${table.publishedAt} IS NULL`),
   ],
 );
 

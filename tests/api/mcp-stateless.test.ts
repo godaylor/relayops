@@ -12,6 +12,9 @@ vi.mock("../../apps/api/src/auth", () => ({
 }));
 
 const protocolVersion = "2026-07-28";
+const originalMcpTtl = process.env.KANEO_MCP_SESSION_TTL_MS;
+const originalMcpPerUser = process.env.KANEO_MCP_MAX_SESSIONS_PER_USER;
+const originalTrustProxy = process.env.KANEO_TRUST_PROXY;
 
 function modernRequest(
   method: string,
@@ -65,9 +68,49 @@ async function rpcBody(response: Response): Promise<RpcBody> {
   return JSON.parse(data ?? text) as RpcBody;
 }
 
+async function initializeLegacySession() {
+  return mcpRoutes.request("/mcp", {
+    method: "POST",
+    headers: {
+      accept: "application/json, text/event-stream",
+      authorization: "Bearer test-token",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "initialize",
+      params: {
+        protocolVersion: "2025-06-18",
+        capabilities: {},
+        clientInfo: { name: "legacy-security-test", version: "1.0.0" },
+      },
+    }),
+  });
+}
+
+async function closeLegacySession(sessionId: string) {
+  return mcpRoutes.request("/mcp", {
+    method: "DELETE",
+    headers: {
+      authorization: "Bearer test-token",
+      "mcp-session-id": sessionId,
+    },
+  });
+}
+
 afterEach(() => {
   vi.unstubAllGlobals();
   authMocks.getSession.mockClear();
+  if (originalMcpTtl === undefined) delete process.env.KANEO_MCP_SESSION_TTL_MS;
+  else process.env.KANEO_MCP_SESSION_TTL_MS = originalMcpTtl;
+  if (originalMcpPerUser === undefined) {
+    delete process.env.KANEO_MCP_MAX_SESSIONS_PER_USER;
+  } else {
+    process.env.KANEO_MCP_MAX_SESSIONS_PER_USER = originalMcpPerUser;
+  }
+  if (originalTrustProxy === undefined) delete process.env.KANEO_TRUST_PROXY;
+  else process.env.KANEO_TRUST_PROXY = originalTrustProxy;
 });
 
 describe("MCP 2026-07-28 stateless HTTP", () => {
@@ -305,6 +348,9 @@ describe("MCP 2026-07-28 stateless HTTP", () => {
       expect.objectContaining({ name: "whoami" }),
     );
     expect(authMocks.getSession).toHaveBeenCalledTimes(3);
+    expect(await closeLegacySession(sessionId ?? "")).toEqual(
+      expect.objectContaining({ status: 200 }),
+    );
   });
 
   it.each([
@@ -349,6 +395,96 @@ describe("MCP 2026-07-28 stateless HTTP", () => {
     });
 
     expect(response.status).toBe(200);
+    const sessionId = response.headers.get("mcp-session-id");
+    expect(sessionId).toBeTruthy();
+    expect((await closeLegacySession(sessionId ?? "")).status).toBe(200);
+  });
+
+  it("bounds legacy sessions per user and releases capacity on close", async () => {
+    process.env.KANEO_MCP_MAX_SESSIONS_PER_USER = "1";
+    const responses = await Promise.all([
+      initializeLegacySession(),
+      initializeLegacySession(),
+    ]);
+    const first = responses.find((response) => response.status === 200);
+    const excess = responses.find((response) => response.status === 429);
+    expect(first).toBeDefined();
+    expect(excess).toBeDefined();
+    if (!first || !excess) throw new Error("Expected one accepted MCP session");
+    const firstSessionId = first.headers.get("mcp-session-id");
+    expect(first.status).toBe(200);
+    expect(firstSessionId).toBeTruthy();
+
+    expect(excess.status).toBe(429);
+    expect(await excess.json()).toEqual({ error: "session_capacity_exceeded" });
+
+    expect((await closeLegacySession(firstSessionId ?? "")).status).toBe(200);
+    const replacement = await initializeLegacySession();
+    expect(replacement.status).toBe(200);
+    expect(
+      (
+        await closeLegacySession(
+          replacement.headers.get("mcp-session-id") ?? "",
+        )
+      ).status,
+    ).toBe(200);
+  });
+
+  it("expires idle sessions and permits bounded restart recovery", async () => {
+    process.env.KANEO_MCP_SESSION_TTL_MS = "40";
+    const first = await initializeLegacySession();
+    const sessionId = first.headers.get("mcp-session-id");
+    expect(first.status).toBe(200);
+    expect(sessionId).toBeTruthy();
+    await new Promise((resolve) => setTimeout(resolve, 60));
+
+    const expired = await mcpRoutes.request("/mcp", {
+      method: "POST",
+      headers: {
+        authorization: "Bearer test-token",
+        "content-type": "application/json",
+        "mcp-session-id": sessionId ?? "",
+      },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 2,
+        method: "tools/list",
+        params: {},
+      }),
+    });
+    expect(expired.status).toBe(404);
+
+    const replacement = await initializeLegacySession();
+    expect(replacement.status).toBe(200);
+    expect(
+      (
+        await closeLegacySession(
+          replacement.headers.get("mcp-session-id") ?? "",
+        )
+      ).status,
+    ).toBe(200);
+  });
+
+  it("rate limits public OAuth writes using forwarded identity only when trusted", async () => {
+    process.env.KANEO_TRUST_PROXY = "true";
+    const headers = {
+      "content-type": "application/json",
+      "x-forwarded-for": `198.51.100.${Math.floor(Math.random() * 200) + 1}`,
+    };
+    const responses = await Promise.all(
+      Array.from({ length: 61 }, () =>
+        mcpRoutes.request("/mcp/register", {
+          method: "POST",
+          headers,
+          body: "{}",
+        }),
+      ),
+    );
+    expect(
+      responses.slice(0, 60).every((response) => response.status === 400),
+    ).toBe(true);
+    expect(responses[60]?.status).toBe(429);
+    expect(responses[60]?.headers.get("retry-after")).toBe("60");
   });
 
   it("returns a tool error rather than throwing when arguments fail validation", async () => {

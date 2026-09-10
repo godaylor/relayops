@@ -19,7 +19,13 @@ function isDisallowedIpv4(ip: string): boolean {
     (a === 100 && b >= 64 && b <= 127) ||
     (a === 169 && b === 254) ||
     (a === 172 && b >= 16 && b <= 31) ||
-    (a === 192 && b === 168)
+    (a === 192 && b === 0) ||
+    (a === 192 && b === 168) ||
+    (a === 192 && b === 0 && parts[2] === 2) ||
+    (a === 198 && (b === 18 || b === 19)) ||
+    (a === 198 && b === 51 && parts[2] === 100) ||
+    (a === 203 && b === 0 && parts[2] === 113) ||
+    a >= 224
   );
 }
 
@@ -53,7 +59,10 @@ function isDisallowedIpv6(ip: string): boolean {
     normalized.startsWith("fea") ||
     normalized.startsWith("feb") ||
     normalized.startsWith("fc") ||
-    normalized.startsWith("fd")
+    normalized.startsWith("fd") ||
+    normalized.startsWith("ff") ||
+    normalized.startsWith("100:") ||
+    normalized.startsWith("2001:db8:")
   );
 }
 
@@ -85,30 +94,51 @@ function privateDestinationsAllowed(): boolean {
   );
 }
 
-export async function assertPublicDestination(
+export type ResolvedDestination = {
+  address: string;
+  family: 4 | 6;
+};
+
+export async function resolvePublicDestination(
   destinationUrl: string,
   label: string,
-): Promise<void> {
+): Promise<{ url: URL; addresses: ResolvedDestination[] }> {
   const url = new URL(destinationUrl);
 
   if (!["http:", "https:"].includes(url.protocol)) {
     throw new Error(`${label} URL must use http or https`);
   }
-
-  if (privateDestinationsAllowed()) {
-    return;
+  if (url.username || url.password) {
+    throw new Error(`${label} URL must not contain credentials`);
   }
 
-  if (isDisallowedAddress(url.hostname)) {
-    throw new Error(`${label} destination resolves to a non-routable address`);
-  }
+  const literal = url.hostname.replace(/^\[|\]$/g, "");
+  const literalFamily = net.isIP(literal);
+  const addresses = literalFamily
+    ? [{ address: literal, family: literalFamily as 4 | 6 }]
+    : (await lookup(literal, { all: true, verbatim: true })).map((entry) => ({
+        address: entry.address,
+        family: entry.family as 4 | 6,
+      }));
 
-  const addresses = await lookup(url.hostname, { all: true, verbatim: true });
   if (addresses.length === 0) {
     throw new Error(`${label} destination could not be resolved`);
   }
 
-  if (addresses.some((entry) => isDisallowedAddress(entry.address))) {
+  if (
+    !privateDestinationsAllowed() &&
+    (isDisallowedAddress(literal) ||
+      addresses.some((entry) => isDisallowedAddress(entry.address)))
+  ) {
     throw new Error(`${label} destination resolves to a non-routable address`);
   }
+
+  return { url, addresses };
+}
+
+export async function assertPublicDestination(
+  destinationUrl: string,
+  label: string,
+): Promise<void> {
+  await resolvePublicDestination(destinationUrl, label);
 }

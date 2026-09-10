@@ -38,6 +38,23 @@ vi.mock("../../apps/api/src/mcp/oauth-store", () => {
   const rows = new Map<string, { payload: unknown; expiresAt: Date }>();
   const keyOf = (kind: string, key: string) => `${kind}:${key}`;
   return {
+    putStateBounded: async (
+      kind: string,
+      key: string,
+      payload: unknown,
+      expiresAt: Date,
+      maxRows: number,
+    ) => {
+      const now = Date.now();
+      for (const [rowKey, row] of rows) {
+        if (row.expiresAt.getTime() < now) rows.delete(rowKey);
+      }
+      const count = [...rows.keys()].filter((rowKey) =>
+        rowKey.startsWith(`${kind}:`),
+      ).length;
+      if (count >= maxRows) throw new Error("capacity exceeded");
+      rows.set(keyOf(kind, key), { payload, expiresAt });
+    },
     putState: async (
       kind: string,
       key: string,
@@ -75,7 +92,7 @@ import {
   getAuthorizationRequest,
 } from "../../apps/api/src/mcp/oauth";
 
-const clientUrl = process.env.KANEO_CLIENT_URL || "http://localhost:5173";
+const clientUrl = process.env.KANEO_CLIENT_URL || "http://127.0.0.1:32000";
 const clientOrigin = new URL(clientUrl).origin;
 
 function challengeFor(verifier: string): string {

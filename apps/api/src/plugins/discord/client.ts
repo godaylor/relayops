@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/node";
+import { safeOutboundFetch } from "../../utils/safe-outbound-fetch";
 
 type DiscordEmbedField = {
   name: string;
@@ -39,39 +40,26 @@ export async function postToDiscord(
   webhookUrl: string,
   message: DiscordMessage,
 ): Promise<void> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), DISCORD_TIMEOUT_MS);
+  Sentry.addBreadcrumb({
+    category: "integration",
+    level: "info",
+    data: { integration: "discord" },
+  });
+  const response = await safeOutboundFetch(webhookUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(message),
+    timeoutMs: DISCORD_TIMEOUT_MS,
+    maxResponseBytes: 64 * 1024,
+    label: "Discord webhook",
+  });
 
-  try {
-    Sentry.addBreadcrumb({
-      category: "integration",
-      level: "info",
-      data: { integration: "discord" },
-    });
-    const response = await fetch(webhookUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(message),
-      signal: controller.signal,
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `Discord webhook request failed (${response.status}): ${errorText}`,
-      );
-    }
-  } catch (error) {
-    if (error instanceof Error && error.name === "AbortError") {
-      throw new Error(
-        `Discord webhook request timed out after ${DISCORD_TIMEOUT_MS}ms`,
-      );
-    }
-
-    throw error;
-  } finally {
-    clearTimeout(timeoutId);
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(
+      `Discord webhook request failed (${response.status}): ${errorText}`,
+    );
   }
 }

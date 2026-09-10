@@ -61,6 +61,21 @@ function parseBearerToken(authHeader: string | undefined): {
   };
 }
 
+function rejectRateLimitedApiKey(
+  result: Awaited<ReturnType<typeof verifyApiKey>>,
+) {
+  if (result?.valid !== false || result.reason !== "rate_limited") return;
+  throw new HTTPException(429, {
+    res: new Response(JSON.stringify({ message: "Too Many Requests" }), {
+      status: 429,
+      headers: {
+        "Content-Type": "application/json",
+        "Retry-After": String(result.retryAfterSeconds),
+      },
+    }),
+  });
+}
+
 export async function authenticateApiRequest(c: Context): Promise<void> {
   const { token, malformed } = parseBearerToken(c.req.header("Authorization"));
   if (malformed) {
@@ -70,6 +85,7 @@ export async function authenticateApiRequest(c: Context): Promise<void> {
   const apiKeyHeader = c.req.header("x-api-key")?.trim();
   if (!token && apiKeyHeader) {
     const apiKeyResult = await verifyApiKey(apiKeyHeader);
+    rejectRateLimitedApiKey(apiKeyResult);
     if (!apiKeyResult?.valid || !apiKeyResult.key) {
       throw new HTTPException(401, { message: "Unauthorized" });
     }
@@ -90,6 +106,7 @@ export async function authenticateApiRequest(c: Context): Promise<void> {
 
   if (token) {
     const apiKeyResult = await verifyApiKey(token);
+    rejectRateLimitedApiKey(apiKeyResult);
     if (apiKeyResult?.valid && apiKeyResult.key) {
       const key = apiKeyResult.key;
       c.set("userId", key.userId);
@@ -142,6 +159,7 @@ export async function resolveAssetBearerOrCookie(c: Context): Promise<{
   const apiKeyHeader = c.req.header("x-api-key")?.trim();
   if (!token && apiKeyHeader) {
     const apiKeyResult = await verifyApiKey(apiKeyHeader);
+    rejectRateLimitedApiKey(apiKeyResult);
     if (apiKeyResult?.valid && apiKeyResult.key) {
       return {
         userId: apiKeyResult.key.userId,
@@ -153,6 +171,7 @@ export async function resolveAssetBearerOrCookie(c: Context): Promise<{
 
   if (token) {
     const apiKeyResult = await verifyApiKey(token);
+    rejectRateLimitedApiKey(apiKeyResult);
     if (apiKeyResult?.valid && apiKeyResult.key) {
       return {
         userId: apiKeyResult.key.userId,

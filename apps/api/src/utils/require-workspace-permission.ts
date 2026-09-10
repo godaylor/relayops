@@ -5,7 +5,7 @@ import { HTTPException } from "hono/http-exception";
 import db, { schema } from "../database";
 import { isInstanceAdmin } from "./is-instance-admin";
 
-type PermissionMap = Record<string, string[]>;
+type PermissionMap = Record<string, readonly string[]>;
 
 function builtInRoleStatements(
   role: string,

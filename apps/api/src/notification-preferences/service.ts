@@ -381,19 +381,19 @@ export async function updateNotificationPreferences(
     ntfyTopic,
     ntfyToken:
       input.ntfyToken === undefined
-        ? (existing?.ntfyToken ?? null)
+        ? (encryptSecret(existing?.ntfyToken ?? null) ?? null)
         : (encryptSecret(ntfyToken) ?? null),
     gotifyEnabled,
     gotifyServerUrl,
     gotifyToken:
       input.gotifyToken === undefined
-        ? (existing?.gotifyToken ?? null)
+        ? (encryptSecret(existing?.gotifyToken ?? null) ?? null)
         : (encryptSecret(gotifyToken) ?? null),
     webhookEnabled,
     webhookUrl,
     webhookSecret:
       input.webhookSecret === undefined
-        ? (existing?.webhookSecret ?? null)
+        ? (encryptSecret(existing?.webhookSecret ?? null) ?? null)
         : (encryptSecret(webhookSecret) ?? null),
     taskAssignmentEnabled:
       input.taskAssignmentEnabled ?? existing?.taskAssignmentEnabled ?? true,

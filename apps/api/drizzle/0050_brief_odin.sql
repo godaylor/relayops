@@ -1,0 +1,1 @@
+CREATE INDEX "incident_event_workspace_type_incident_occurred_idx" ON "incident_event" USING btree ("workspace_id","type","incident_id","occurred_at");

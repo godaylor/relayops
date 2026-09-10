@@ -1,6 +1,3 @@
-import { existsSync, readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import { afterEach, vi } from "vitest";
 
 // Prevent dotenv-mono from loading the local .env file during tests.
@@ -20,18 +17,6 @@ function stripEnvValueQuotes(value: string) {
   return trimmed;
 }
 
-function deriveTestDatabaseUrl(connectionString: string) {
-  const url = new URL(connectionString);
-  const databaseName = url.pathname.replace(/^\//, "");
-
-  if (!databaseName || databaseName.endsWith("_test")) {
-    return connectionString;
-  }
-
-  url.pathname = `/${databaseName}_test`;
-  return url.toString();
-}
-
 function assertTestDatabaseUrl(connectionString: string) {
   const url = new URL(connectionString);
   const databaseName = url.pathname.replace(/^\//, "");
@@ -42,27 +27,13 @@ function assertTestDatabaseUrl(connectionString: string) {
   }
 }
 
-function readDatabaseUrlFromEnvFile() {
-  const currentDir = dirname(fileURLToPath(import.meta.url));
-  const envPath = resolve(currentDir, "../../.env");
-
-  if (!existsSync(envPath)) {
-    return null;
-  }
-
-  const envFile = readFileSync(envPath, "utf8");
-  const match = envFile.match(/^DATABASE_URL=(.+)$/m);
-  const raw = match?.[1]?.trim();
-  return raw ? stripEnvValueQuotes(raw) : null;
-}
-
-const defaultTestDatabaseUrl =
-  "postgresql://postgres:postgres@localhost:5432/kaneo_test";
 const envDatabaseUrl = process.env.DATABASE_URL?.trim();
-const fromEnv = envDatabaseUrl ? stripEnvValueQuotes(envDatabaseUrl) : "";
-const rawDatabaseUrl =
-  fromEnv || readDatabaseUrlFromEnvFile() || defaultTestDatabaseUrl;
-process.env.DATABASE_URL = deriveTestDatabaseUrl(rawDatabaseUrl);
+if (!envDatabaseUrl) {
+  throw new Error(
+    "Set DATABASE_URL explicitly to the disposable verification database. Integration tests never read the application .env or guess a database.",
+  );
+}
+process.env.DATABASE_URL = stripEnvValueQuotes(envDatabaseUrl);
 assertTestDatabaseUrl(process.env.DATABASE_URL);
 
 process.env.NODE_ENV = "test";

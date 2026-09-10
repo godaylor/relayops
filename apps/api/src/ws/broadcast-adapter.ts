@@ -22,17 +22,27 @@ export type UserBroadcast = {
   message: UserBroadcastMessage;
   origin?: string;
 };
+export type WorkspaceBroadcast = {
+  workspaceId: string;
+  message: UserBroadcastMessage;
+  excludeUserId?: string;
+  origin?: string;
+};
 
 export type BroadcastAdapter = {
   /** Publish a message to all instances watching this project */
   publish(msg: BroadcastMessage): Promise<void>;
 
   publishToUser(msg: UserBroadcast): Promise<void>;
+  publishToWorkspace(msg: WorkspaceBroadcast): Promise<void>;
 
   /** Subscribe to messages for delivery to local connections */
   subscribe(handler: (msg: BroadcastMessage) => void): Promise<void>;
 
   subscribeToUser(handler: (msg: UserBroadcast) => void): Promise<void>;
+  subscribeToWorkspace(
+    handler: (msg: WorkspaceBroadcast) => void,
+  ): Promise<void>;
 
   /** Cleanup on shutdown */
   shutdown(): Promise<void>;

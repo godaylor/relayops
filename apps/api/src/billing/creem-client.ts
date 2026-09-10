@@ -1,13 +1,5 @@
-import { Creem } from "creem";
 import { HTTPException } from "hono/http-exception";
-import { creemApiKey } from "./config";
-
-function creemClient() {
-  return new Creem({
-    apiKey: creemApiKey(),
-    server: process.env.CREEM_TEST_MODE === "true" ? "test" : "prod",
-  });
-}
+import { providerRequest, providerUrl } from "./provider-request";
 
 export async function createCheckoutSession(input: {
   productId: string;
@@ -18,52 +10,49 @@ export async function createCheckoutSession(input: {
   metadata: Record<string, string>;
 }) {
   try {
-    const checkout = await creemClient().checkouts.create({
-      productId: input.productId,
+    const result = await providerRequest("checkouts", {
+      product_id: input.productId,
       units: input.units,
-      successUrl: input.successUrl,
-      requestId: input.requestId,
+      success_url: input.successUrl,
+      request_id: input.requestId,
       customer: { email: input.customerEmail },
       metadata: input.metadata,
     });
-
-    if (!checkout.checkoutUrl) {
-      throw new Error("Checkout session has no URL");
-    }
-    return { checkoutUrl: checkout.checkoutUrl };
-  } catch (error) {
-    console.error("Creem checkout creation failed:", error);
+    return { checkoutUrl: providerUrl(result.checkout_url) };
+  } catch {
+    console.error("Billing checkout request failed");
     throw new HTTPException(502, {
       message: "Billing provider request failed",
     });
   }
 }
-
 export async function updateSubscriptionSeats(input: {
   subscriptionId: string;
   productId: string;
   units: number;
 }) {
   try {
-    await creemClient().subscriptions.update(input.subscriptionId, {
-      items: [{ productId: input.productId, units: input.units }],
-      updateBehavior: "proration-charge",
-    });
+    await providerRequest(
+      `subscriptions/${encodeURIComponent(input.subscriptionId)}`,
+      {
+        items: [{ product_id: input.productId, units: input.units }],
+        update_behavior: "proration-charge",
+      },
+    );
     return { ok: true as const };
-  } catch (error) {
-    console.error("Creem seat update failed:", error);
+  } catch {
+    console.error("Billing seat update failed");
     return { ok: false as const };
   }
 }
-
 export async function createCustomerPortalLink(customerId: string) {
   try {
-    const links = await creemClient().customers.generateBillingLinks({
-      customerId,
+    const result = await providerRequest("customers/billing", {
+      customer_id: customerId,
     });
-    return { portalUrl: links.customerPortalLink };
-  } catch (error) {
-    console.error("Creem portal link creation failed:", error);
+    return { portalUrl: providerUrl(result.customer_portal_link) };
+  } catch {
+    console.error("Billing portal request failed");
     throw new HTTPException(502, {
       message: "Billing provider request failed",
     });

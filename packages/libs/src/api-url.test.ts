@@ -3,7 +3,7 @@ import { resolveApiBaseUrl } from "./api-url";
 
 describe("resolveApiBaseUrl", () => {
   it("appends /api when the base has no api suffix", () => {
-    expect(resolveApiBaseUrl(undefined)).toBe("http://localhost:1337/api");
+    expect(resolveApiBaseUrl(undefined)).toBe("http://127.0.0.1:32001/api");
     expect(resolveApiBaseUrl("http://localhost:1337")).toBe(
       "http://localhost:1337/api",
     );

@@ -10,5 +10,9 @@ if (!response.ok) {
 }
 
 const spec = await response.json();
+// Keep the snapshot portable regardless of the local deployment environment.
+spec.servers = [
+  { url: "/api", description: "RelayOps API server (same origin)" },
+];
 const outputPath = resolve(import.meta.dirname, "../../docs/openapi.json");
 await writeFile(outputPath, `${JSON.stringify(spec, null, 2)}\n`);

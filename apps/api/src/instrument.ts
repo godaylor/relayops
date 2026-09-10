@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import * as Sentry from "@sentry/node";
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
+import { redactSensitive } from "./utils/redact-sensitive";
 
 function parseSampleRate(value: string | undefined) {
   const n = Number(value);
@@ -34,5 +35,8 @@ if (process.env.SENTRY_DSN) {
     tracesSampleRate,
     profilesSampleRate,
     integrations: [nodeProfilingIntegration()],
+    beforeSend(event) {
+      return redactSensitive(event) as typeof event;
+    },
   });
 }

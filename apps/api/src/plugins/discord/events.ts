@@ -106,7 +106,7 @@ async function getDiscordEventData(
     return null;
   }
 
-  const clientUrl = process.env.KANEO_CLIENT_URL || "http://localhost:5173";
+  const clientUrl = process.env.KANEO_CLIENT_URL || "http://127.0.0.1:32000";
   const taskUrl = `${clientUrl}/dashboard/workspace/${taskRow.workspaceId}/project/${taskRow.projectId}/task/${taskId}`;
 
   return {
