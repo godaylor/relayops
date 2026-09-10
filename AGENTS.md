@@ -1,8 +1,27 @@
-# Kaneo agent guide
+# Kaneo → RelayOps transformation agent guide
 
-Kaneo is a fast, deliberately simple, self-hosted project-management platform. The Hono API owns domain behavior and authorization, the React app consumes its typed client, PostgreSQL stores durable state, and events plus WebSockets keep clients current. Redis is optional and coordinates realtime delivery across multiple API instances.
+This repository is the MIT-licensed Kaneo baseline being deliberately transformed into **RelayOps**, a realtime incident-operations product. The Hono API remains the domain and authorization authority, the React app consumes its typed client, PostgreSQL stores durable state, and events plus WebSockets keep clients current. Redis stays optional and coordinates delivery across multiple API instances.
 
 This is an operating guide, not a README. These rules are good defaults; explicit developer and user instructions take precedence.
+
+## Transformation contract
+
+- Planning is the current state. Do not implement RelayOps until the user approves `PLAN.md`.
+- Before implementation, read `docs/BASELINE_AUDIT.md`, `docs/PRODUCT_OPTIONS.md`, `docs/TRANSFORMATION_SPEC.md`, `docs/ARCHITECTURE.md`, and `PLAN.md`. Those documents define the audited baseline, product boundary, target architecture, and delivery gates.
+- RelayOps is not a Kaneo reskin. Its first-class model is Service → Signal → Incident → append-only Timeline; project/task terminology or behavior must not leak into the new product merely to save implementation effort.
+- Implement one approved plan phase at a time. Approval authorizes only Stage 0; the vertical tracer starts only after the Stage-0 gate is green. Keep requirement IDs `ROP-001`–`ROP-015` traceable to tests and stop at every stated gate.
+- Prefer a strangler migration: add the new product beside the legacy model, keep old data intact, and require an explicit decision before a destructive or one-way migration.
+- Preserve the root `LICENSE`, Andrej Acevski's copyright notice, and a visible statement that the product is derived from Kaneo. RelayOps must not imply official Kaneo endorsement.
+- Do not ship a transformed release until branding/provenance, exact-artifact license questions (including Creem and bundled fonts), third-party notices, an SBOM, artifact-level MIT/OFL attribution, and the security release blockers in the baseline audit are resolved.
+
+## Target product boundaries
+
+- The primary experiences are Operations Overview, Incident Workbench, Response Board, Incident Room, Services, and Analytics.
+- The Workbench is a server-filtered, virtualized table whose shareable state lives in validated URL search parameters; saved views are explicit persisted presets, not hidden local state.
+- The Response Board is a secondary state-machine projection. Every drag action must be transactional, permission-checked, conflict-aware, and available through keyboard and menu alternatives.
+- Incident history is durable and ordered. Realtime transport may invalidate caches, but it must not be the system of record; reconnect performs authoritative refetch.
+- Roles are capability sets enforced by the API. UI capability checks improve presentation but never replace authorization.
+- Keep self-hosted, single-instance and same-origin deployments first-class. Split web/API deployments must continue to work, and Redis must remain optional.
 
 ## Principles
 
@@ -56,7 +75,7 @@ Not every change touches every surface. Make the decision deliberately rather th
 - Keep API handlers thin and domain behavior in controllers or focused utilities.
 - Validate API inputs with Zod through `@hono/zod-openapi`: define routes with `createRoute` and mount them on the `apiRouter()` factory in `apps/api/src/openapi.ts`. Request schemas live in a feature's `schema.ts`, response schemas in its `response.ts` (named with `.openapi("Name")` so they become reusable components). Use `HTTPException` for expected HTTP failures. Valibot remains only for internal, non-HTTP config validation under `plugins/` and `ws/`.
 - Use `requireWorkspacePermission` rather than duplicating role checks.
-- Use `publishEvent()` when a mutation drives activity, notifications, integrations, or realtime updates.
+- For unchanged legacy Kaneo features, use `publishEvent()` when a mutation drives activity, notifications, integrations, or realtime updates. RelayOps incident mutations instead write `incident_event` and `outbox_event` in the same PostgreSQL transaction; only the outbox worker publishes after commit.
 - Keep web requests in `apps/web/src/fetchers/` and server state in TanStack Query hooks.
 - Use the client from `@kaneo/libs`; do not create a parallel untyped request layer.
 - Define database schema in `apps/api/src/database/schema.ts` and relations in `apps/api/src/database/relations.ts`.
@@ -66,7 +85,7 @@ Not every change touches every surface. Make the decision deliberately rather th
 
 ## Safety and tooling
 
-- Use pnpm 10.32.1 and Node.js 20.19 or newer. Server environment variables come from the root `.env`; local Vite-only overrides belong in `apps/web/.env.local`. See `ENVIRONMENT_SETUP.md`.
+- Use pnpm 10.32.1 and Node.js 24 or newer, matching the root package constraint. Server environment variables come from the root `.env`; local Vite-only overrides belong in `apps/web/.env.local`. See `ENVIRONMENT_SETUP.md`.
 - Never use production databases, storage, or credentials for development or tests.
 - Preserve unrelated work in a dirty worktree. Do not delete data or generated files unless the task requires it and the target is verified.
 - Track processes you start and stop only those processes; never kill by broad name or path patterns.
@@ -88,6 +107,8 @@ Use the smallest proof that covers the changed behavior, then broaden it when th
 Run repository-wide checks when a change crosses packages broadly, before a requested commit or pull request, or when explicitly asked. Report what ran and what did not.
 
 ## Releases
+
+The workflow below describes the Kaneo baseline. Treat it as an implementation constraint to adapt deliberately during the release-hardening phase, not as authorization to publish RelayOps. A public transformed release remains blocked until the final plan gate passes.
 
 Releasing is manual and deliberate: dispatch the **Release** workflow from `main`. Nothing releases on a push.
 
@@ -117,6 +138,10 @@ Version-carrying files are listed in `scripts/release/apply-version.mjs`. Add ne
 
 - **instance**: one deployed Kaneo installation.
 - **workspace**: the top-level collaboration and authorization boundary.
+- **service**: an operational system or component owned inside a workspace.
+- **signal**: an inbound observation that may be attached to or create an incident.
+- **incident**: a severity-bearing operational event governed by the RelayOps lifecycle.
+- **timeline event**: an immutable, ordered incident fact; edits are represented by compensating events where applicable.
 - **project**: a task container inside a workspace.
 - **role**: a workspace-scoped set of permission statements.
 - **activity**: durable, user-visible history.
