@@ -16,6 +16,8 @@ The current owner request authorizes product completion and public deployment pr
 
 Current handoff and remaining public-host requirements: [PORTFOLIO_HANDOFF.md](PORTFOLIO_HANDOFF.md), [production deployment](docs/PRODUCTION_DEPLOY.md). The public runtime is still pending; local evidence must not be presented as production evidence.
 
+Published code revision `a4db45b90`: CI `34542873720`, Security `34542873775` (including the replacement Dependency audit), and Pages `34542873772` all completed successfully. Local port 32000 runs the verified image; the disposable verification containers are stopped. Working Git state was clean after publication, with no history rewrite or upstream push.
+
 Final local-demo and publication verification record, updated 2026-09-10 (Europe/Moscow). The static portfolio demo is published on GitHub Pages. S13/S14 production-release gates remain PARTIAL for the explicitly listed checks and external decisions; this is not production approval.
 
 ## Publication preparation — 2026-09-10

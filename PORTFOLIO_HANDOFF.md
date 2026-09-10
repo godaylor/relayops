@@ -49,6 +49,8 @@ Browser → typed Hono API → workspace authorization → PostgreSQL transactio
 
 Full workspace typecheck (7 tasks), unit tests (808 tests across 10 tasks), production builds (7 tasks), PostgreSQL integration (261 passed, 2 optional performance tests skipped), and 13 real-browser scenarios passed during this implementation. Biome has no errors and retains existing warnings/information. Locale key parity passes. The new browser test loses an already-committed create response and verifies retry uses the same idempotency key and yields one incident.
 
+Published implementation: `a4db45b9014463bcac7f8ad734357dfb67a641a6`. GitHub [CI](https://github.com/godaylor/relayops/actions/runs/34542873720), [Security including Dependency audit](https://github.com/godaylor/relayops/actions/runs/34542873775), and [Pages](https://github.com/godaylor/relayops/actions/runs/34542873772) all completed successfully. The local application on port 32000 now uses the verified image. The temporary verification app/database containers were stopped without deleting volumes or touching other projects.
+
 The updated full dependency audit has **zero high/critical**, with two moderate development-tool advisories still open. Source license inventory covers 1468 packages without unresolved metadata. Production Compose validates; the bundled Docker image builds. This does not substitute for a test on the actual public host.
 
 **Actually running in public production:** the static Pages information site only. No public auth, database, incident creation, storage or realtime endpoint is claimed. To finish, provide access to a Docker-capable server/Coolify and a hostname, deploy the prepared stack, configure backups, and verify the full journey over HTTPS/WSS. Manual screen-reader review remains a follow-up. Optional real mail/OAuth/integrations have not been verified.
@@ -62,10 +64,10 @@ Percentages are engineering estimates, not test coverage. Overall is the unweigh
 | Concept and purpose | 95% | Clear incident-operations domain and end-to-end workflow | Feedback from real users |
 | UX/UI | 85% | Real incident form, simpler onboarding, RU/EN and responsive/keyboard browser checks | Manual assistive-technology review, further copy refinement |
 | Core functionality | 90% | Service → incident → response/timeline → analytics; signals, roles and persistence checked | Longer real-use validation and optional integration checks |
-| Testing/security/quality | 85% | Typecheck, unit/integration/browser tests, build, lint and high/critical dependency fixes | Two moderate tool advisories, final hosted CI and deployment security checks |
+| Testing/security/quality | 85% | Typecheck, unit/integration/browser tests, build, lint and high/critical dependency fixes; GitHub CI/Security green | Two moderate tool advisories and deployment security checks |
 | Backend/database/auth | 90% | PostgreSQL, Better Auth, API authority, transactional history/outbox and uploads | Production backup/restore and operational configuration |
 | Public production deploy | 10% | Deployable image and validated HTTPS/persistent Compose | Provision host and verify the actual public runtime |
-| GitHub/docs/licensing | 85% | Personal origin/main corrected, About/topics, README, notices and inventory | Hosted verification of this revision; production URL |
+| GitHub/docs/licensing | 85% | Personal origin/main corrected, About/topics, README, notices, inventory and hosted verification | Production URL and deployment-specific notices |
 | Personal Portfolio №09 handoff | 70% | This handoff, actual stack/contribution and screenshots | Working public URL and production evidence |
 
 **Overall: 76.25%.** The missing public runtime is a blocking gap regardless of the average.
