@@ -22,7 +22,7 @@ function parseValue(raw: string) {
  * rather than being silently ignored.
  */
 export function parseFrontmatter(source: string, file: string) {
-  const normalised = source.replace(/^﻿/, "");
+  const normalised = source.replace(/\r\n?/g, "\n").replace(/^﻿/, "");
 
   if (!normalised.startsWith(`${DELIMITER}\n`)) {
     throw new Error(

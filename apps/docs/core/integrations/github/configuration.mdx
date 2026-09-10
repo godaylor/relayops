@@ -17,11 +17,7 @@ Add the following environment variables to your Kaneo deployment:
 ```bash
 # GitHub App (integration only: repository sync, webhooks)
 GITHUB_APP_ID=123456
-GITHUB_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----
-MIIEpAIBAAKCAQEA...
-[Full contents of your private key]
-...
------END RSA PRIVATE KEY-----"
+GITHUB_PRIVATE_KEY="<paste PEM private key here>"
 GITHUB_WEBHOOK_SECRET=your-webhook-secret-here
 
 # Optional: GitHub App slug for installation URLs in the UI
@@ -58,12 +54,7 @@ services:
     environment:
       # ... other environment variables
       GITHUB_APP_ID: "123456"
-      GITHUB_PRIVATE_KEY: |
-        -----BEGIN RSA PRIVATE KEY-----
-        MIIEpAIBAAKCAQEA...
-        [Full contents of your private key]
-        ...
-        -----END RSA PRIVATE KEY-----
+      GITHUB_PRIVATE_KEY: "<paste PEM private key here>"
       GITHUB_WEBHOOK_SECRET: "your-webhook-secret-here"
       GITHUB_APP_NAME: "kaneo-mycompany"
     # ... rest of configuration
@@ -86,12 +77,7 @@ metadata:
 type: Opaque
 stringData:
   GITHUB_APP_ID: "123456"
-  GITHUB_PRIVATE_KEY: |
-    -----BEGIN RSA PRIVATE KEY-----
-    MIIEpAIBAAKCAQEA...
-    [Full contents of your private key]
-    ...
-    -----END RSA PRIVATE KEY-----
+  GITHUB_PRIVATE_KEY: "<paste PEM private key here>"
   GITHUB_WEBHOOK_SECRET: "your-webhook-secret-here"
   GITHUB_APP_NAME: "kaneo-mycompany"
 ```
@@ -121,11 +107,7 @@ For development or simple deployments, create a `.env` file:
 ```bash
 # .env file
 GITHUB_APP_ID=123456
-GITHUB_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----
-MIIEpAIBAAKCAQEA...
-[Full contents of your private key]
-...
------END RSA PRIVATE KEY-----"
+GITHUB_PRIVATE_KEY="<paste PEM private key here>"
 GITHUB_WEBHOOK_SECRET=your-webhook-secret-here
 GITHUB_APP_NAME=kaneo-mycompany
 ```

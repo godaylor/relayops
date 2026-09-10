@@ -1,14 +1,14 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Kaneo API",
+    "title": "RelayOps API",
     "version": "1.0.0",
-    "description": "Kaneo Project Management API - Manage projects, tasks, labels, and more"
+    "description": "RelayOps incident operations API — services, signals, incidents, append-only timelines and reliability analytics. Includes retained legacy Kaneo compatibility routes. Independent MIT-licensed derivative of Kaneo; not an official or endorsed Kaneo product."
   },
   "servers": [
     {
-      "url": "https://cloud.kaneo.app/api",
-      "description": "Kaneo API Server"
+      "url": "/api",
+      "description": "RelayOps API server (same origin)"
     }
   ],
   "security": [
@@ -198,6 +198,28 @@
         },
         "required": [
           "redirect"
+        ]
+      },
+      "RelayOpsWebhookIngestionResult": {
+        "type": "object",
+        "properties": {
+          "accepted": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "deduplicated": {
+            "type": "boolean"
+          },
+          "signalId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "accepted",
+          "deduplicated",
+          "signalId"
         ]
       },
       "OAuthIdToken": {
@@ -575,6 +597,2248 @@
           "archivedAt",
           "position",
           "lastTaskNumber"
+        ]
+      },
+      "RelayOpsWorkspaceState": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "productMode": {
+            "type": "string",
+            "enum": [
+              "legacy",
+              "relayops"
+            ]
+          },
+          "legacyProjectCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "legacyTaskCount": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "productMode",
+          "legacyProjectCount",
+          "legacyTaskCount"
+        ]
+      },
+      "RelayOpsServiceList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/RelayOpsService"
+        }
+      },
+      "RelayOpsService": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "workspaceId": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tier": {
+            "type": "string",
+            "enum": [
+              "critical",
+              "high",
+              "standard",
+              "low"
+            ]
+          },
+          "health": {
+            "type": "string",
+            "enum": [
+              "operational",
+              "degraded",
+              "major_outage",
+              "maintenance"
+            ]
+          },
+          "ownerTeamId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ownerTeamName": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "repositoryUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "runbookUrl": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "archivedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "workspaceId",
+          "slug",
+          "name",
+          "description",
+          "tier",
+          "health",
+          "ownerTeamId",
+          "repositoryUrl",
+          "runbookUrl",
+          "archivedAt",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "RelayOpsTeam": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "RelayOpsOverview": {
+        "type": "object",
+        "properties": {
+          "activeIncidents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelayOpsIncident"
+            }
+          },
+          "degradedServices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelayOpsService"
+            }
+          },
+          "commanderlessCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "serviceCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "latestUpdates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "incidentId": {
+                  "type": "string"
+                },
+                "incidentKey": {
+                  "type": "string"
+                },
+                "incidentTitle": {
+                  "type": "string"
+                },
+                "serviceName": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "incident.created",
+                    "incident.status_changed",
+                    "incident.severity_changed",
+                    "incident.assignment_changed",
+                    "incident.update_published",
+                    "incident.timestamps_corrected",
+                    "incident.resolved",
+                    "incident.dismissed",
+                    "incident.reopened",
+                    "incident.signal_attached"
+                  ]
+                },
+                "occurredAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "id",
+                "incidentId",
+                "incidentKey",
+                "incidentTitle",
+                "serviceName",
+                "type",
+                "occurredAt"
+              ]
+            }
+          },
+          "demoDataCount": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "activeIncidents",
+          "degradedServices",
+          "commanderlessCount",
+          "serviceCount",
+          "latestUpdates",
+          "demoDataCount"
+        ]
+      },
+      "RelayOpsIncident": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "workspaceId": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "key": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "detected",
+              "triaging",
+              "mitigating",
+              "monitoring",
+              "resolved",
+              "dismissed"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "unknown",
+              "sev1",
+              "sev2",
+              "sev3",
+              "sev4"
+            ]
+          },
+          "impact": {
+            "type": "string",
+            "enum": [
+              "unknown",
+              "none",
+              "degraded",
+              "partial_outage",
+              "full_outage"
+            ]
+          },
+          "serviceId": {
+            "type": "string"
+          },
+          "commanderId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resolutionSummary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "createdBy": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "detectedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "acknowledgedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "mitigatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "resolvedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "dismissedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "lastUpdateAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isDemo": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "workspaceId",
+          "number",
+          "key",
+          "title",
+          "summary",
+          "status",
+          "severity",
+          "impact",
+          "serviceId",
+          "commanderId",
+          "resolutionSummary",
+          "version",
+          "createdBy",
+          "detectedAt",
+          "acknowledgedAt",
+          "mitigatedAt",
+          "resolvedAt",
+          "dismissedAt",
+          "lastUpdateAt",
+          "createdAt",
+          "updatedAt",
+          "isDemo"
+        ]
+      },
+      "RelayOpsIncidentDetail": {
+        "type": "object",
+        "properties": {
+          "incident": {
+            "$ref": "#/components/schemas/RelayOpsIncident"
+          },
+          "service": {
+            "$ref": "#/components/schemas/RelayOpsService"
+          },
+          "commander": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          },
+          "responders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ]
+            }
+          },
+          "affectedServices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "slug"
+              ]
+            }
+          },
+          "timeline": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelayOpsIncidentEvent"
+            }
+          }
+        },
+        "required": [
+          "incident",
+          "service",
+          "commander",
+          "responders",
+          "affectedServices",
+          "timeline"
+        ]
+      },
+      "RelayOpsIncidentEvent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "workspaceId": {
+            "type": "string"
+          },
+          "incidentId": {
+            "type": "string"
+          },
+          "incidentVersion": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "incident.created",
+              "incident.status_changed",
+              "incident.severity_changed",
+              "incident.assignment_changed",
+              "incident.update_published",
+              "incident.timestamps_corrected",
+              "incident.resolved",
+              "incident.dismissed",
+              "incident.reopened",
+              "incident.signal_attached"
+            ]
+          },
+          "actorUserId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "idempotencyKey": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "workspaceId",
+          "incidentId",
+          "incidentVersion",
+          "type",
+          "actorUserId",
+          "occurredAt",
+          "payload",
+          "idempotencyKey"
+        ]
+      },
+      "RelayOpsDemoCleanup": {
+        "type": "object",
+        "properties": {
+          "incidents": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "services": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "outboxEvents": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "incidents",
+          "services",
+          "outboxEvents"
+        ]
+      },
+      "RelayOpsLegacyArchive": {
+        "type": "object",
+        "properties": {
+          "projects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                },
+                "archivedAt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "taskCount": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "slug",
+                "archivedAt",
+                "taskCount"
+              ]
+            }
+          }
+        },
+        "required": [
+          "projects"
+        ]
+      },
+      "RelayOpsLegacyExport": {
+        "type": "object",
+        "properties": {
+          "schemaVersion": {
+            "type": "number",
+            "enum": [
+              1
+            ]
+          },
+          "exportedAt": {
+            "type": "string"
+          },
+          "workspaceId": {
+            "type": "string"
+          },
+          "projects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "archivedAt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "id",
+                "slug",
+                "name",
+                "description",
+                "archivedAt",
+                "createdAt"
+              ]
+            }
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "projectId": {
+                  "type": "string"
+                },
+                "number": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "type": "string"
+                },
+                "priority": {
+                  "type": "string"
+                },
+                "assigneeId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "startDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "dueDate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              "required": [
+                "id",
+                "projectId",
+                "number",
+                "title",
+                "description",
+                "status",
+                "priority",
+                "assigneeId",
+                "startDate",
+                "dueDate",
+                "createdAt",
+                "updatedAt"
+              ]
+            }
+          }
+        },
+        "required": [
+          "schemaVersion",
+          "exportedAt",
+          "workspaceId",
+          "projects",
+          "tasks"
+        ]
+      },
+      "RelayOpsIncidentVersionConflict": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "version_conflict"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "current": {
+            "$ref": "#/components/schemas/RelayOpsIncidentDetail"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "current"
+        ]
+      },
+      "RelayOpsIncidentTimelinePage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelayOpsIncidentEvent"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor"
+        ]
+      },
+      "RelayOpsIncidentWorkbenchPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelayOpsIncidentWorkbenchItem"
+            }
+          },
+          "nextCursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "facets": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "value",
+                    "label",
+                    "count"
+                  ]
+                }
+              },
+              "severity": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "value",
+                    "label",
+                    "count"
+                  ]
+                }
+              },
+              "service": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "value",
+                    "label",
+                    "count"
+                  ]
+                }
+              },
+              "commander": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "value",
+                    "label",
+                    "count"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "status",
+              "severity",
+              "service",
+              "commander"
+            ]
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "count": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "value",
+                "label",
+                "count"
+              ]
+            }
+          }
+        },
+        "required": [
+          "items",
+          "nextCursor",
+          "facets",
+          "groups"
+        ]
+      },
+      "RelayOpsIncidentWorkbenchItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "detected",
+              "triaging",
+              "mitigating",
+              "monitoring",
+              "resolved",
+              "dismissed"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "unknown",
+              "sev1",
+              "sev2",
+              "sev3",
+              "sev4"
+            ]
+          },
+          "impact": {
+            "type": "string",
+            "enum": [
+              "unknown",
+              "none",
+              "degraded",
+              "partial_outage",
+              "full_outage"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "detectedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "resolvedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "lastUpdateAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "service": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "slug"
+            ]
+          },
+          "affectedServices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "slug"
+              ]
+            }
+          },
+          "commander": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          },
+          "responders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "title",
+          "summary",
+          "status",
+          "severity",
+          "impact",
+          "version",
+          "detectedAt",
+          "resolvedAt",
+          "lastUpdateAt",
+          "service",
+          "affectedServices",
+          "commander",
+          "responders"
+        ]
+      },
+      "RelayOpsSavedViewList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/RelayOpsSavedView"
+        }
+      },
+      "RelayOpsSavedView": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "workspaceId": {
+            "type": "string"
+          },
+          "ownerUserId": {
+            "type": "string"
+          },
+          "schemaVersion": {
+            "type": "number",
+            "enum": [
+              1
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "private",
+              "workspace"
+            ]
+          },
+          "definition": {
+            "type": "object",
+            "properties": {
+              "q": {
+                "type": "string"
+              },
+              "status": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "detected",
+                    "triaging",
+                    "mitigating",
+                    "monitoring",
+                    "resolved",
+                    "dismissed"
+                  ]
+                }
+              },
+              "severity": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "unknown",
+                    "sev1",
+                    "sev2",
+                    "sev3",
+                    "sev4"
+                  ]
+                }
+              },
+              "service": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "commander": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "from": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              },
+              "sort": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "enum": [
+                        "severity",
+                        "status",
+                        "detectedAt",
+                        "lastUpdateAt",
+                        "title",
+                        "service",
+                        "commander"
+                      ]
+                    },
+                    "direction": {
+                      "type": "string",
+                      "enum": [
+                        "asc",
+                        "desc"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "field",
+                    "direction"
+                  ]
+                }
+              },
+              "group": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "status",
+                  "severity",
+                  "service",
+                  "commander"
+                ]
+              },
+              "density": {
+                "type": "string",
+                "enum": [
+                  "compact",
+                  "comfortable"
+                ]
+              },
+              "columns": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "enum": [
+                        "key",
+                        "title",
+                        "status",
+                        "severity",
+                        "impact",
+                        "service",
+                        "affectedServices",
+                        "commander",
+                        "responders",
+                        "detectedAt",
+                        "elapsed",
+                        "lastUpdateAt"
+                      ]
+                    },
+                    "pin": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "enum": [
+                        "left",
+                        "right",
+                        null
+                      ]
+                    },
+                    "width": {
+                      "type": "integer",
+                      "minimum": 80,
+                      "maximum": 640
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "pin",
+                    "width"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "q",
+              "status",
+              "severity",
+              "service",
+              "commander",
+              "from",
+              "to",
+              "sort",
+              "group",
+              "density",
+              "columns"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "workspaceId",
+          "ownerUserId",
+          "schemaVersion",
+          "name",
+          "visibility",
+          "definition",
+          "version",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "RelayOpsSavedViewVersionConflict": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "saved_view_version_conflict"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "current": {
+            "$ref": "#/components/schemas/RelayOpsSavedView"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "current"
+        ]
+      },
+      "RelayOpsSavedViewDelete": {
+        "type": "object",
+        "properties": {
+          "deleted": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "deletedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "deleted",
+          "id",
+          "deletedAt"
+        ]
+      },
+      "RelayOpsSignal": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "workspaceId": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "externalId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "fingerprint": {
+            "type": "string"
+          },
+          "deduplicationKey": {
+            "type": "string"
+          },
+          "serviceId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "observedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "severityHint": {
+            "type": "string",
+            "enum": [
+              "unknown",
+              "sev1",
+              "sev2",
+              "sev3",
+              "sev4"
+            ]
+          },
+          "redactedPayload": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "ingestionStatus": {
+            "type": "string",
+            "enum": [
+              "new",
+              "attached"
+            ]
+          },
+          "isDemo": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "workspaceId",
+          "source",
+          "externalId",
+          "fingerprint",
+          "deduplicationKey",
+          "serviceId",
+          "title",
+          "summary",
+          "observedAt",
+          "severityHint",
+          "redactedPayload",
+          "ingestionStatus",
+          "isDemo",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "RelayOpsSignalCreateResult": {
+        "type": "object",
+        "properties": {
+          "signal": {
+            "$ref": "#/components/schemas/RelayOpsSignal"
+          },
+          "deduplicated": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "signal",
+          "deduplicated"
+        ]
+      },
+      "RelayOpsSignalSource": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "workspaceId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "generic_webhook"
+            ]
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "webhookPath": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "workspaceId",
+          "name",
+          "source",
+          "enabled",
+          "webhookPath",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "RelayOpsSignalSourceSecret": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RelayOpsSignalSource"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "secret": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "secret"
+            ]
+          }
+        ]
+      },
+      "RelayOpsSignalAttachment": {
+        "type": "object",
+        "properties": {
+          "incidentId": {
+            "type": "string"
+          },
+          "signal": {
+            "$ref": "#/components/schemas/RelayOpsSignal"
+          },
+          "attached": {
+            "type": "boolean"
+          },
+          "incidentVersion": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          }
+        },
+        "required": [
+          "incidentId",
+          "signal",
+          "attached",
+          "incidentVersion"
+        ]
+      },
+      "RelayOpsSignalAttachmentConflict": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "version_conflict"
+            ]
+          },
+          "currentVersion": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          }
+        },
+        "required": [
+          "code",
+          "currentVersion"
+        ]
+      },
+      "RelayOpsReliabilityAnalytics": {
+        "type": "object",
+        "properties": {
+          "definition": {
+            "type": "object",
+            "properties": {
+              "version": {
+                "type": "string",
+                "enum": [
+                  "relayops-reliability-v1"
+                ]
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "staleThresholdHours": {
+                "type": "number",
+                "enum": [
+                  24
+                ]
+              },
+              "hotspotAggregation": {
+                "type": "string",
+                "enum": [
+                  "primary_service"
+                ]
+              },
+              "formulas": {
+                "type": "object",
+                "properties": {
+                  "mtta": {
+                    "type": "string"
+                  },
+                  "mttr": {
+                    "type": "string"
+                  },
+                  "mitigation": {
+                    "type": "string"
+                  },
+                  "reopen": {
+                    "type": "string"
+                  },
+                  "stale": {
+                    "type": "string"
+                  },
+                  "volume": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "mtta",
+                  "mttr",
+                  "mitigation",
+                  "reopen",
+                  "stale",
+                  "volume"
+                ]
+              }
+            },
+            "required": [
+              "version",
+              "timezone",
+              "staleThresholdHours",
+              "hotspotAggregation",
+              "formulas"
+            ]
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "filters": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              },
+              "timezone": {
+                "type": "string"
+              },
+              "status": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "detected",
+                    "triaging",
+                    "mitigating",
+                    "monitoring",
+                    "resolved",
+                    "dismissed"
+                  ]
+                }
+              },
+              "severity": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "unknown",
+                    "sev1",
+                    "sev2",
+                    "sev3",
+                    "sev4"
+                  ]
+                }
+              },
+              "service": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "compare": {
+                "type": "boolean"
+              },
+              "includeDemo": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "timezone",
+              "status",
+              "severity",
+              "service",
+              "compare",
+              "includeDemo"
+            ]
+          },
+          "period": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              },
+              "startAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "endAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "startAt",
+              "endAt"
+            ]
+          },
+          "metrics": {
+            "type": "object",
+            "properties": {
+              "volume": {
+                "type": "object",
+                "properties": {
+                  "count": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "count"
+                ]
+              },
+              "mtta": {
+                "type": "object",
+                "properties": {
+                  "sampleSize": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "excludedMissing": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "averageMs": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0
+                  },
+                  "p50Ms": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0
+                  },
+                  "p90Ms": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "sampleSize",
+                  "excludedMissing",
+                  "averageMs",
+                  "p50Ms",
+                  "p90Ms"
+                ]
+              },
+              "mttr": {
+                "type": "object",
+                "properties": {
+                  "sampleSize": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "excludedMissing": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "averageMs": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0
+                  },
+                  "p50Ms": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0
+                  },
+                  "p90Ms": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "sampleSize",
+                  "excludedMissing",
+                  "averageMs",
+                  "p50Ms",
+                  "p90Ms"
+                ]
+              },
+              "mitigation": {
+                "type": "object",
+                "properties": {
+                  "sampleSize": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "excludedMissing": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "averageMs": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0
+                  },
+                  "p50Ms": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0
+                  },
+                  "p90Ms": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "sampleSize",
+                  "excludedMissing",
+                  "averageMs",
+                  "p50Ms",
+                  "p90Ms"
+                ]
+              },
+              "reopen": {
+                "type": "object",
+                "properties": {
+                  "numerator": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "denominator": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "percent": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                },
+                "required": [
+                  "numerator",
+                  "denominator",
+                  "percent"
+                ]
+              },
+              "stale": {
+                "type": "object",
+                "properties": {
+                  "numerator": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "denominator": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "percent": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                },
+                "required": [
+                  "numerator",
+                  "denominator",
+                  "percent"
+                ]
+              }
+            },
+            "required": [
+              "volume",
+              "mtta",
+              "mttr",
+              "mitigation",
+              "reopen",
+              "stale"
+            ]
+          },
+          "comparison": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "period": {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "string"
+                  },
+                  "to": {
+                    "type": "string"
+                  },
+                  "startAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "endAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "from",
+                  "to",
+                  "startAt",
+                  "endAt"
+                ]
+              },
+              "metrics": {
+                "type": "object",
+                "properties": {
+                  "volume": {
+                    "type": "object",
+                    "properties": {
+                      "count": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "count"
+                    ]
+                  },
+                  "mtta": {
+                    "type": "object",
+                    "properties": {
+                      "sampleSize": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "excludedMissing": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "averageMs": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "minimum": 0
+                      },
+                      "p50Ms": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "minimum": 0
+                      },
+                      "p90Ms": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "sampleSize",
+                      "excludedMissing",
+                      "averageMs",
+                      "p50Ms",
+                      "p90Ms"
+                    ]
+                  },
+                  "mttr": {
+                    "type": "object",
+                    "properties": {
+                      "sampleSize": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "excludedMissing": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "averageMs": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "minimum": 0
+                      },
+                      "p50Ms": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "minimum": 0
+                      },
+                      "p90Ms": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "sampleSize",
+                      "excludedMissing",
+                      "averageMs",
+                      "p50Ms",
+                      "p90Ms"
+                    ]
+                  },
+                  "mitigation": {
+                    "type": "object",
+                    "properties": {
+                      "sampleSize": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "excludedMissing": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "averageMs": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "minimum": 0
+                      },
+                      "p50Ms": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "minimum": 0
+                      },
+                      "p90Ms": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "sampleSize",
+                      "excludedMissing",
+                      "averageMs",
+                      "p50Ms",
+                      "p90Ms"
+                    ]
+                  },
+                  "reopen": {
+                    "type": "object",
+                    "properties": {
+                      "numerator": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "denominator": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "percent": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "minimum": 0,
+                        "maximum": 100
+                      }
+                    },
+                    "required": [
+                      "numerator",
+                      "denominator",
+                      "percent"
+                    ]
+                  },
+                  "stale": {
+                    "type": "object",
+                    "properties": {
+                      "numerator": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "denominator": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "percent": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "minimum": 0,
+                        "maximum": 100
+                      }
+                    },
+                    "required": [
+                      "numerator",
+                      "denominator",
+                      "percent"
+                    ]
+                  }
+                },
+                "required": [
+                  "volume",
+                  "mtta",
+                  "mttr",
+                  "mitigation",
+                  "reopen",
+                  "stale"
+                ]
+              }
+            },
+            "required": [
+              "period",
+              "metrics"
+            ]
+          },
+          "series": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "bucket": {
+                  "type": "string"
+                },
+                "volume": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "bucket",
+                "volume"
+              ]
+            }
+          },
+          "hotspots": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "serviceId": {
+                  "type": "string"
+                },
+                "serviceName": {
+                  "type": "string"
+                },
+                "incidentCount": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "sev1Count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "mttrP50Ms": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "serviceId",
+                "serviceName",
+                "incidentCount",
+                "sev1Count",
+                "mttrP50Ms"
+              ]
+            }
+          }
+        },
+        "required": [
+          "definition",
+          "generatedAt",
+          "filters",
+          "period",
+          "metrics",
+          "comparison",
+          "series",
+          "hotspots"
         ]
       },
       "BoardResponse": {
@@ -5493,6 +7757,136 @@
         }
       }
     },
+    "/webhooks/{sourceId}/signals": {
+      "post": {
+        "409": {
+          "description": "Webhook request ID was already used",
+          "content": {
+            "text/plain": {
+              "schema": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string",
+                "format": null,
+                "minLength": null,
+                "maxLength": null
+              }
+            }
+          }
+        },
+        "operationId": "ingestRelayOpsSignalWebhook",
+        "tags": [
+          "RelayOps Signals"
+        ],
+        "summary": "Ingest a signed generic signal webhook",
+        "description": "Authenticates exact raw bytes with HMAC-SHA256. This public route does not use session authentication.",
+        "security": [],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "sourceId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Signal accepted or deduplicated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsWebhookIngestionResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed JSON or stale timestamp",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid webhook signature",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Webhook source not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Webhook body is too large",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported content type",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Signal payload is invalid",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Webhook rate limit exceeded",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Webhook encryption is unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/oauth/id-token": {
       "get": {
         "operationId": "getOAuthIdToken",
@@ -6046,6 +8440,3815 @@
           },
           "403": {
             "description": "No workspace access, or missing project:update permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}": {
+      "get": {
+        "operationId": "getRelayOpsWorkspaceState",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Get RelayOps rollout and legacy archive state",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "RelayOps workspace state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsWorkspaceState"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "No workspace access",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/activate": {
+      "post": {
+        "operationId": "activateRelayOpsWorkspace",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Explicitly opt a workspace into RelayOps",
+        "description": "Switches the workspace product mode. Existing Project and Task rows remain available through the read-only archive and export.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Activated RelayOps workspace",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsWorkspaceState"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing workspace:update permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/services": {
+      "get": {
+        "operationId": "listRelayOpsServices",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "List the Service Catalog",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "required": false,
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "archived",
+                "all"
+              ],
+              "default": "active"
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service Catalog",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsServiceList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing service:read permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createRelayOpsService",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Create a RelayOps service",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  },
+                  "slug": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 48,
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 500
+                  },
+                  "tier": {
+                    "type": "string",
+                    "enum": [
+                      "critical",
+                      "high",
+                      "standard",
+                      "low"
+                    ],
+                    "default": "standard"
+                  },
+                  "health": {
+                    "type": "string",
+                    "enum": [
+                      "operational",
+                      "degraded",
+                      "major_outage",
+                      "maintenance"
+                    ],
+                    "default": "operational"
+                  },
+                  "ownerTeamId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "minLength": 1
+                  },
+                  "repositoryUrl": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 2048,
+                    "format": "uri"
+                  },
+                  "runbookUrl": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 2048,
+                    "format": "uri"
+                  }
+                },
+                "required": [
+                  "name",
+                  "slug"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created service",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsService"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid service or owner team",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing service:create permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Active service slug already exists",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/services/{id}": {
+      "get": {
+        "operationId": "getRelayOpsService",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Get a RelayOps service",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsService"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing service:read permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Service not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateRelayOpsService",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Update a RelayOps service",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  },
+                  "slug": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 48,
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                  },
+                  "description": {
+                    "type": "string",
+                    "maxLength": 500
+                  },
+                  "tier": {
+                    "type": "string",
+                    "enum": [
+                      "critical",
+                      "high",
+                      "standard",
+                      "low"
+                    ]
+                  },
+                  "health": {
+                    "type": "string",
+                    "enum": [
+                      "operational",
+                      "degraded",
+                      "major_outage",
+                      "maintenance"
+                    ]
+                  },
+                  "ownerTeamId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "minLength": 1
+                  },
+                  "repositoryUrl": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 2048,
+                    "format": "uri"
+                  },
+                  "runbookUrl": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 2048,
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated service",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsService"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid service or owner team",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing workspace:update permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Service not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Active service slug already exists",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/services/{id}/archive": {
+      "post": {
+        "operationId": "archiveRelayOpsService",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Archive a RelayOps service",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsService"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing workspace:update permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Service not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Service state or slug conflicts",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/services/{id}/unarchive": {
+      "post": {
+        "operationId": "unarchiveRelayOpsService",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Restore an archived RelayOps service",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsService"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing workspace:update permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Service not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Service state or slug conflicts",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/teams": {
+      "get": {
+        "operationId": "listRelayOpsServiceOwnerTeams",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "List teams available for Service ownership",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workspace teams",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelayOpsTeam"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing service:read permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/overview": {
+      "get": {
+        "operationId": "getRelayOpsOverview",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Get the operational overview",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operations Overview",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsOverview"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing Service or Incident read permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/demo-data": {
+      "post": {
+        "operationId": "createRelayOpsDemoIncident",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Create the deterministic onboarding demo incident",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "serviceId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "serviceId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Demo incident",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsIncidentDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing incident:create permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Service not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteRelayOpsDemoData",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Atomically remove server-marked RelayOps demo data",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted demo records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsDemoCleanup"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing workspace:update permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/legacy": {
+      "get": {
+        "operationId": "getRelayOpsLegacyArchive",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "List preserved Kaneo projects in the read-only archive",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Legacy archive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsLegacyArchive"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing project:read permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/legacy/export": {
+      "get": {
+        "operationId": "exportRelayOpsLegacyArchive",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Export preserved Kaneo Project and Task data",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Legacy Project and Task export",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsLegacyExport"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing project:read permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/incidents": {
+      "post": {
+        "operationId": "createRelayOpsIncident",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Create a detected incident with its durable timeline event",
+        "description": "Atomically writes the incident, incident.created event, and delivery outbox record.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "serviceId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "summary": {
+                    "type": "string",
+                    "maxLength": 2000
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "unknown",
+                      "sev1",
+                      "sev2",
+                      "sev3",
+                      "sev4"
+                    ],
+                    "default": "unknown"
+                  },
+                  "impact": {
+                    "type": "string",
+                    "enum": [
+                      "unknown",
+                      "none",
+                      "degraded",
+                      "partial_outage",
+                      "full_outage"
+                    ],
+                    "default": "unknown"
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 128
+                  }
+                },
+                "required": [
+                  "serviceId",
+                  "title",
+                  "idempotencyKey"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created incident detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsIncidentDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing incident:create permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Service not found in the workspace",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Archived service cannot receive incidents",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listRelayOpsIncidents",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Query the Incident Workbench with server filters and cursor pagination",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "required": false,
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string",
+                "enum": [
+                  "detected",
+                  "triaging",
+                  "mitigating",
+                  "monitoring",
+                  "resolved",
+                  "dismissed"
+                ]
+              },
+              "maxItems": 100
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string",
+                "enum": [
+                  "unknown",
+                  "sev1",
+                  "sev2",
+                  "sev3",
+                  "sev4"
+                ]
+              },
+              "maxItems": 100
+            },
+            "required": false,
+            "name": "severity",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "maxItems": 100
+            },
+            "required": false,
+            "name": "service",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "maxItems": 100
+            },
+            "required": false,
+            "name": "commander",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": false,
+            "name": "from",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": false,
+            "name": "to",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^-?(severity|status|detectedAt|lastUpdateAt|title|service|commander)$"
+              },
+              "minItems": 1,
+              "maxItems": 3
+            },
+            "required": false,
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "none",
+                "status",
+                "severity",
+                "service",
+                "commander"
+              ],
+              "default": "none"
+            },
+            "required": false,
+            "name": "group",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "required": false,
+            "name": "cursor",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Incident Workbench page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsIncidentWorkbenchPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid filter, sort, date, or cursor",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing incident:read permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/incidents/{id}": {
+      "get": {
+        "operationId": "getRelayOpsIncident",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Get an incident and its authoritative durable timeline",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Incident detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsIncidentDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing incident:read permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Incident not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/incidents/{id}/transition": {
+      "post": {
+        "operationId": "transitionRelayOpsIncident",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Apply one canonical incident lifecycle transition",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 128
+                  },
+                  "to": {
+                    "type": "string",
+                    "enum": [
+                      "detected",
+                      "triaging",
+                      "mitigating",
+                      "monitoring",
+                      "resolved",
+                      "dismissed"
+                    ]
+                  },
+                  "resolutionSummary": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 5000
+                  }
+                },
+                "required": [
+                  "expectedVersion",
+                  "idempotencyKey",
+                  "to"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transitioned incident",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsIncidentDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid command",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing lifecycle capability",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Incident not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Optimistic version conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsIncidentVersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Transition is not allowed",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/incidents/{id}/severity": {
+      "post": {
+        "operationId": "changeRelayOpsIncidentSeverity",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Change incident severity with optimistic versioning",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 128
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "unknown",
+                      "sev1",
+                      "sev2",
+                      "sev3",
+                      "sev4"
+                    ]
+                  }
+                },
+                "required": [
+                  "expectedVersion",
+                  "idempotencyKey",
+                  "severity"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated incident severity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsIncidentDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid command",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing severity capability",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Incident not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Optimistic version conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsIncidentVersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Severity is unchanged",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/incidents/{id}/updates": {
+      "post": {
+        "operationId": "publishRelayOpsIncidentUpdate",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Publish an append-only durable incident update",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 128
+                  },
+                  "message": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 5000
+                  }
+                },
+                "required": [
+                  "expectedVersion",
+                  "idempotencyKey",
+                  "message"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Incident update published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsIncidentDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid command",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing timeline publish capability",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Incident not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Optimistic version conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsIncidentVersionConflict"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/incidents/{id}/participants": {
+      "post": {
+        "operationId": "assignRelayOpsIncidentParticipants",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Assign the incident commander, responders, and affected services",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 128
+                  },
+                  "commanderId": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "minLength": 1
+                  },
+                  "responderIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "maxItems": 100
+                  },
+                  "affectedServiceIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "maxItems": 100
+                  }
+                },
+                "required": [
+                  "expectedVersion",
+                  "idempotencyKey"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated incident participants",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsIncidentDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid command",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing assignment capability",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Incident not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Optimistic version conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsIncidentVersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Participant does not belong to the workspace",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/incidents/{id}/timestamps/correct": {
+      "post": {
+        "operationId": "correctRelayOpsIncidentTimestamps",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Append a compensating incident timestamp correction",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 128
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  },
+                  "detectedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "acknowledgedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "mitigatedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "resolvedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "dismissedAt": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "expectedVersion",
+                  "idempotencyKey",
+                  "reason"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Corrected incident timestamps",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsIncidentDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid command",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing timeline correction capability",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Incident not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Optimistic version conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsIncidentVersionConflict"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Timestamp invariants failed",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/incidents/{id}/timeline": {
+      "get": {
+        "operationId": "listRelayOpsIncidentTimeline",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "List the append-only incident timeline with a scoped cursor",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            },
+            "required": false,
+            "name": "cursor",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Incident timeline page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsIncidentTimelinePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid timeline cursor",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing incident read capability",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Incident not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/saved-views": {
+      "get": {
+        "operationId": "listRelayOpsSavedViews",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "List private and authorized workspace saved views",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Saved views",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsSavedViewList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing saved_view:read permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createRelayOpsSavedView",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Create a versioned Incident Workbench saved view",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  },
+                  "visibility": {
+                    "type": "string",
+                    "enum": [
+                      "private",
+                      "workspace"
+                    ],
+                    "default": "private"
+                  },
+                  "definition": {
+                    "type": "object",
+                    "properties": {
+                      "q": {
+                        "type": "string",
+                        "maxLength": 200,
+                        "default": ""
+                      },
+                      "status": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "detected",
+                            "triaging",
+                            "mitigating",
+                            "monitoring",
+                            "resolved",
+                            "dismissed"
+                          ]
+                        },
+                        "maxItems": 6
+                      },
+                      "severity": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "unknown",
+                            "sev1",
+                            "sev2",
+                            "sev3",
+                            "sev4"
+                          ]
+                        },
+                        "maxItems": 5
+                      },
+                      "service": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 128
+                        },
+                        "maxItems": 100
+                      },
+                      "commander": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 128
+                        },
+                        "maxItems": 100
+                      },
+                      "from": {
+                        "type": "string",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                      },
+                      "to": {
+                        "type": "string",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                      },
+                      "sort": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field": {
+                              "type": "string",
+                              "enum": [
+                                "severity",
+                                "status",
+                                "detectedAt",
+                                "lastUpdateAt",
+                                "title",
+                                "service",
+                                "commander"
+                              ]
+                            },
+                            "direction": {
+                              "type": "string",
+                              "enum": [
+                                "asc",
+                                "desc"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "field",
+                            "direction"
+                          ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 3
+                      },
+                      "group": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "status",
+                          "severity",
+                          "service",
+                          "commander"
+                        ]
+                      },
+                      "density": {
+                        "type": "string",
+                        "enum": [
+                          "compact",
+                          "comfortable"
+                        ]
+                      },
+                      "columns": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "enum": [
+                                "key",
+                                "title",
+                                "status",
+                                "severity",
+                                "impact",
+                                "service",
+                                "affectedServices",
+                                "commander",
+                                "responders",
+                                "detectedAt",
+                                "elapsed",
+                                "lastUpdateAt"
+                              ]
+                            },
+                            "pin": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "enum": [
+                                "left",
+                                "right",
+                                null
+                              ]
+                            },
+                            "width": {
+                              "type": "integer",
+                              "minimum": 80,
+                              "maximum": 640
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "pin",
+                            "width"
+                          ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 12
+                      }
+                    },
+                    "required": [
+                      "status",
+                      "severity",
+                      "service",
+                      "commander",
+                      "from",
+                      "to",
+                      "sort",
+                      "group",
+                      "density",
+                      "columns"
+                    ]
+                  }
+                },
+                "required": [
+                  "name",
+                  "definition"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created saved view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsSavedView"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing saved-view create or share permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Saved-view name already exists",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/saved-views/{id}": {
+      "patch": {
+        "operationId": "updateRelayOpsSavedView",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Update a saved view with optimistic versioning",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  },
+                  "visibility": {
+                    "type": "string",
+                    "enum": [
+                      "private",
+                      "workspace"
+                    ]
+                  },
+                  "definition": {
+                    "type": "object",
+                    "properties": {
+                      "q": {
+                        "type": "string",
+                        "maxLength": 200,
+                        "default": ""
+                      },
+                      "status": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "detected",
+                            "triaging",
+                            "mitigating",
+                            "monitoring",
+                            "resolved",
+                            "dismissed"
+                          ]
+                        },
+                        "maxItems": 6
+                      },
+                      "severity": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "unknown",
+                            "sev1",
+                            "sev2",
+                            "sev3",
+                            "sev4"
+                          ]
+                        },
+                        "maxItems": 5
+                      },
+                      "service": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 128
+                        },
+                        "maxItems": 100
+                      },
+                      "commander": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 128
+                        },
+                        "maxItems": 100
+                      },
+                      "from": {
+                        "type": "string",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                      },
+                      "to": {
+                        "type": "string",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                      },
+                      "sort": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "field": {
+                              "type": "string",
+                              "enum": [
+                                "severity",
+                                "status",
+                                "detectedAt",
+                                "lastUpdateAt",
+                                "title",
+                                "service",
+                                "commander"
+                              ]
+                            },
+                            "direction": {
+                              "type": "string",
+                              "enum": [
+                                "asc",
+                                "desc"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "field",
+                            "direction"
+                          ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 3
+                      },
+                      "group": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "status",
+                          "severity",
+                          "service",
+                          "commander"
+                        ]
+                      },
+                      "density": {
+                        "type": "string",
+                        "enum": [
+                          "compact",
+                          "comfortable"
+                        ]
+                      },
+                      "columns": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "enum": [
+                                "key",
+                                "title",
+                                "status",
+                                "severity",
+                                "impact",
+                                "service",
+                                "affectedServices",
+                                "commander",
+                                "responders",
+                                "detectedAt",
+                                "elapsed",
+                                "lastUpdateAt"
+                              ]
+                            },
+                            "pin": {
+                              "type": [
+                                "string",
+                                "null"
+                              ],
+                              "enum": [
+                                "left",
+                                "right",
+                                null
+                              ]
+                            },
+                            "width": {
+                              "type": "integer",
+                              "minimum": 80,
+                              "maximum": 640
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "pin",
+                            "width"
+                          ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 12
+                      }
+                    },
+                    "required": [
+                      "status",
+                      "severity",
+                      "service",
+                      "commander",
+                      "from",
+                      "to",
+                      "sort",
+                      "group",
+                      "density",
+                      "columns"
+                    ]
+                  }
+                },
+                "required": [
+                  "expectedVersion"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated saved view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsSavedView"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Saved view is not writable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Saved view not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Optimistic saved-view version conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsSavedViewVersionConflict"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteRelayOpsSavedView",
+        "tags": [
+          "RelayOps"
+        ],
+        "summary": "Delete a saved view with optimistic versioning",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "exclusiveMinimum": 0
+            },
+            "required": true,
+            "name": "expectedVersion",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted saved view",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsSavedViewDelete"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Saved view is not writable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Saved view not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Optimistic saved-view version conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsSavedViewVersionConflict"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/signals": {
+      "get": {
+        "operationId": "listRelayOpsSignals",
+        "tags": [
+          "RelayOps Signals"
+        ],
+        "summary": "List normalized signals",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "new",
+                "attached",
+                "all"
+              ],
+              "default": "all"
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "serviceId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workspace signals",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelayOpsSignal"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing signal:read permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createRelayOpsManualSignal",
+        "tags": [
+          "RelayOps Signals"
+        ],
+        "summary": "Create a normalized manual signal",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 128
+                  },
+                  "externalId": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "serviceId": {
+                    "type": "string",
+                    "maxLength": 128
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "summary": {
+                    "type": "string",
+                    "maxLength": 2000
+                  },
+                  "observedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "severityHint": {
+                    "type": "string",
+                    "enum": [
+                      "unknown",
+                      "sev1",
+                      "sev2",
+                      "sev3",
+                      "sev4"
+                    ],
+                    "default": "unknown"
+                  },
+                  "deduplicationKey": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "payload": {
+                    "type": "object",
+                    "additionalProperties": {}
+                  }
+                },
+                "required": [
+                  "idempotencyKey",
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created or deduplicated signal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsSignalCreateResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing signal:create permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Service not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/signals/demo": {
+      "post": {
+        "operationId": "createRelayOpsDemoSignal",
+        "tags": [
+          "RelayOps Signals"
+        ],
+        "summary": "Create the deterministic degraded-latency demo signal",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "serviceId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "serviceId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created or deduplicated demo signal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsSignalCreateResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing signal:create permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Service not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/signals/{id}": {
+      "get": {
+        "operationId": "getRelayOpsSignal",
+        "tags": [
+          "RelayOps Signals"
+        ],
+        "summary": "Get a normalized signal",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Signal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsSignal"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing signal:read permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Signal not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/signal-sources": {
+      "get": {
+        "operationId": "listRelayOpsSignalSources",
+        "tags": [
+          "RelayOps Signals"
+        ],
+        "summary": "List webhook sources without secrets",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Webhook sources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelayOpsSignalSource"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing signal:ingest permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createRelayOpsSignalSource",
+        "tags": [
+          "RelayOps Signals"
+        ],
+        "summary": "Create a webhook source and reveal its secret once",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created webhook source",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsSignalSourceSecret"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing signal:ingest permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Source name conflicts",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Webhook encryption is not configured",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/signal-sources/{sourceId}/rotate-secret": {
+      "post": {
+        "operationId": "rotateRelayOpsSignalSourceSecret",
+        "tags": [
+          "RelayOps Signals"
+        ],
+        "summary": "Rotate a webhook secret and reveal it once",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "sourceId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rotated webhook source",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsSignalSourceSecret"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing signal:ingest permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Source not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Webhook encryption is not configured",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/incidents/{incidentId}/signals/{signalId}": {
+      "post": {
+        "operationId": "attachRelayOpsSignal",
+        "tags": [
+          "RelayOps Signals"
+        ],
+        "summary": "Atomically attach a signal to an incident",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "incidentId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "signalId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expectedVersion": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                  },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "minLength": 8,
+                    "maxLength": 128
+                  }
+                },
+                "required": [
+                  "expectedVersion",
+                  "idempotencyKey"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Signal attachment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsSignalAttachment"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing signal:attach permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Signal or incident not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Optimistic version conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsSignalAttachmentConflict"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/analytics/reliability": {
+      "get": {
+        "operationId": "getRelayOpsReliabilityAnalytics",
+        "tags": [
+          "RelayOps Analytics"
+        ],
+        "summary": "Get deterministic reliability aggregates and comparison",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": false,
+            "name": "from",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": false,
+            "name": "to",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "default": "UTC"
+            },
+            "required": false,
+            "name": "timezone",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string",
+                "enum": [
+                  "detected",
+                  "triaging",
+                  "mitigating",
+                  "monitoring",
+                  "resolved",
+                  "dismissed"
+                ]
+              },
+              "maxItems": 100
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string",
+                "enum": [
+                  "unknown",
+                  "sev1",
+                  "sev2",
+                  "sev3",
+                  "sev4"
+                ]
+              },
+              "maxItems": 100
+            },
+            "required": false,
+            "name": "severity",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "maxItems": 100
+            },
+            "required": false,
+            "name": "service",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ],
+              "default": true
+            },
+            "required": false,
+            "name": "compare",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ],
+              "default": false
+            },
+            "required": false,
+            "name": "includeDemo",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reliability analytics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelayOpsReliabilityAnalytics"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid analytics filters or timezone",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing analytics:read permission",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/relayops/workspaces/{workspaceId}/analytics/reliability.csv": {
+      "get": {
+        "operationId": "exportRelayOpsReliabilityAnalytics",
+        "tags": [
+          "RelayOps Analytics"
+        ],
+        "summary": "Export the authorized reliability filter set as CSV",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": false,
+            "name": "from",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": false,
+            "name": "to",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "default": "UTC"
+            },
+            "required": false,
+            "name": "timezone",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string",
+                "enum": [
+                  "detected",
+                  "triaging",
+                  "mitigating",
+                  "monitoring",
+                  "resolved",
+                  "dismissed"
+                ]
+              },
+              "maxItems": 100
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string",
+                "enum": [
+                  "unknown",
+                  "sev1",
+                  "sev2",
+                  "sev3",
+                  "sev4"
+                ]
+              },
+              "maxItems": 100
+            },
+            "required": false,
+            "name": "severity",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "maxItems": 100
+            },
+            "required": false,
+            "name": "service",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ],
+              "default": true
+            },
+            "required": false,
+            "name": "compare",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ],
+              "default": false
+            },
+            "required": false,
+            "name": "includeDemo",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reliability incident export",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid analytics filters or timezone",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials"
+          },
+          "403": {
+            "description": "Missing analytics:export permission",
             "content": {
               "text/plain": {
                 "schema": {

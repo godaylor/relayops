@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import "./globals.css";
+import "./portfolio.css";
+
+const basePath = process.env.NEXT_PUBLIC_RELAYOPS_BASE_PATH || "";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -10,90 +12,69 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://kaneo.app"),
   title: {
-    default: "Kaneo - All you need. Nothing you don't.",
-    template: "%s | Kaneo",
+    default: "RelayOps — Incident Operations",
+    template: "%s | RelayOps",
   },
   description:
-    "All you need. Nothing you don't. Open source project management that works for you, not against you.",
+    "Self-hosted realtime incident operations, derived from the MIT-licensed Kaneo project.",
   keywords: [
-    "kaneo",
-    "project management",
+    "RelayOps",
+    "incident operations",
+    "incident response",
+    "realtime",
     "open source",
-    "kanban",
-    "task management",
     "self-hosted",
-    "team collaboration",
   ],
-  applicationName: "Kaneo",
-  alternates: {
-    canonical: "/",
-  },
+  applicationName: "RelayOps",
   openGraph: {
     type: "website",
-    url: "https://kaneo.app",
-    siteName: "Kaneo",
-    title: "Kaneo - All you need. Nothing you don't.",
+    siteName: "RelayOps",
+    title: "RelayOps — Incident Operations",
     description:
-      "Open source project management that works for you, not against you. Self-hosted, simple, and powerful.",
-    images: [
-      {
-        url: "/images/hero.png",
-        width: 1200,
-        height: 630,
-        alt: "Kaneo",
-      },
-    ],
+      "Self-hosted realtime incident operations, derived from the MIT-licensed Kaneo project.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kaneo - All you need. Nothing you don't.",
+    title: "RelayOps — Incident Operations",
     description:
-      "Open source project management that works for you, not against you. Self-hosted, simple, and powerful.",
-    images: ["/images/hero.png"],
+      "Self-hosted realtime incident operations, derived from the MIT-licensed Kaneo project.",
   },
   robots: {
     index: true,
     follow: true,
   },
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-    apple: "/apple-touch-icon.png",
+    icon: `${basePath}/favicon.svg`,
+    shortcut: `${basePath}/favicon.svg`,
+    apple: `${basePath}/apple-touch-icon.png`,
   },
   category: "productivity",
-  creator: "Kaneo",
-  publisher: "Kaneo",
+  creator: "RelayOps",
+  publisher: "RelayOps",
 };
 
 const jsonLd = [
   {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Kaneo",
-    url: "https://kaneo.app",
-    logo: "https://kaneo.app/logo-512.png",
-    sameAs: ["https://github.com/usekaneo/kaneo"],
+    name: "RelayOps",
   },
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Kaneo",
-    url: "https://kaneo.app",
-    inLanguage: "en",
+    name: "RelayOps",
+    inLanguage: ["ru", "en"],
   },
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "Kaneo",
+    name: "RelayOps",
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web, Linux, macOS, Windows",
     description:
-      "Open source project management that works for you, not against you. Self-hosted, simple, and powerful.",
-    url: "https://kaneo.app",
-    image: "https://kaneo.app/images/hero.png",
-    license: "https://github.com/usekaneo/kaneo/blob/main/LICENSE",
+      "Self-hosted realtime incident operations, derived from the MIT-licensed Kaneo project.",
+    license: `${basePath}/licenses/LICENSE`,
   },
 ];
 
@@ -101,7 +82,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="ru" suppressHydrationWarning>
       <body>
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: This is necessary to apply the user's preferred color scheme before React hydration to prevent a flash of incorrect theme.
@@ -131,17 +112,6 @@ export default function RootLayout({
           // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD structured data must be inlined as a script tag for search engines to parse.
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <Script
-          defer
-          data-domain="kaneo.app"
-          src="https://plausible.kaneo.app/js/script.file-downloads.hash.outbound-links.pageview-props.revenue.tagged-events.js"
-          strategy="afterInteractive"
-        />
-        <Script id="plausible-init" strategy="afterInteractive">
-          {
-            "window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }"
-          }
-        </Script>
       </body>
     </html>
   );

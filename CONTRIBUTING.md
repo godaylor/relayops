@@ -1,6 +1,6 @@
-# Contributing to Kaneo
+# Contributing to RelayOps
 
-Thanks for wanting to contribute to Kaneo! Whether you're fixing bugs, adding features, or improving docs, we appreciate your help.
+Thanks for wanting to contribute to RelayOps. Whether you're fixing bugs, adding features, or improving docs, we appreciate your help.
 
 ## Table of Contents
 
@@ -63,7 +63,7 @@ This starts both the API (port 1337) and web app (port 5173). Both will automati
 
 ### Finding Something to Work On
 
-- **Browse [open issues](https://github.com/usekaneo/kaneo/issues)** - look for "good first issue" labels
+- **Browse the repository's open issues** - look for "good first issue" labels
 - **Check our [Discord](https://discord.gg/rU4tSyhXXU)** - we often discuss features and bugs there
 - **Found a bug?** Feel free to fix it and open a PR
 
@@ -117,7 +117,7 @@ We use [conventional commits](https://www.conventionalcommits.org/) to keep our 
 
 ### Localization (i18n)
 
-Kaneo uses [i18next](https://www.i18next.com/) with [react-i18next](https://react.i18next.com/) in the web app. We want user-facing copy to stay consistent, translatable, and easy to maintain.
+RelayOps uses [i18next](https://www.i18next.com/) with [react-i18next](https://react.i18next.com/) in the web app. We want user-facing copy to stay consistent, translatable, and easy to maintain.
 
 #### Approach
 
@@ -222,15 +222,15 @@ For more context, see [this blog article](https://roe.dev/blog/using-ai-in-open-
 ## Need Help?
 
 - **Discord**: Join our [Discord server](https://discord.gg/rU4tSyhXXU) for real-time help
-- **Issues**: Open a [GitHub issue](https://github.com/usekaneo/kaneo/issues) for bugs or feature requests
+- **Issues**: Open a GitHub issue in this repository for bugs or feature requests
 - **Discussions**: Use GitHub Discussions for questions about contributing
 
 ## Types of Contributions We Love
 
 - **Bug fixes** - Found something broken? Fix it!
 - **New features** - Have an idea? Let's discuss it first
-- **Documentation** - Help others understand how to use Kaneo
+- **Documentation** - Help others understand how to use RelayOps
 - **Performance improvements** - Make things faster
-- **Accessibility** - Help make Kaneo usable for everyone
+- **Accessibility** - Help make RelayOps usable for everyone
 
-Thanks for contributing to Kaneo! 🚀
+Thanks for contributing to RelayOps! 🚀

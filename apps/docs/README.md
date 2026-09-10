@@ -1,33 +1,30 @@
-# Kaneo Mintlify Docs
+# RelayOps documentation
 
-This directory contains Kaneo documentation powered by Mintlify.
+This directory contains the RelayOps product and API documentation powered by Mintlify.
+
+RelayOps is derived from the MIT-licensed Kaneo project and is not officially endorsed by Kaneo. Internal package names and compatibility identifiers may continue to use the upstream `kaneo` name.
 
 ## Monorepo setup
 
-- Repository: `kaneo`
+- Product: `RelayOps`
 - Docs root for Mintlify: `/apps/docs`
 - Main config: `apps/docs/docs.json`
 - OpenAPI source file: `apps/docs/openapi.json`
 
 ## Local preview
 
-1. Install Mintlify CLI:
+Use the repository's existing Docker workflow for local validation. The Mintlify CLI commands below remain an upstream-compatible option for documentation-only work:
 
 ```bash
 npm i -g mint
-```
-
-2. Run from this directory:
-
-```bash
 mint dev
 ```
 
-3. Open `http://localhost:3000`.
+Run the preview from this directory and open `http://localhost:3000`.
 
 ## Content structure
 
-- `index.mdx`: docs landing page
+- `index.mdx`: documentation landing page
 - `core/**`: product and deployment guides
-- `api-reference/**`: overview/auth pages
-- API endpoints are generated from the local OpenAPI file in `docs.json`
+- `api-reference/**`: overview and authentication pages
+- API endpoints are generated from the local OpenAPI file configured in `docs.json`

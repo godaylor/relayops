@@ -15,8 +15,8 @@ To configure a custom OAuth/OIDC provider, you need to set the following environ
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `CUSTOM_OAUTH_CLIENT_ID` | OAuth client ID from your provider | `2b1ae9df-8d25-4dbc-8cc8-f8f2c1ef6bd0` |
-| `CUSTOM_OAUTH_CLIENT_SECRET` | OAuth client secret from your provider | `NzDjplDsdQyP062wTmkZ8kyiaziBag0N` |
+| `CUSTOM_OAUTH_CLIENT_ID` | OAuth client ID from your provider | `example` |
+| `CUSTOM_OAUTH_CLIENT_SECRET` | OAuth client secret from your provider | `TODO` |
 | `CUSTOM_OAUTH_AUTHORIZATION_URL` | Authorization endpoint URL | `https://id.example.com/authorize` |
 | `CUSTOM_OAUTH_TOKEN_URL` | Token exchange endpoint URL | `https://id.example.com/api/oidc/token` |
 | `CUSTOM_OAUTH_USER_INFO_URL` | User info endpoint URL | `https://id.example.com/api/oidc/userinfo` |
@@ -82,8 +82,8 @@ docker compose up -d
 ### Pocket ID
 
 ```bash
-CUSTOM_OAUTH_CLIENT_ID=2b1ae9df-8d25-4dbc-8cc8-f8f2c1ef6bd0
-CUSTOM_OAUTH_CLIENT_SECRET=NzDjplDsdQyP062wTmkZ8kyiaziBag0N
+CUSTOM_OAUTH_CLIENT_ID=example
+CUSTOM_OAUTH_CLIENT_SECRET=TODO
 CUSTOM_OAUTH_AUTHORIZATION_URL=https://4c6332d2.demo.pocket-id.org/authorize
 CUSTOM_OAUTH_TOKEN_URL=https://4c6332d2.demo.pocket-id.org/api/oidc/token
 CUSTOM_OAUTH_USER_INFO_URL=https://4c6332d2.demo.pocket-id.org/api/oidc/userinfo

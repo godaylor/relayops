@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "next dev -p 3001",
-    "build": "next build",
-    "start": "next start",
+    "dev": "next dev -H 127.0.0.1 -p 32020",
+    "build": "next build && node ../../scripts/release/licenses.mjs site out/licenses",
+    "start": "next start -H 127.0.0.1 -p 32020",
     "lint": "biome check --write .",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "og:generate": "node scripts/generate-og.mjs"
