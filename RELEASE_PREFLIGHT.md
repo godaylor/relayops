@@ -4,11 +4,11 @@ Final local-demo and publication verification record, updated 2026-09-10 (Europe
 
 ## Publication preparation — 2026-09-10
 
-- Work now lives as eleven logical commits on `codex/relayops-publication-prep`, directly above unchanged baseline `8100f3b1`; no existing commit was rewritten. The branch is pushed to the public `main` branch of `godaylor/relayops`.
+- Work now lives in a sequence of logical publication commits on `codex/relayops-publication-prep`, directly above unchanged baseline `8100f3b1`; no existing commit was rewritten. The branch is pushed to the public `main` branch of `godaylor/relayops`.
 - Gitleaks 8.30.1 scanned the exact staged tree (13.03 MB) with zero leaks. Semgrep 1.175.1 scanned the preceding complete tree; all ERROR findings were fixed, with no broad secret allowlist. The publication delta contains source, UI, workflow, license, notice and documentation changes; local state and user data remain excluded.
 - GitHub Actions now includes pinned Gitleaks, CodeQL security-extended and dependency review jobs. External Actions are pinned to immutable commit SHAs; legacy upstream publishing/notification and over-privileged automation were removed.
 - GitHub is authenticated in the browser as `godaylor`; `gh` is unavailable. Public repository `godaylor/relayops` was created after explicit owner confirmation. `origin` remains the upstream Kaneo repository and must not be used for push.
-- Gitleaks re-scanned the resulting eleven-commit `8100f3b1..HEAD` history with zero leaks.
+- Gitleaks re-scanned the publication range `8100f3b1..HEAD` with zero leaks.
 - Manual AT review is explicitly deferred by the owner for this portfolio/demo. It remains a production-quality follow-up, not a blocker for the requested demo publication.
 
 ## Local audit fixes — 2026-09-09 follow-up
@@ -18,7 +18,7 @@ Mobile shell and OpenAPI/Helm guidance fixes are verified; see FINAL_AUDIT.md fo
 ## Scope and preserved state
 
 - Work is restricted to `E:\Projects\PetProjects\01-relayops`. Root rename is repaired, including stale Windows dependency junctions. Historical audit references and internal `@kaneo/*`, `KANEO_*`, `charts/kaneo` compatibility identifiers are intentional.
-- Branch `codex/relayops-publication-prep` contains eleven logical commits above original HEAD `8100f3b1ab47a0b49c7ac6deabe64eb0d1d9970d`. Pre-existing S0–S12 work is preserved. The branch is pushed to `publication/main`; no tag or PR was created.
+- Branch `codex/relayops-publication-prep` contains the logical publication commits above original HEAD `8100f3b1ab47a0b49c7ac6deabe64eb0d1d9970d`. Pre-existing S0–S12 work is preserved. The branch is pushed to `publication/main`; no tag or PR was created.
 - Origin is still `https://github.com/usekaneo/kaneo.git`, **not a RelayOps publication destination**. The authenticated GitHub owner is `godaylor`; `publication` points to `https://github.com/godaylor/relayops.git`. Repository variables `RELAYOPS_PUBLISH_ENABLED=true` and `RELAYOPS_RELEASE_APPROVED=true` are set, Pages source is GitHub Actions, and the free demo is live at `https://godaylor.github.io/relayops/`.
 - Main website: `http://127.0.0.1:32000`, same-origin `/api`, no required Redis/SMTP/S3/billing. PostgreSQL and uploads are not host-published.
 - Existing PostgreSQL 15 data remains on volume `68810d3d5bdc68cea5168c7bbf7d0ebe13d09dd36790e2f0983cd58dae9df1be`. Old container `relayops-codex-s3-postgres` stays stopped: never start a second PostgreSQL against the same volume. No database major upgrade or destructive conversion.
@@ -77,7 +77,7 @@ Logs are local under `.local/`; distributable inventories/reports under ignored 
 - Built `relayops-web:local`: `sha256:e14af4e9db3a87e363cfd9008133319f3f841c59cfa44e3dd52005814a9fdb4e`.
 - Trivy zero-finding scan IDs: bundled `sha256:558725da437c3391e3b1b73e1459c2ceff7d04d4338bcc56e4987040ccd27f31`; API `sha256:fc96beaf05d02942abc0e3e4d9d734027dcba716602d2d87c0e8137cd0ca4755`; web `sha256:a1776ad20a55d6d617835710c3a7a0416676e0df1264e60ba1ad083ec37c137e`. Later immutable-base/health/header configuration rebuilds changed image IDs. These reports are evidence for the scanned images, not certification of final digests. Refresh image-level SBOM/scans on the actual chosen publication artifacts before release.
 - First Redis-recovery E2E failed at keyboard selection with the menu still open. The test now navigates Home/ArrowDown and asserts focus before Enter and menu dismissal afterward; recovered two-node scenario passed without changing product behavior or loosening its budgets. Redis absence, outage and recovery are distinct recorded checks.
-- Independent local source scans were added during publication preparation: Gitleaks 8.30.1 reported zero leaks in the exact staged tree and all eleven commits; Semgrep 1.175.1 ERROR findings were fixed. GitHub-hosted Security run `34477531894` completed successfully; manual assistive-technology review is deferred by owner.
+- Independent local source scans were added during publication preparation: Gitleaks 8.30.1 reported zero leaks in the exact staged tree and the publication range; Semgrep 1.175.1 ERROR findings were fixed. GitHub-hosted Security run `34477531894` completed successfully; manual assistive-technology review is deferred by owner.
 - Source candidate: `node scripts/release/source-candidate.mjs` generates `artifacts/relayops-source-candidate.tar.gz` with a file-hash manifest from the current working tree. It excludes private local state, environment secrets, unused legacy marketing assets and the separate legacy Planka importer. It is not a commit, Git history export, or proof of a clean GitHub checkout. The archive is a review package; publication still needs the decisions below.
 
 ## External/manual production gates still open
