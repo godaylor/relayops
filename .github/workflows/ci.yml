@@ -116,6 +116,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        # release:check compares the root notices with the immutable baseline.
+        with:
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@f520eceda224fe1a4aed5a2a27a194379a409996 # v6
