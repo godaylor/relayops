@@ -4,7 +4,7 @@
 		"title": "One incident.\nOne shared picture.",
 		"intro": "Keep services, incoming signals and response decisions together. A durable timeline gives the next responder the context to continue.",
 		"open": "Open local RelayOps",
-		"local": "Local portfolio build. Public hosting has not been configured.",
+		"local": "Static portfolio demo is published on GitHub Pages. The live RelayOps runtime is not publicly hosted.",
 		"flow": "From observation to resolution",
 		"service": "Service",
 		"signal": "Signal",
