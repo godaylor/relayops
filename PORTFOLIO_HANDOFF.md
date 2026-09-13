@@ -47,13 +47,29 @@ Browser → typed Hono API → workspace authorization → PostgreSQL transactio
 
 ## Verification and production truth
 
+Free-hosting continuation (2026-09-13): added `render.yaml` with an explicit Free
+single-instance plan and `RELAYOPS_RESOURCE_PROFILE=free`, plus persistent generated
+secrets and Render origin discovery. API unit tests (460), all workspace tests,
+workspace typecheck/build (7 tasks each), Biome (no errors), Docker build, and all
+13 browser scenarios passed. Browser verification used a 512 MiB container with
+about 264 MiB observed memory, including two-session realtime and signal intake.
+The test containers were stopped by verified IDs. No other project was stopped.
+
+Render account inspection confirmed Hobby, no card, and $0 accrued. Supabase's
+free-project quota is full; no existing project was changed. The chosen isolated
+database option is Neon Free, but its GitHub sign-in timed out in the browser.
+No cloud RelayOps resources were created and no paid resource was authorized.
+The remaining action is account access, database provisioning, Render deployment,
+then anonymous/new-user acceptance on the assigned public URL. See
+[FREE_TIER_DEPLOY.md](docs/FREE_TIER_DEPLOY.md).
+
 Full workspace typecheck (7 tasks), unit tests (808 tests across 10 tasks), production builds (7 tasks), PostgreSQL integration (261 passed, 2 optional performance tests skipped), and 13 real-browser scenarios passed during this implementation. Biome has no errors and retains existing warnings/information. Locale key parity passes. The new browser test loses an already-committed create response and verifies retry uses the same idempotency key and yields one incident.
 
 Published implementation: `a4db45b9014463bcac7f8ad734357dfb67a641a6`. GitHub [CI](https://github.com/godaylor/relayops/actions/runs/34542873720), [Security including Dependency audit](https://github.com/godaylor/relayops/actions/runs/34542873775), and [Pages](https://github.com/godaylor/relayops/actions/runs/34542873772) all completed successfully. The local application on port 32000 now uses the verified image. The temporary verification app/database containers were stopped without deleting volumes or touching other projects.
 
 The updated full dependency audit has **zero high/critical**, with two moderate development-tool advisories still open. Source license inventory covers 1468 packages without unresolved metadata. Production Compose validates; the bundled Docker image builds. This does not substitute for a test on the actual public host.
 
-**Actually running in public production:** the static Pages information site only. No public auth, database, incident creation, storage or realtime endpoint is claimed. To finish, provide access to a Docker-capable server/Coolify and a hostname, deploy the prepared stack, configure backups, and verify the full journey over HTTPS/WSS. Manual screen-reader review remains a follow-up. Optional real mail/OAuth/integrations have not been verified.
+**Actually running in public production:** the static Pages information site only. No public auth, database, incident creation, storage or realtime endpoint is claimed. To finish, provision an isolated free PostgreSQL database and the prepared Render Free service, configure backups, and verify the full journey over HTTPS/WSS. Manual screen-reader review remains a follow-up. Optional real mail/OAuth/integrations have not been verified.
 
 ## Readiness assessment
 

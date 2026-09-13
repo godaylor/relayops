@@ -205,7 +205,7 @@ export function getDatabasePool(): Pool {
       // indefinitely and blocking every API request.
       connectionTimeoutMillis: 5_000,
       idleTimeoutMillis: 30_000,
-      max: 10,
+      max: process.env.RELAYOPS_RESOURCE_PROFILE === "free" ? 3 : 10,
     });
   }
 

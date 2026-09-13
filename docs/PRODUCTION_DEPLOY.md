@@ -1,5 +1,8 @@
 # Public RelayOps deployment
 
+For a no-cost hosted runtime, use [the Render + Neon deployment](FREE_TIER_DEPLOY.md).
+The Docker Compose setup below remains available for self-hosting.
+
 The application runs as one Node/Hono + React/Nginx container, PostgreSQL 16 and a Caddy HTTPS gateway. Redis, SMTP, S3, paid authentication and a background-job service are not required. The API runs its transactional outbox worker. Uploads and database records use separate persistent volumes. This deploys the working application, not the Pages site.
 
 ## Host

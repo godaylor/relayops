@@ -52,6 +52,7 @@ import relayops from "./relayops";
 import {
   startRelayOpsOutboxWorker,
   stopRelayOpsOutboxWorker,
+  wakeRelayOpsOutboxWorker,
 } from "./relayops/outbox-worker";
 import { relayOpsPresence } from "./relayops/presence";
 import { publicSignalWebhookRouter } from "./relayops/signals";
@@ -296,6 +297,13 @@ export function createApp() {
     c.header("X-Content-Type-Options", "nosniff");
     c.header("Referrer-Policy", "no-referrer");
     await next();
+    if (
+      (c.req.path.startsWith("/api/relayops/") ||
+        c.req.path.startsWith("/api/webhooks/")) &&
+      ["POST", "PUT", "PATCH", "DELETE"].includes(c.req.method)
+    ) {
+      wakeRelayOpsOutboxWorker();
+    }
   });
 
   const maxBodySize = boundedInteger(
@@ -1111,7 +1119,9 @@ export async function runStartupTasks() {
   await seedDefaultWorkspaceRoles();
 
   initializePlugins();
-  initializeScheduler();
+  // The free profile serves the RelayOps domain; legacy task/billing crons
+  // otherwise keep a scale-to-zero database awake even with no users.
+  if (process.env.RELAYOPS_RESOURCE_PROFILE !== "free") initializeScheduler();
   await initializeWebSocketAdapter();
   startRelayOpsOutboxWorker();
 }

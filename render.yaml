@@ -1,0 +1,32 @@
+# One bundled web/API instance. PostgreSQL is supplied separately on a free plan.
+services:
+  - type: web
+    name: relayops-godaylor
+    runtime: docker
+    plan: free
+    region: frankfurt
+    repo: https://github.com/godaylor/relayops
+    branch: main
+    dockerfilePath: ./Dockerfile.kaneo
+    dockerContext: .
+    healthCheckPath: /api/health
+    autoDeployTrigger: off
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: NOTIFICATION_SECRET_ENCRYPTION_KEY
+        generateValue: true
+      - key: RELAYOPS_WEBHOOK_ENCRYPTION_SEED
+        generateValue: true
+      - key: RELAYOPS_RESOURCE_PROFILE
+        value: free
+      - key: DISABLE_EMAIL_OTP_SIGN_IN
+        value: "true"
+      - key: HOST
+        value: 127.0.0.1
+      - key: PORT
+        value: "1337"
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=320

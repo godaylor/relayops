@@ -19,8 +19,11 @@ type ClaimedOutboxEvent = {
 };
 
 const POLL_INTERVAL_MS = 250;
-let timer: ReturnType<typeof setInterval> | undefined;
+let timer: ReturnType<typeof setTimeout> | undefined;
 let running = false;
+let started = false;
+let wakeRequested = false;
+let retryUntil = 0;
 const workerId = randomUUID();
 
 export async function processRelayOpsOutboxBatch(
@@ -70,6 +73,9 @@ export async function processRelayOpsOutboxBatch(
         where id = ${event.id} and claimed_by = ${workerId} and published_at is null
       `);
     } catch (error) {
+      // Keep checking through the longest retry delay; idle backoff must not
+      // postpone a scheduled retry on a scale-to-zero database.
+      retryUntil = Date.now() + 330_000;
       const message = redactOutboxError(error);
       const delayMs = calculateOutboxRetryDelayMs(event.attempts);
       await db.execute(sql`
@@ -87,20 +93,54 @@ export async function processRelayOpsOutboxBatch(
 }
 
 export function startRelayOpsOutboxWorker() {
-  if (timer) return;
-  timer = setInterval(() => {
-    if (running) return;
-    running = true;
-    void processRelayOpsOutboxBatch()
-      .catch((error) => console.error("RelayOps outbox worker failed:", error))
-      .finally(() => {
-        running = false;
-      });
-  }, POLL_INTERVAL_MS);
+  if (started) return;
+  started = true;
+  schedule(0);
+}
+
+function schedule(delayMs: number) {
+  if (!started) return;
+  if (timer) clearTimeout(timer);
+  timer = setTimeout(() => void tick(), delayMs);
   timer.unref();
 }
 
-export function stopRelayOpsOutboxWorker() {
-  if (timer) clearInterval(timer);
+async function tick() {
   timer = undefined;
+  if (!started || running) return;
+  running = true;
+  wakeRequested = false;
+  let processed = 0;
+  try {
+    processed = await processRelayOpsOutboxBatch();
+  } catch (error) {
+    retryUntil = Date.now() + 330_000;
+    console.error("RelayOps outbox worker failed:", redactOutboxError(error));
+  } finally {
+    running = false;
+    const idleDelay =
+      process.env.RELAYOPS_RESOURCE_PROFILE === "free"
+        ? Date.now() < retryUntil
+          ? 1_000
+          : 15 * 60_000
+        : POLL_INTERVAL_MS;
+    schedule(wakeRequested || processed > 0 ? POLL_INTERVAL_MS : idleDelay);
+  }
+}
+
+/** Called after HTTP mutations commit. PostgreSQL remains the durable queue. */
+export function wakeRelayOpsOutboxWorker() {
+  if (!started) return;
+  if (running) {
+    wakeRequested = true;
+    return;
+  }
+  schedule(0);
+}
+
+export function stopRelayOpsOutboxWorker() {
+  started = false;
+  if (timer) clearTimeout(timer);
+  timer = undefined;
+  wakeRequested = false;
 }

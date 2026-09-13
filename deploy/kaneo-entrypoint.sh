@@ -21,6 +21,16 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 # Derive KANEO_API_URL from KANEO_CLIENT_URL if not explicitly set
+if [ -z "${KANEO_CLIENT_URL:-}" ] && [ -n "${RENDER_EXTERNAL_URL:-}" ]; then
+  export KANEO_CLIENT_URL="$RENDER_EXTERNAL_URL"
+fi
+
+# Render persists generated environment values across deploys. Derive the
+# required 32-byte webhook key from its independent generated secret.
+if [ -z "${RELAYOPS_WEBHOOK_ENCRYPTION_KEY:-}" ] && [ -n "${RELAYOPS_WEBHOOK_ENCRYPTION_SEED:-}" ]; then
+  export RELAYOPS_WEBHOOK_ENCRYPTION_KEY="$(node -e 'process.stdout.write("hex:" + require("node:crypto").createHash("sha256").update(process.env.RELAYOPS_WEBHOOK_ENCRYPTION_SEED).digest("hex"))')"
+fi
+
 client_url_trimmed="$(printf '%s' "${KANEO_CLIENT_URL:-}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
 client_url="${client_url_trimmed%/}"
 if [ -z "${KANEO_API_URL:-}" ] && [ -n "$client_url" ]; then

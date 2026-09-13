@@ -36,7 +36,7 @@ React, TypeScript, Vite, Tailwind CSS, Base UI/coss и сохранённые Ra
 
 ## Рабочее приложение в интернете
 
-Подготовлена [инструкция публичного развёртывания](docs/PRODUCTION_DEPLOY.md) с `compose.production.yml`: HTTPS gateway, приложение и PostgreSQL, постоянные uploads и генерация секретов без их вывода. Публичный runtime пока не развёрнут; Pages URL ниже — только информационная страница. Локальные browser tests не являются проверкой production.
+Для бесплатного runtime подготовлены [Render + Neon](docs/FREE_TIER_DEPLOY.md), `render.yaml` и профиль экономии ресурсов с рабочими API и WebSocket. [Docker Compose с HTTPS](docs/PRODUCTION_DEPLOY.md) остаётся вариантом самостоятельного размещения. Публичный runtime пока не развёрнут: требуется вход в отдельную PostgreSQL-платформу, поскольку бесплатная квота Supabase уже занята. Pages URL ниже — только информационная страница. Локальные browser tests не являются проверкой production.
 
 ## Запуск для разработки
 
