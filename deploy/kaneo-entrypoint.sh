@@ -64,7 +64,9 @@ fi
 
 /docker-entrypoint.d/env.sh
 
-node --enable-source-maps /app/apps/api/dist/index.js &
+# Nginx exposes the public port; its upstream and readiness probe use 1337.
+# Hosts such as Render use PORT to discover the public listener, not this API.
+PORT=1337 node --enable-source-maps /app/apps/api/dist/index.js &
 api_pid=$!
 
 echo "Waiting for API to be ready..."

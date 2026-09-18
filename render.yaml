@@ -27,6 +27,6 @@ services:
       - key: HOST
         value: 127.0.0.1
       - key: PORT
-        value: "1337"
+        value: "5173"
       - key: NODE_OPTIONS
         value: --max-old-space-size=320

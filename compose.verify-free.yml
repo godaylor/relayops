@@ -7,6 +7,7 @@ services:
       RELAYOPS_RESOURCE_PROFILE: free
       NODE_OPTIONS: --max-old-space-size=320
       HOST: 127.0.0.1
+      PORT: "5173"
       KANEO_CLIENT_URL: ""
       RENDER_EXTERNAL_URL: http://127.0.0.1:${RELAYOPS_TEST_WEB_PORT:-32041}
       RELAYOPS_WEBHOOK_ENCRYPTION_KEY: ""
