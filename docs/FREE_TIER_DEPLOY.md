@@ -57,7 +57,7 @@ Pricing and limitations: [Render Free](https://render.com/docs/free),
 [Neon pricing](https://neon.com/pricing),
 [Render Blueprint reference](https://render.com/docs/blueprint-spec).
 
-Deployment status: configuration prepared; public runtime acceptance pending.
+Deployment status: live on Render Free + Neon Free. Public incident workflow passed on 2026-09-20; see [verification](PUBLIC_RELEASE_VERIFICATION.md).
 
 ## Local verification
 

@@ -1,6 +1,6 @@
 # RelayOps — portfolio handoff
 
-Updated 2026-09-11. **Working application verified locally; public runtime deployment is pending.** Do not present the Pages site as a live application.
+Updated 2026-09-20. **Public runtime live on Render Free + Neon Free; core incident workflow verified over HTTPS.**
 
 ## Product
 
@@ -40,7 +40,7 @@ Browser → typed Hono API → workspace authorization → PostgreSQL transactio
 ## Links and images
 
 - GitHub: https://github.com/godaylor/relayops
-- Live application: **not deployed**.
+- Live application: https://relayops-godaylor.onrender.com
 - Public information page only: https://godaylor.github.io/relayops/
 - Deployment: [PRODUCTION_DEPLOY.md](docs/PRODUCTION_DEPLOY.md).
 - Screenshots: `docs/screenshots/create-incident.png`, `docs/screenshots/incident-room.png`. These show local verification data, not production traffic.
@@ -55,13 +55,7 @@ workspace typecheck/build (7 tasks each), Biome (no errors), Docker build, and a
 about 264 MiB observed memory, including two-session realtime and signal intake.
 The test containers were stopped by verified IDs. No other project was stopped.
 
-Render account inspection confirmed Hobby, no card, and $0 accrued. Supabase's
-free-project quota is full; no existing project was changed. The chosen isolated
-database option is Neon Free, but its GitHub sign-in timed out in the browser.
-No cloud RelayOps resources were created and no paid resource was authorized.
-The remaining action is account access, database provisioning, Render deployment,
-then anonymous/new-user acceptance on the assigned public URL. See
-[FREE_TIER_DEPLOY.md](docs/FREE_TIER_DEPLOY.md).
+Render Free and Neon Free are provisioned. All 51 migrations completed. Public creation, timeline, board/actions, completion, reload persistence and analytics passed. See [public verification](docs/PUBLIC_RELEASE_VERIFICATION.md). No paid resources were created.
 
 Full workspace typecheck (7 tasks), unit tests (808 tests across 10 tasks), production builds (7 tasks), PostgreSQL integration (261 passed, 2 optional performance tests skipped), and 13 real-browser scenarios passed during this implementation. Biome has no errors and retains existing warnings/information. Locale key parity passes. The new browser test loses an already-committed create response and verifies retry uses the same idempotency key and yields one incident.
 
@@ -69,21 +63,4 @@ Published implementation: `a4db45b9014463bcac7f8ad734357dfb67a641a6`. GitHub [CI
 
 The updated full dependency audit has **zero high/critical**, with two moderate development-tool advisories still open. Source license inventory covers 1468 packages without unresolved metadata. Production Compose validates; the bundled Docker image builds. This does not substitute for a test on the actual public host.
 
-**Actually running in public production:** the static Pages information site only. No public auth, database, incident creation, storage or realtime endpoint is claimed. To finish, provision an isolated free PostgreSQL database and the prepared Render Free service, configure backups, and verify the full journey over HTTPS/WSS. Manual screen-reader review remains a follow-up. Optional real mail/OAuth/integrations have not been verified.
-
-## Readiness assessment
-
-Percentages are engineering estimates, not test coverage. Overall is the unweighted average.
-
-| Category | Readiness | Finished / verified | Remaining |
-|---|---:|---|---|
-| Concept and purpose | 95% | Clear incident-operations domain and end-to-end workflow | Feedback from real users |
-| UX/UI | 85% | Real incident form, simpler onboarding, RU/EN and responsive/keyboard browser checks | Manual assistive-technology review, further copy refinement |
-| Core functionality | 90% | Service → incident → response/timeline → analytics; signals, roles and persistence checked | Longer real-use validation and optional integration checks |
-| Testing/security/quality | 85% | Typecheck, unit/integration/browser tests, build, lint and high/critical dependency fixes; GitHub CI/Security green | Two moderate tool advisories and deployment security checks |
-| Backend/database/auth | 90% | PostgreSQL, Better Auth, API authority, transactional history/outbox and uploads | Production backup/restore and operational configuration |
-| Public production deploy | 10% | Deployable image and validated HTTPS/persistent Compose | Provision host and verify the actual public runtime |
-| GitHub/docs/licensing | 85% | Personal origin/main corrected, About/topics, README, notices, inventory and hosted verification | Production URL and deployment-specific notices |
-| Personal Portfolio №09 handoff | 70% | This handoff, actual stack/contribution and screenshots | Working public URL and production evidence |
-
-**Overall: 76.25%.** The missing public runtime is a blocking gap regardless of the average.
+**Actually running in public production:** RelayOps API/web on Render Free and PostgreSQL on Neon Free. Free services sleep and have shared quotas. Manual screen-reader review and optional integrations remain follow-ups.

@@ -36,7 +36,9 @@ React, TypeScript, Vite, Tailwind CSS, Base UI/coss и сохранённые Ra
 
 ## Рабочее приложение в интернете
 
-Для бесплатного runtime подготовлены [Render + Neon](docs/FREE_TIER_DEPLOY.md), `render.yaml` и профиль экономии ресурсов с рабочими API и WebSocket. [Docker Compose с HTTPS](docs/PRODUCTION_DEPLOY.md) остаётся вариантом самостоятельного размещения. Публичный runtime пока не развёрнут: требуется вход в отдельную PostgreSQL-платформу, поскольку бесплатная квота Supabase уже занята. Pages URL ниже — только информационная страница. Локальные browser tests не являются проверкой production.
+Рабочее приложение: **[relayops-godaylor.onrender.com](https://relayops-godaylor.onrender.com)**.
+
+Render Free + Neon Free, Frankfurt. Публичный сценарий создания инцидента, timeline, действий доски, завершения и аналитики проверен 20 сентября 2026 года. Состояние сохраняется после перезагрузки. [Результаты проверки](docs/PUBLIC_RELEASE_VERIFICATION.md). После простоя возможен холодный старт. Платные ресурсы не создавались.
 
 ## Запуск для разработки
 

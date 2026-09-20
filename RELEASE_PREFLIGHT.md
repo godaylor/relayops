@@ -1,3 +1,5 @@
+> Current runtime status (2026-09-20): Render Free + Neon Free are live; public creation → timeline → board/actions → resolution → analytics passed. See [verification](docs/PUBLIC_RELEASE_VERIFICATION.md). Earlier deployment blockers below are historical.
+
 # RelayOps — release candidate preflight
 
 ## Working-product continuation — 2026-09-11
