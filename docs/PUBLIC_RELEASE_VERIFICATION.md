@@ -69,3 +69,16 @@ Additional engine result: WebKit passed both V3 scenarios, including the width m
 Validation commands: Docker same-origin build succeeded; web TypeScript and locale parity passed. The 15 Chrome browser scenarios all passed (13 in the full run, the remaining two after updating their old copy expectations). The WebKit V3 pair passed. Targeted Biome checks passed with existing warnings; the commit hook performs the repository-wide Biome check.
 
 Final web unit run: **220 tests passed in 60 files**, one worker.
+
+### V3 public deployment evidence
+
+- [PR #18](https://github.com/godaylor/relayops/pull/18) merged after all CI and Security checks succeeded. Source change: `334a027f768a9682e62951a6b416f2ced43e7fab`; deployed merge commit: `be76e8a2a2f20a9b67cdaa77273bc5b9bdcf6001`.
+- Render deploy `dep-dastmifpn0mc73a125p0` on existing service `srv-damos14ri2ms73b91ij0` reported **Deploy succeeded | Live**, duration **2m35s**, on 2026-09-28. The dashboard explicitly shows the deployed source above. Free plan, hostname, database and environment secrets were unchanged. No migration files changed from the previously deployed source.
+- Public cold-open measurement before deploy at 03:08 UTC: a Render wake page was actually observed; **26.167 s** until the login form and **0.960 s** for a reload. These are one observed cold/repeat pair, not a guaranteed latency or a measurement of frontend rendering alone.
+- The temporary local verification containers were stopped by their exact project-scoped Compose name. No neighboring process, port, database, Docker resource or browser tab was modified.
+
+Public V3 acceptance passed on the new HTTPS deployment in 34.4 seconds using a fresh non-admin account and an isolated training workspace: service creation → incident creation → assign coordinator → saved timeline update → board menu into triage → written resolution → refresh confirms summary and exactly one update → analytics service ranking → RU guide → skip → sign-out returns to login. No HTTP errors were observed during the successful pass.
+
+Acceptance incident: `xr3rijtiwocyiam4ue5g70fs`, workspace `fUsLSTDcjWIP0UNZofdLPqqzjfbRxQsJ`. Three clearly named `Release verification V3 …` workspaces remain from public verification attempts, each with synthetic data; the owner's existing workspace was not used or modified. The first attempt already showed one completed incident in analytics but used an incorrect test locator for the ranking list; the second encountered a loading screen beyond the local 5-second assertion limit. The final public pass allowed 30 seconds for hosted UI readiness and passed all assertions. This is a free-runtime latency observation, not a claim of instant loading. [Public analytics screen](screenshots/v3-public-analytics.png) was visually inspected.
+
+Publication is confirmed at [the existing live URL](https://relayops-godaylor.onrender.com). This report update changes documentation/screenshots only; the runtime remains the verified `be76e8a2` source. No owner action is required for the completed deployment. Remaining unverified environment checks are Firefox UI, native Safari/physical-device zoom and mail delivery; they are not represented as passed.
