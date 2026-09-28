@@ -10,7 +10,7 @@ async function openDemoIncident(page: import("@playwright/test").Page) {
   await page.getByLabel("Workspace Name").fill(`RelayOps ${suffix}`);
   await page.getByRole("button", { name: "Create RelayOps workspace" }).click();
   await page.getByLabel("Service name").fill("Checkout API");
-  await page.getByLabel("Service slug").fill(`checkout-${suffix}`);
+  await page.getByLabel("Service identifier").fill(`checkout-${suffix}`);
   await page.getByRole("button", { name: "Create first service" }).click();
   await page.getByRole("button", { name: "Create demo incident" }).click();
   await expect(page).toHaveURL(/\/relayops\/[^/]+\/incidents\/[^/?]+/);
@@ -32,10 +32,10 @@ test("Incident Room preserves and reapplies a stale durable update draft", async
     page.getByText("Degraded service", { exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Operational state" }),
+    page.getByRole("heading", { name: "Response timing" }),
   ).toBeVisible();
   await expect(
-    page.getByText("incident.created", { exact: true }),
+    page.getByText("Problem recorded", { exact: true }),
   ).toBeVisible();
 
   const currentResponse = await request.get(
@@ -90,7 +90,7 @@ test("Incident Room preserves and reapplies a stale durable update draft", async
     },
   );
 
-  const draft = page.getByLabel("Durable incident update");
+  const draft = page.getByLabel("Progress update");
   await draft.fill("Failover is in progress; customer errors are falling.");
   await page.getByRole("button", { name: "Publish update" }).click();
   await expect(

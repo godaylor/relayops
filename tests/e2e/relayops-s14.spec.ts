@@ -29,7 +29,7 @@ test("S14 clean RU onboarding, localized filters and persistent EN/RU switching"
       .getByRole("button", { name: "Создать рабочее пространство RelayOps" })
       .click();
     await page.getByLabel("Название сервиса").fill("Платёжный API");
-    await page.getByLabel("Идентификатор сервиса").fill(suffix);
+    await page.getByLabel("Короткий идентификатор").fill(suffix);
     await page.getByRole("button", { name: "Создать первый сервис" }).click();
     await page.getByRole("button", { name: "Создать демоинцидент" }).click();
     await expect(page).toHaveURL(/\/relayops\/[^/]+\/incidents\/[^/?]+/);
@@ -37,7 +37,7 @@ test("S14 clean RU onboarding, localized filters and persistent EN/RU switching"
     expect(workspace).toBeTruthy();
     await page.goto(`/relayops/${workspace}/incidents`);
     await expect(
-      page.getByRole("option", { name: "Обнаружен (1)", exact: true }),
+      page.getByRole("option", { name: "Сообщён (1)", exact: true }),
     ).toBeAttached();
     await expect(
       page.getByRole("option", { name: "detected (1)", exact: true }),
@@ -55,7 +55,7 @@ test("S14 clean RU onboarding, localized filters and persistent EN/RU switching"
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("lang", "ru-RU");
     await expect(
-      page.getByRole("option", { name: "Обнаружен (1)", exact: true }),
+      page.getByRole("option", { name: "Сообщён (1)", exact: true }),
     ).toBeAttached();
     expect(errors).toEqual([]);
   } finally {

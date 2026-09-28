@@ -46,3 +46,26 @@ no availability SLA. See [FREE_TIER_DEPLOY.md](FREE_TIER_DEPLOY.md).
 Production credentials are environment secrets in the RelayOps Render service.
 No secret value is included in source or this report. The temporary ignored local
 connection handoff file was removed after the explicitly authorized transfer.
+
+## V3 newcomer and collaboration pass — 2026-09-28
+
+This pass keeps the existing API, PostgreSQL schema, authorization and Free Render/Neon target. It adds RU/EN explanations and a non-mutating payment-failure example before login, visible account/workspace/role context, links to existing invitations, explicit sign-out, a restartable six-step guide, and assignment of an existing member as response coordinator. The guide is in document flow, supports Escape and focus return, and handles unavailable targets without changing data. Plain progress/status/analytics copy replaces implementation-oriented explanations.
+
+Local verification uses only the isolated `relayops-v3-20260928` Compose project and temporary PostgreSQL storage, using the repository's existing verification ports 32040/32041 after checking availability. No production database is used for tests. No neighboring resources were changed.
+
+- Chrome: newcomer registration → own workspace → service → incident → coordinator → progress update with network loss/recovery → resolved summary → refresh → analytics → sign-out passed.
+- Separate sessions: invited viewer can read its workspace but cannot mutate; an independently registered outsider and anonymous guest cannot read another workspace; the new account and guest do not become instance admins; sign-out yields 401 and protected navigation returns to login.
+- The existing browser suites also cover keyboard board transitions, two-user realtime/conflicts, lost-response retry without duplicate incident creation, RU/EN persistence, empty states and reduced motion.
+- Long unbroken incident titles now wrap rather than expanding the Overview. Entry and four main routes passed shell-overflow checks at 320, 360, 390, 430, 639, 640, 767, 768, 1023, 1024, 1280, 1440, 1920, 2560, 3840, 5120 and 7680 CSS pixels. Large widths are emulation, not physical-device tests.
+- A rapid next action during an offline update exposed a version conflict. Status actions now wait for the pending update, and publishing waits for a pending transition. The browser scenario and a focused regression test cover this boundary; backend conflict enforcement remains intact.
+- Screenshots inspected: [entry on mobile](screenshots/v3-entry-mobile.png), [long incident title](screenshots/v3-incident-desktop.png), [saved result in analytics](screenshots/v3-analytics-desktop.png). These are local, synthetic training data.
+
+Performance observations before publication: a warm public root request took 192 ms and a subsequent health request 74 ms. Existing Render startup logs showed about 44 seconds from the startup wrapper to API readiness. This is not a measured end-to-end visitor cold start. Render itself warns of 50 seconds or more after inactivity; the app now explains this before login. No keepalive, tier change or new hosting service was introduced.
+
+Limitations: native iPhone Safari, physical 4K/8K screens, screen-reader review and a study with actual novice users are not claimed. Existing text-zoom checks are not native browser zoom. Email delivery/password recovery cannot be claimed without a configured mail provider. The earlier public owner acceptance above remains historical evidence, not a substitute for verifying this deployment.
+
+Additional engine result: WebKit passed both V3 scenarios, including the width matrix. Firefox could run the independent-account API checks but its Playwright 1.55.1 driver failed during page creation (`_page` undefined), before application navigation; the Firefox UI pass is therefore not verified. Browsers were installed only in this project's ignored `.local` directory.
+
+Validation commands: Docker same-origin build succeeded; web TypeScript and locale parity passed. The 15 Chrome browser scenarios all passed (13 in the full run, the remaining two after updating their old copy expectations). The WebKit V3 pair passed. Targeted Biome checks passed with existing warnings; the commit hook performs the repository-wide Biome check.
+
+Final web unit run: **220 tests passed in 60 files**, one worker.

@@ -36,7 +36,7 @@ async function onboardWorkspace(page: Page) {
   await page.getByLabel("Workspace Name").fill(`RelayOps ${suffix}`);
   await page.getByRole("button", { name: "Create RelayOps workspace" }).click();
   await page.getByLabel("Service name").fill("Checkout API");
-  await page.getByLabel("Service slug").fill(`checkout-${suffix}`);
+  await page.getByLabel("Service identifier").fill(`checkout-${suffix}`);
   await page.getByRole("button", { name: "Create first service" }).click();
   await page.getByRole("button", { name: "Create demo incident" }).click();
   await expect(page).toHaveURL(/\/relayops\/[^/]+\/incidents\/[^/?]+/);
@@ -76,7 +76,7 @@ test("S9 analytics reconciles a second-browser resolution and cross-filters into
   await page.goto(analyticsUrl);
   await expect(
     page.getByRole("heading", {
-      name: "Reliability, measured from durable incident facts",
+      name: "How quickly the team handles problems",
     }),
   ).toBeVisible();
   await expect(page.getByRole("table")).toBeVisible();
@@ -85,7 +85,7 @@ test("S9 analytics reconciles a second-browser resolution and cross-filters into
   ).toBeVisible();
   await expect(
     page.getByText(
-      "acknowledged_at - detected_at; missing or negative durations excluded",
+      "Response time runs from reporting to acknowledgement. Resolution time runs from reporting to a saved solution. Recovery time ends when monitoring starts. The median is the middle result; 90% of measured results are at or below the p90 value. Missing timestamps are excluded, not treated as zero.",
     ),
   ).toBeAttached();
 

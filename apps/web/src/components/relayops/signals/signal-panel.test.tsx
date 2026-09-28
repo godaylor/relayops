@@ -17,7 +17,7 @@ afterEach(() => {
 });
 
 const labels: SignalPanelLabels = {
-  title: "Signals",
+  title: "Observations",
   description: "Normalize observations before incident response.",
   intakeEyebrow: "Intake / triage",
   manualHeading: "Add an observation",

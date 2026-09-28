@@ -14,7 +14,7 @@ async function createRelayOpsWorkspace(
   await page.getByRole("button", { name: "Create RelayOps workspace" }).click();
   await expect(page).toHaveURL(/\/relayops\/[^/?]+/);
   await expect(
-    page.getByRole("heading", { name: "Bring your first service online" }),
+    page.getByRole("heading", { name: "Add your first service" }),
   ).toBeVisible();
   return suffix;
 }
@@ -40,9 +40,9 @@ test("clean onboarding opens Incident Room and removes only marked demo data", a
 
   await page.getByLabel("Service name").fill(serviceName);
   await page
-    .getByLabel("Service slug")
+    .getByLabel("Service identifier")
     .fill(`payments-${Date.now().toString(36)}`);
-  await page.getByLabel("Tier").selectOption("critical");
+  await page.getByLabel("Importance").selectOption("critical");
   await page.getByLabel("Health").selectOption("degraded");
   await page.getByRole("button", { name: "Create first service" }).click();
   await expect(
@@ -53,16 +53,16 @@ test("clean onboarding opens Incident Room and removes only marked demo data", a
   await expect(page).toHaveURL(/\/relayops\/[^/]+\/incidents\/[^/?]+/);
   await expect(page.getByText("DEMO", { exact: true })).toBeVisible();
   await expect(
-    page.getByText("incident.created", { exact: true }),
+    page.getByText("Problem recorded", { exact: true }),
   ).toBeVisible();
   await page.getByLabel("Acknowledge the incident context").check();
   await page.getByLabel("Open the service runbook").check();
-  await page.getByLabel("Review the durable timeline").check();
+  await page.getByLabel("Review the saved history").check();
   await expect(page.getByText("Training checklist complete")).toBeVisible();
 
   await page.getByRole("link", { name: "Back to Operations" }).click();
   await expect(
-    page.getByRole("heading", { name: "Current operational state" }),
+    page.getByRole("heading", { name: "What needs attention" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Remove demo data" }).click();
   await page.getByRole("button", { name: "Remove marked data" }).click();
@@ -95,18 +95,18 @@ test("guided onboarding can skip demo without a second empty state", async ({
   await expect(
     page.getByRole("heading", { name: "No services yet" }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "Operations", exact: true }).click();
+  await page.getByRole("link", { name: "Overview", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Bring your first service online" }),
+    page.getByRole("heading", { name: "Add your first service" }),
   ).toBeVisible();
   await page.getByLabel("Service name").fill("Catalog API");
   await page
-    .getByLabel("Service slug")
+    .getByLabel("Service identifier")
     .fill(`catalog-${Date.now().toString(36)}`);
   await page.getByRole("button", { name: "Create first service" }).click();
   await page.getByRole("button", { name: "Skip and open Overview" }).click();
   await expect(
-    page.getByRole("heading", { name: "Current operational state" }),
+    page.getByRole("heading", { name: "What needs attention" }),
   ).toBeVisible();
   await expect(
     page

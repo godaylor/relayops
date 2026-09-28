@@ -2481,7 +2481,8 @@
 			"reapply": "Reapply draft",
 			"discard": "Discard draft",
 			"failedTitle": "Command failed",
-			"failed": "The incident command could not be completed."
+			"failed": "The incident command could not be completed.",
+			"saved": "Saved"
 		},
 		"lifecycle": {
 			"detected": "Detected",
@@ -2589,7 +2590,9 @@
 			"title": "Reliability, measured from durable incident facts",
 			"to": "To",
 			"volume": "Incident volume",
-			"volumeTrend": "Detected incident volume"
+			"volumeTrend": "Detected incident volume",
+			"explanation": "How to read these numbers",
+			"explanationBody": "Response time runs from reporting to acknowledgement. Resolution time runs from reporting to a saved solution. Recovery time ends when monitoring starts. The median is the middle result; 90% of measured results are at or below the p90 value. Missing timestamps are excluded, not treated as zero."
 		},
 		"workbench": {
 			"applyFilters": "Apply filters",
@@ -2680,6 +2683,66 @@
 			"openIncident": "Open {{key}}: {{title}}, {{severity}}, {{status}}, elapsed {{elapsed}}",
 			"retry": "Retry clock rail",
 			"title": "Live incident clock rail"
+		},
+		"account": {
+			"error": "Could not sign out. Check your connection and retry.",
+			"members": "Members and invitations",
+			"role": "Role: {{role}}",
+			"rolesBody": "The owner manages the workspace. Administrators manage members and settings. A response coordinator can assign people and finish incidents. Responders record progress and change work status. Viewers read without editing. Custom roles may differ; the server checks every action.",
+			"rolesTitle": "What roles allow",
+			"signedIn": "Signed in: {{name}}",
+			"signOut": "Sign out",
+			"switch": "Choose workspace",
+			"workspace": "Workspace: {{name}}"
+		},
+		"assignment": {
+			"clear": "No coordinator",
+			"error": "Could not load members. Try again.",
+			"label": "Response coordinator",
+			"loading": "Loading workspace members…",
+			"save": "Save coordinator"
+		},
+		"guide": {
+			"analytics": "6. Review the results",
+			"analyticsBody": "Open Analytics to see counts and response times. A median is the middle result; missing timestamps are not counted as zero.",
+			"back": "Back",
+			"board": "4. Change the work status",
+			"boardBody": "On the response board, open the card menu and choose an available status. Teammates see saved changes.",
+			"create": "2. Record a problem",
+			"createBody": "Create incident opens a new record. For example: payment fails. This is separate from changing the status of an existing problem.",
+			"finish": "Finish",
+			"finishIssue": "5. Save the solution",
+			"finishIssueBody": "In the incident room, describe the solution, then choose Resolved. The history stays available after completion.",
+			"history": "3. Coordinate and record progress",
+			"historyBody": "Open a problem from Issues. In its room, choose a coordinator if your role allows it, then write what was checked in Progress update.",
+			"missing": "This control is not on this page or your role does not allow it. Open the relevant page, or continue to the next step.",
+			"next": "Next",
+			"open": "How to use",
+			"safety": "The guide does not change your records. For practice, create a separate workspace and use a marked demo incident; its history is saved until you remove demo data.",
+			"services": "1. Choose a service",
+			"servicesBody": "Open Services and add the website or system your team maintains.",
+			"show": "Show this control",
+			"skip": "Skip",
+			"step": "Step {{current}} of {{total}}",
+			"title": "A problem, from report to solution"
+		},
+		"intro": {
+			"access": "Use your own account for saved team work. A workspace separates one team’s records from another. Ask its owner for an invitation to join an existing team.",
+			"cold": "On free hosting, the first visit after inactivity may take about a minute, sometimes longer. Render may show its own wake-up page before this app opens.",
+			"description": "Record the problem, assign the response and keep a history of the fix. A service problem is called an incident here.",
+			"example": "Training example: payment fails in an online store",
+			"exampleBody": "Choose Checkout → record the failure → assign a coordinator → write what you checked → record the solution → review recovery time. This example does not create any records.",
+			"title": "Teamwork on website and IT service outages"
+		},
+		"role": {
+			"admin": "Administrator",
+			"incident_commander": "Response coordinator",
+			"member": "Member",
+			"owner": "Owner",
+			"responder": "Responder",
+			"service_owner": "Service owner",
+			"viewer": "Viewer",
+			"workspace_admin": "Workspace administrator"
 		}
 	},
 	"billing": {

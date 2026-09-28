@@ -122,3 +122,7 @@ describe("VerifyOtp", () => {
     );
   });
 });
+
+vi.mock("@/components/relayops/language-switcher", () => ({
+  RelayOpsLanguageSwitcher: () => null,
+}));

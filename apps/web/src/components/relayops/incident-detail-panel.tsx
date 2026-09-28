@@ -46,22 +46,16 @@ const eventKeys = {
 } as const;
 
 function TimelineSummary({
-  type,
   payload,
 }: {
   type: string;
   payload: Record<string, unknown>;
 }) {
-  const { t } = useTranslation();
   const message = typeof payload.message === "string" ? payload.message : null;
   const reason = typeof payload.reason === "string" ? payload.reason : null;
-  const key = eventKeys[type as keyof typeof eventKeys];
 
   return (
     <>
-      <p className="mt-2 text-muted-foreground text-sm">
-        {key ? t(key) : t("relayops:timeline.fallback")}
-      </p>
       {message || reason ? (
         <p className="mt-2 whitespace-pre-wrap text-sm">{message ?? reason}</p>
       ) : null}
@@ -171,7 +165,7 @@ export function IncidentDetailPanel({
   );
 
   return (
-    <section className="rounded-xl border border-[#17211f]/10 bg-white dark:border-white/10 dark:bg-[#101a18]">
+    <section className="min-w-0 [overflow-wrap:anywhere] rounded-xl border border-[#17211f]/10 bg-white dark:border-white/10 dark:bg-[#101a18]">
       <div className="border-b p-5 sm:p-7">
         <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
           <div>
@@ -248,7 +242,12 @@ export function IncidentDetailPanel({
               >
                 <span className="absolute top-5 -left-[2.08rem] size-3 rounded-full border-2 border-white bg-[#245ebe] dark:border-[#101a18]" />
                 <div className="flex flex-wrap justify-between gap-2">
-                  <strong className="font-mono text-sm">{event.type}</strong>
+                  <strong className="font-mono text-sm">
+                    {t(
+                      eventKeys[event.type as keyof typeof eventKeys] ??
+                        "relayops:timeline.fallback",
+                    )}
+                  </strong>
                   <time
                     dateTime={new Date(event.occurredAt).toISOString()}
                     className="text-muted-foreground text-xs"

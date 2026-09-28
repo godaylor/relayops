@@ -53,7 +53,7 @@ describe("IncidentWorkbench inspector", () => {
   it("localizes enum facets and groups without changing canonical URL values", () => {
     const labels = {
       ...workbenchLabels,
-      statusById: { ...workbenchLabels.statusById, detected: "Обнаружен" },
+      statusById: { ...workbenchLabels.statusById, detected: "Сообщён" },
     };
     render(
       <IncidentWorkbench
@@ -73,10 +73,10 @@ describe("IncidentWorkbench inspector", () => {
         onSelectIncident={vi.fn()}
       />,
     );
-    expect(screen.getByRole("option", { name: "Обнаружен (1)" })).toHaveValue(
+    expect(screen.getByRole("option", { name: "Сообщён (1)" })).toHaveValue(
       "detected",
     );
-    expect(screen.getByText("Обнаружен · 1")).toBeInTheDocument();
+    expect(screen.getByText("Сообщён · 1")).toBeInTheDocument();
   });
   it("opens from keyboard, focuses detail, and restores the originating row", async () => {
     const onSelectIncident = vi.fn();

@@ -91,3 +91,7 @@ describe("AcceptInvitation", () => {
     });
   });
 });
+
+vi.mock("@/components/relayops/language-switcher", () => ({
+  RelayOpsLanguageSwitcher: () => null,
+}));

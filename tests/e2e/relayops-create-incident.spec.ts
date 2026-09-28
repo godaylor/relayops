@@ -13,7 +13,7 @@ test("Create an ordinary incident and retry a lost response without duplicates",
   await page.getByLabel("Workspace Name").fill(suffix);
   await page.getByRole("button", { name: "Create RelayOps workspace" }).click();
   await page.getByLabel("Service name").fill("Payments API");
-  await page.getByLabel("Service slug").fill(suffix);
+  await page.getByLabel("Service identifier").fill(suffix);
   await page.getByRole("button", { name: "Create first service" }).click();
   await page
     .locator("#relayops-main")
@@ -58,7 +58,7 @@ test("Create an ordinary incident and retry a lost response without duplicates",
       name: "Payment authorizations are timing out",
     }),
   ).toBeVisible();
-  await expect(page.getByText("incident.created", { exact: true })).toHaveCount(
+  await expect(page.getByText("Problem recorded", { exact: true })).toHaveCount(
     1,
   );
   await page.screenshot({

@@ -12,7 +12,7 @@ async function openDemoIncident(page: Page) {
   await page.getByLabel("Workspace Name").fill(`RelayOps ${suffix}`);
   await page.getByRole("button", { name: "Create RelayOps workspace" }).click();
   await page.getByLabel("Service name").fill("Checkout API");
-  await page.getByLabel("Service slug").fill(`checkout-${suffix}`);
+  await page.getByLabel("Service identifier").fill(`checkout-${suffix}`);
   await page.getByRole("button", { name: "Create first service" }).click();
   await page.getByRole("button", { name: "Create demo incident" }).click();
   await expect(page).toHaveURL(/\/relayops\/[^/]+\/incidents\/[^/?]+/);
@@ -56,7 +56,7 @@ async function openPersonaPage(
   });
   await page.goto(url);
   await expect(
-    page.getByRole("heading", { name: "Operational state" }),
+    page.getByRole("heading", { name: "Response timing" }),
   ).toBeVisible();
   return { context, page };
 }
@@ -244,7 +244,7 @@ test("Viewer, Responder, Commander, Service Owner and Admin discover only allowe
       persona.grants,
     );
     const transition = opened.page.getByRole("button", { name: "Triaging" });
-    const update = opened.page.getByLabel("Durable incident update");
+    const update = opened.page.getByLabel("Progress update");
     if (persona.transition)
       await expect(transition, persona.name).toBeVisible();
     else await expect(transition, persona.name).toHaveCount(0);
