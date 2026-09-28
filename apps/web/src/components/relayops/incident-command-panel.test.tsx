@@ -133,6 +133,18 @@ beforeEach(() => {
 
 afterEach(cleanup);
 
+it("waits for a progress update before allowing another status change", async () => {
+  publishUpdate.mockImplementation(() => new Promise(() => {}));
+  renderPanel();
+  fireEvent.change(screen.getByLabelText("Progress update"), {
+    target: { value: "Checking the payment provider" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Publish update" }));
+  await waitFor(() =>
+    expect(screen.getByRole("button", { name: "Mitigating" })).toBeDisabled(),
+  );
+});
+
 describe("RelayOps IncidentCommandPanel", () => {
   it("preserves the draft on 409 and reapplies it with the same idempotency key", async () => {
     const current = withVersion(3);
@@ -147,7 +159,7 @@ describe("RelayOps IncidentCommandPanel", () => {
       .mockResolvedValueOnce(withVersion(4));
     renderPanel();
 
-    const draft = screen.getByLabelText("Durable incident update");
+    const draft = screen.getByLabelText("Progress update");
     fireEvent.change(draft, {
       target: { value: "Database failover is in progress." },
     });
@@ -179,11 +191,15 @@ describe("RelayOps IncidentCommandPanel", () => {
     );
     const client = renderPanel();
 
-    const draft = screen.getByLabelText("Durable incident update");
+    const draft = screen.getByLabelText("Progress update");
     fireEvent.change(draft, { target: { value: "Draft must survive." } });
     fireEvent.click(screen.getByRole("button", { name: "Publish update" }));
 
-    expect(await screen.findByText("Service unavailable")).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        "Could not save. Check your connection and retry; your text is still here.",
+      ),
+    ).toBeInTheDocument();
     expect(draft).toHaveValue("Draft must survive.");
     expect(
       client.getQueryData(relayOpsKeys.incident("workspace-1", "incident-1")),
@@ -195,8 +211,6 @@ describe("RelayOps IncidentCommandPanel", () => {
     renderPanel();
 
     expect(screen.queryByText("Transition incident")).not.toBeInTheDocument();
-    expect(
-      screen.queryByLabelText("Durable incident update"),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Progress update")).not.toBeInTheDocument();
   });
 });

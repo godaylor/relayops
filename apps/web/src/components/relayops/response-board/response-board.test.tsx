@@ -15,7 +15,7 @@ import type {
 } from "./types";
 
 const labels: ResponseBoardLabels = {
-  title: "Response Board",
+  title: "Response board",
   description: "Canonical incident lifecycle",
   count: (count) => `${count} incidents`,
   statusById: {
@@ -212,14 +212,18 @@ describe("ResponseBoard", () => {
     expect(onTransition).toHaveBeenCalledTimes(1);
 
     rejectTransition(new Error("Network unavailable"));
-    expect(await screen.findByText("Network unavailable")).toBeInTheDocument();
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Rolled Checkout latency back to Detected",
+    );
     expect(
       within(screen.getByRole("region", { name: "Detected" })).getByText(
         "Checkout latency",
       ),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Rolled Checkout latency back to Detected"),
+      screen.getByText("Rolled Checkout latency back to Detected", {
+        selector: '[aria-live="polite"]',
+      }),
     ).toBeInTheDocument();
     expect(
       screen.queryByText("Checkout latency accepted in Triaging"),

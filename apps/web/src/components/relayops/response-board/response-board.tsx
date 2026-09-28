@@ -614,7 +614,7 @@ export function ResponseBoard({
           return next;
         });
         setLastError(
-          error instanceof Error ? error.message : labels.failedTitle,
+          labels.rollback(incident.title, labels.statusById[incident.status]),
         );
       }
       setAnnouncement(

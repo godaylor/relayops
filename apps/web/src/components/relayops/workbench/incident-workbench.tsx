@@ -35,7 +35,6 @@ export function IncidentWorkbench({
   labels,
   state,
   page,
-  error,
   isFetching,
   isLoadingMore,
   selectedDetail,
@@ -100,11 +99,6 @@ export function IncidentWorkbench({
       <section className="grid min-h-96 place-items-center rounded-xl border bg-background p-8 text-center">
         <div>
           <h1 className="font-semibold text-2xl">{labels.errorTitle}</h1>
-          {error ? (
-            <p className="mt-2 max-w-lg text-muted-foreground">
-              {error.message}
-            </p>
-          ) : null}
           {onRetry ? (
             <Button className="mt-5" variant="outline" onClick={onRetry}>
               <RotateCw />

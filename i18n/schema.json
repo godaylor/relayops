@@ -9521,6 +9521,15 @@
 						},
 						"error": {
 							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"servicesError": {
+							"type": "string"
+						},
+						"chooseService": {
+							"type": "string"
 						}
 					},
 					"required": [
@@ -9530,7 +9539,10 @@
 						"severity",
 						"serviceFirst",
 						"submit",
-						"error"
+						"error",
+						"description",
+						"servicesError",
+						"chooseService"
 					]
 				},
 				"severity": {
@@ -11160,6 +11172,12 @@
 						},
 						"generatedAt": {
 							"type": "string"
+						},
+						"explanation": {
+							"type": "string"
+						},
+						"explanationBody": {
+							"type": "string"
 						}
 					},
 					"required": [
@@ -11198,7 +11216,9 @@
 						"date",
 						"action",
 						"openWorkbench",
-						"generatedAt"
+						"generatedAt",
+						"explanation",
+						"explanationBody"
 					]
 				},
 				"status": {
@@ -11312,6 +11332,9 @@
 						},
 						"failed": {
 							"type": "string"
+						},
+						"saved": {
+							"type": "string"
 						}
 					},
 					"required": [
@@ -11330,7 +11353,242 @@
 						"reapply",
 						"discard",
 						"failedTitle",
-						"failed"
+						"failed",
+						"saved"
+					]
+				},
+				"intro": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"example": {
+							"type": "string"
+						},
+						"exampleBody": {
+							"type": "string"
+						},
+						"access": {
+							"type": "string"
+						},
+						"cold": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"description",
+						"example",
+						"exampleBody",
+						"access",
+						"cold"
+					]
+				},
+				"account": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"signedIn": {
+							"type": "string"
+						},
+						"workspace": {
+							"type": "string"
+						},
+						"role": {
+							"type": "string"
+						},
+						"switch": {
+							"type": "string"
+						},
+						"members": {
+							"type": "string"
+						},
+						"signOut": {
+							"type": "string"
+						},
+						"error": {
+							"type": "string"
+						},
+						"rolesTitle": {
+							"type": "string"
+						},
+						"rolesBody": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"signedIn",
+						"workspace",
+						"role",
+						"switch",
+						"members",
+						"signOut",
+						"error",
+						"rolesTitle",
+						"rolesBody"
+					]
+				},
+				"assignment": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"label": {
+							"type": "string"
+						},
+						"save": {
+							"type": "string"
+						},
+						"clear": {
+							"type": "string"
+						},
+						"loading": {
+							"type": "string"
+						},
+						"error": {
+							"type": "string"
+						}
+					},
+					"required": ["label", "save", "clear", "loading", "error"]
+				},
+				"guide": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"open": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"next": {
+							"type": "string"
+						},
+						"back": {
+							"type": "string"
+						},
+						"skip": {
+							"type": "string"
+						},
+						"finish": {
+							"type": "string"
+						},
+						"show": {
+							"type": "string"
+						},
+						"missing": {
+							"type": "string"
+						},
+						"step": {
+							"type": "string"
+						},
+						"safety": {
+							"type": "string"
+						},
+						"services": {
+							"type": "string"
+						},
+						"servicesBody": {
+							"type": "string"
+						},
+						"create": {
+							"type": "string"
+						},
+						"createBody": {
+							"type": "string"
+						},
+						"history": {
+							"type": "string"
+						},
+						"historyBody": {
+							"type": "string"
+						},
+						"board": {
+							"type": "string"
+						},
+						"boardBody": {
+							"type": "string"
+						},
+						"finishIssue": {
+							"type": "string"
+						},
+						"finishIssueBody": {
+							"type": "string"
+						},
+						"analytics": {
+							"type": "string"
+						},
+						"analyticsBody": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"open",
+						"title",
+						"next",
+						"back",
+						"skip",
+						"finish",
+						"show",
+						"missing",
+						"step",
+						"safety",
+						"services",
+						"servicesBody",
+						"create",
+						"createBody",
+						"history",
+						"historyBody",
+						"board",
+						"boardBody",
+						"finishIssue",
+						"finishIssueBody",
+						"analytics",
+						"analyticsBody"
+					]
+				},
+				"role": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"owner": {
+							"type": "string"
+						},
+						"admin": {
+							"type": "string"
+						},
+						"member": {
+							"type": "string"
+						},
+						"viewer": {
+							"type": "string"
+						},
+						"responder": {
+							"type": "string"
+						},
+						"incident_commander": {
+							"type": "string"
+						},
+						"service_owner": {
+							"type": "string"
+						},
+						"workspace_admin": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"owner",
+						"admin",
+						"member",
+						"viewer",
+						"responder",
+						"incident_commander",
+						"service_owner",
+						"workspace_admin"
 					]
 				}
 			},
@@ -11370,7 +11628,12 @@
 				"analytics",
 				"status",
 				"impact",
-				"commands"
+				"commands",
+				"intro",
+				"account",
+				"assignment",
+				"guide",
+				"role"
 			]
 		},
 		"publicProject": {

@@ -9,7 +9,7 @@ import { SignalPanel } from "./signals";
 afterEach(cleanup);
 
 const boardLabels: ResponseBoardLabels = {
-  title: "Response Board",
+  title: "Response board",
   description: "Canonical incident lifecycle",
   count: (count) => `${count} incidents`,
   statusById: {
@@ -60,7 +60,7 @@ const boardLabels: ResponseBoardLabels = {
 };
 
 const signalLabels: SignalPanelLabels = {
-  title: "Signals",
+  title: "Observations",
   description: "Normalize observations before incident response.",
   intakeEyebrow: "Intake / triage",
   manualHeading: "Add an observation",

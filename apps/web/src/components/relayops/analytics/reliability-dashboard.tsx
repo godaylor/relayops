@@ -192,7 +192,7 @@ export function ReliabilityDashboard({
             {t("relayops:analytics.filters")}
           </h2>
           <p className="font-mono text-muted-foreground text-xs">
-            {search.timezone} · {data.definition.version}
+            {search.timezone}
           </p>
         </div>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
@@ -316,22 +316,13 @@ export function ReliabilityDashboard({
             <MetricCard key={metric.label} {...metric} />
           ))}
         </div>
-        <details className="mt-3 rounded-lg border border-[#17211f]/10 bg-white px-4 py-3 text-sm dark:border-white/10 dark:bg-[#101a18]">
+        <details className="mt-3 rounded-lg border bg-background p-4 text-sm">
           <summary className="cursor-pointer font-medium">
-            {t("relayops:analytics.metrics")} · {data.definition.version}
+            {t("relayops:analytics.explanation")}
           </summary>
-          <dl className="mt-3 grid gap-x-6 gap-y-2 sm:grid-cols-2 xl:grid-cols-3">
-            {Object.entries(data.definition.formulas).map(
-              ([metric, formula]) => (
-                <div key={metric}>
-                  <dt className="font-mono text-muted-foreground text-xs uppercase">
-                    {metric}
-                  </dt>
-                  <dd className="mt-1">{formula}</dd>
-                </div>
-              ),
-            )}
-          </dl>
+          <p className="mt-3 max-w-3xl">
+            {t("relayops:analytics.explanationBody")}
+          </p>
         </details>
       </section>
 

@@ -12,6 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import PageTitle from "@/components/page-title";
+import { AccountContext } from "@/components/relayops/account-context";
 import { CreateIncidentDialog } from "@/components/relayops/create-incident-dialog";
 import { RelayOpsLanguageSwitcher } from "@/components/relayops/language-switcher";
 import { LiveIncidentClockRail } from "@/components/relayops/live-incident-clock-rail";
@@ -19,6 +20,7 @@ import {
   RelayOpsErrorState,
   RelayOpsSkeleton,
 } from "@/components/relayops/route-state";
+import { UsageGuide } from "@/components/relayops/usage-guide";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -214,7 +216,7 @@ function RelayOpsShell() {
   return (
     <div
       data-relayops-shell
-      className="h-full w-full min-w-0 max-w-full overflow-y-auto bg-[#f4f6f5] text-[#17211f] dark:bg-[#0b1210] dark:text-[#f4f6f5]"
+      className="h-full w-full min-w-0 max-w-full overflow-y-auto bg-[#f4f6f5] text-[#17211f] [overflow-wrap:anywhere] dark:bg-[#0b1210] dark:text-[#f4f6f5]"
     >
       <PageTitle title={t("relayops:pageTitle")} />
       <a
@@ -223,7 +225,7 @@ function RelayOpsShell() {
       >
         {t("relayops:skipToContent")}
       </a>
-      <header className="sticky top-0 z-40 border-[#17211f]/10 border-b bg-white/95 backdrop-blur dark:border-white/10 dark:bg-[#101a18]/95">
+      <header className="relative z-40 border-[#17211f]/10 border-b bg-white/95 backdrop-blur dark:border-white/10 dark:bg-[#101a18]/95">
         <div className="mx-auto flex min-w-0 max-w-[92rem] flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <Link
             to="/relayops/$workspaceId"
@@ -247,7 +249,9 @@ function RelayOpsShell() {
           </Link>
           <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2 text-xs sm:justify-end">
             <RelayOpsLanguageSwitcher />
-            <CreateIncidentDialog workspaceId={workspaceId} />
+            <div data-guide="create">
+              <CreateIncidentDialog workspaceId={workspaceId} />
+            </div>
             <Badge
               variant="outline"
               className="min-h-8 gap-2 bg-white dark:bg-[#101a18]"
@@ -293,6 +297,17 @@ function RelayOpsShell() {
           {nav.map(({ label, to, icon: Icon }) => (
             <Link
               key={label}
+              data-guide={
+                to.endsWith("/services")
+                  ? "services"
+                  : to.endsWith("/board")
+                    ? "board"
+                    : to.endsWith("/analytics")
+                      ? "analytics"
+                      : to.endsWith("/incidents")
+                        ? "history"
+                        : undefined
+              }
               to={to}
               params={{ workspaceId }}
               activeOptions={{
@@ -320,6 +335,8 @@ function RelayOpsShell() {
           ) : null}
         </nav>
       </header>
+      <AccountContext workspaceId={workspaceId} />
+      <UsageGuide />
       <LiveIncidentClockRail
         workspaceId={workspaceId}
         incidents={overview.data?.activeIncidents ?? []}

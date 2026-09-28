@@ -130,7 +130,9 @@ describe("ReliabilityDashboard", () => {
     expect(
       screen.queryByRole("button", { name: /relayops:analytics.export/i }),
     ).not.toBeInTheDocument();
-    expect(screen.getByText("acknowledged - detected")).toBeInTheDocument();
+    expect(
+      screen.getByText("relayops:analytics.explanationBody"),
+    ).toBeInTheDocument();
     const result = await axe.run(container, {
       rules: { "color-contrast": { enabled: false } },
     });

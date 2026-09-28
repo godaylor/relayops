@@ -31,6 +31,7 @@ import {
   type RelayOpsTransitionTarget,
   relayOpsTransitionTargets,
 } from "@/lib/relayops-lifecycle";
+import { IncidentAssignment } from "./incident-assignment";
 
 const statusKeys = {
   detected: "relayops:status.detected",
@@ -70,6 +71,11 @@ export function IncidentCommandPanel({
   const queryClient = useQueryClient();
   const incidentId = detail.incident.id;
   const transition = useTransitionRelayOpsIncident(workspaceId, incidentId);
+  const canAssign = useRelayOpsCapability(
+    "action.incident.assign",
+    capabilityContext,
+    workspaceId,
+  );
   const canTransition = useRelayOpsCapability(
     "action.incident.transition",
     capabilityContext,
@@ -106,6 +112,7 @@ export function IncidentCommandPanel({
     null,
   );
   const [commandError, setCommandError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
 
   const targets = relayOpsTransitionTargets(
     detail.incident.status as RelayOpsIncidentStatus,
@@ -124,6 +131,7 @@ export function IncidentCommandPanel({
 
   async function moveTo(target: RelayOpsTransitionTarget) {
     setCommandError(null);
+    setSaved(false);
     try {
       await transition.mutateAsync({
         expectedVersion: detail.incident.version,
@@ -134,18 +142,18 @@ export function IncidentCommandPanel({
           : {}),
       });
       if (target === "resolved") setResolutionSummary("");
+      setSaved(true);
     } catch (error) {
       setCommandError(
         isRelayOpsVersionConflict(error)
           ? t("relayops:commands.conflictTransition")
-          : error instanceof Error
-            ? error.message
-            : t("relayops:commands.failed"),
+          : t("relayops:commands.failed"),
       );
     }
   }
 
   async function publish(expectedVersion: number, idempotencyKey: string) {
+    setSaved(false);
     try {
       await publishUpdate.mutateAsync({
         expectedVersion,
@@ -156,14 +164,13 @@ export function IncidentCommandPanel({
       setDraftKey(null);
       setConflict(null);
       setCommandError(null);
+      setSaved(true);
     } catch (error) {
       if (isRelayOpsVersionConflict(error)) {
         setConflict(error.body);
         return;
       }
-      setCommandError(
-        error instanceof Error ? error.message : t("relayops:commands.failed"),
-      );
+      setCommandError(t("relayops:commands.failed"));
     }
   }
 
@@ -184,7 +191,11 @@ export function IncidentCommandPanel({
     );
     setConflict(null);
   }
-  if (visibleTargets.length === 0 && !canPublish.allowed) {
+  if (
+    visibleTargets.length === 0 &&
+    !canPublish.allowed &&
+    !canAssign.allowed
+  ) {
     return null;
   }
 
@@ -194,7 +205,11 @@ export function IncidentCommandPanel({
       className="space-y-5 border-t p-5 sm:p-7"
     >
       <div>
-        <h2 id="incident-commands-heading" className="font-semibold text-lg">
+        <h2
+          id="incident-commands-heading"
+          tabIndex={-1}
+          className="font-semibold text-lg"
+        >
           {t("relayops:commands.title")}
         </h2>
         <p className="mt-1 text-muted-foreground text-sm">
@@ -204,6 +219,14 @@ export function IncidentCommandPanel({
         </p>
       </div>
 
+      {canAssign.allowed ? (
+        <IncidentAssignment workspaceId={workspaceId} detail={detail} />
+      ) : null}
+      {saved ? (
+        <p role="status" className="text-sm">
+          {t("relayops:commands.saved")}
+        </p>
+      ) : null}
       <div className="space-y-3">
         <h3 className="font-medium text-sm">
           {t("relayops:commands.transition")}
@@ -226,7 +249,10 @@ export function IncidentCommandPanel({
               type="button"
               variant={target === "dismissed" ? "outline" : "secondary"}
               loading={transition.isPending}
-              disabled={target === "resolved" && !resolutionSummary.trim()}
+              disabled={
+                publishUpdate.isPending ||
+                (target === "resolved" && !resolutionSummary.trim())
+              }
               onClick={() => void moveTo(target)}
             >
               {t(statusKeys[target])}
@@ -249,7 +275,7 @@ export function IncidentCommandPanel({
           <Button
             type="submit"
             loading={publishUpdate.isPending}
-            disabled={!draft.trim()}
+            disabled={transition.isPending || !draft.trim()}
           >
             {t("relayops:commands.publish")}
           </Button>

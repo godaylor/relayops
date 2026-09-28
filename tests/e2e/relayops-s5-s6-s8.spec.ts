@@ -35,7 +35,7 @@ async function openDemoIncident(page: Page) {
   await page.getByLabel("Workspace Name").fill(`RelayOps ${suffix}`);
   await page.getByRole("button", { name: "Create RelayOps workspace" }).click();
   await page.getByLabel("Service name").fill("Checkout API");
-  await page.getByLabel("Service slug").fill(`checkout-${suffix}`);
+  await page.getByLabel("Service identifier").fill(`checkout-${suffix}`);
   await page.getByRole("button", { name: "Create first service" }).click();
   await page.getByRole("button", { name: "Create demo incident" }).click();
   await expect(page).toHaveURL(/\/relayops\/[^/]+\/incidents\/[^/?]+/);
@@ -54,7 +54,9 @@ test("Response Board, two-browser realtime, presence, and signal intake stay acc
   const incidentUrl = `/relayops/${workspaceId}/incidents/${incidentId}`;
 
   await expect(page.getByText("Live", { exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Signals" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Observations" }),
+  ).toBeVisible();
   await expect(
     page.getByText("In this Incident Room", { exact: true }),
   ).toBeVisible();
@@ -68,7 +70,7 @@ test("Response Board, two-browser realtime, presence, and signal intake stay acc
   const latencies: number[] = [];
   for (let index = 1; index <= 3; index += 1) {
     const message = `Realtime evidence ${index}`;
-    await page.getByLabel("Durable incident update").fill(message);
+    await page.getByLabel("Progress update").fill(message);
     const startedAt = Date.now();
     await page.getByRole("button", { name: "Publish update" }).click();
     await expect(secondPage.getByText(message, { exact: true })).toBeVisible({
@@ -101,13 +103,13 @@ test("Response Board, two-browser realtime, presence, and signal intake stay acc
   await expect(page.getByText("Attached", { exact: true })).toBeVisible();
 
   const signalPanel = page
-    .getByRole("heading", { name: "Signals" })
+    .getByRole("heading", { name: "Observations" })
     .locator("xpath=ancestor::section[1]");
   await expectAxeClean(page, signalPanel);
 
   await page.goto(`/relayops/${workspaceId}/board`);
   await expect(
-    page.getByRole("heading", { name: "Response Board" }),
+    page.getByRole("heading", { name: "Response board" }),
   ).toBeVisible();
   for (const lane of [
     "Detected",
@@ -121,7 +123,7 @@ test("Response Board, two-browser realtime, presence, and signal intake stay acc
   }
 
   const moveMenu = page.getByRole("button", {
-    name: "Move Checkout latency above error budget to another lifecycle state",
+    name: "Change status of Checkout latency above error budget",
   });
   await moveMenu.focus();
   await page.keyboard.press("Enter");

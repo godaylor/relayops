@@ -108,7 +108,7 @@ async function onboardAdmin(page: Page) {
   await page.getByLabel("Workspace Name").fill(`RelayOps ${suffix}`);
   await page.getByRole("button", { name: "Create RelayOps workspace" }).click();
   await page.getByLabel("Service name").fill("Checkout API");
-  await page.getByLabel("Service slug").fill(`checkout-${suffix}`);
+  await page.getByLabel("Service identifier").fill(`checkout-${suffix}`);
   await page.getByRole("button", { name: "Create first service" }).click();
 
   const workspaceId = page.url().match(/\/relayops\/([^/?]+)/)?.[1];
@@ -204,7 +204,7 @@ async function acceptInvitedUser(
 
 async function moveFromBoard(page: Page, title: string, target: string) {
   const move = page.getByRole("button", {
-    name: `Move ${title} to another lifecycle state`,
+    name: `Change status of ${title}`,
   });
   await expect(move).toBeVisible({ timeout: 10_000 });
   await move.focus();
@@ -351,7 +351,7 @@ test("S10 ten-step clean-DB demo proves two users, keyboard lifecycle, conflict,
   await commander.page.goto(`/relayops/${workspaceId}/incidents/${incidentId}`);
   for (let index = 1; index <= 3; index += 1) {
     const message = `S10 realtime proof ${index}`;
-    await page.getByLabel("Durable incident update").fill(message);
+    await page.getByLabel("Progress update").fill(message);
     const startedAt = Date.now();
     await page.getByRole("button", { name: "Publish update" }).click();
     await expect(
@@ -367,9 +367,7 @@ test("S10 ten-step clean-DB demo proves two users, keyboard lifecycle, conflict,
     ] ?? Number.POSITIVE_INFINITY;
   expect(p95).toBeLessThanOrEqual(750);
 
-  await page
-    .getByLabel("Durable incident update")
-    .fill("Draft survives conflict");
+  await page.getByLabel("Progress update").fill("Draft survives conflict");
   const stale = await jsonCommand<unknown>(
     page,
     `/api/relayops/workspaces/${workspaceId}/incidents/${incidentId}`,
@@ -388,7 +386,7 @@ test("S10 ten-step clean-DB demo proves two users, keyboard lifecycle, conflict,
   };
   await page.route(incidentPattern, staleHandler);
   await commander.page.goto(`/relayops/${workspaceId}/incidents/${incidentId}`);
-  const commanderUpdate = commander.page.getByLabel("Durable incident update");
+  const commanderUpdate = commander.page.getByLabel("Progress update");
   await expect(commanderUpdate).toBeVisible({ timeout: 10_000 });
   await commanderUpdate.fill("Commander changed the record");
   await commander.page.getByRole("button", { name: "Publish update" }).click();
