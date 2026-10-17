@@ -30,6 +30,7 @@
 			"!**/.next",
 			"!**/out",
 			"!**/.cache",
+			"!**/.pnpm-store",
 			"!**/coverage",
 			"!**/.claude",
 			"!**/.pi",
@@ -68,7 +69,11 @@
 	},
 	"overrides": [
 		{
-			"includes": ["release.config.js", "scripts/release/*.mjs"],
+			"includes": [
+				"release.config.js",
+				"scripts/release/*.mjs",
+				"scripts/security/*.mjs"
+			],
 			"linter": {
 				"rules": {
 					"suspicious": {

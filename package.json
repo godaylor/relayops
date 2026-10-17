@@ -23,7 +23,8 @@
     "local:status": "docker compose ps",
     "local:stop": "docker compose stop",
     "release:licenses": "node scripts/release/licenses.mjs",
-    "release:check": "node scripts/release/preflight.mjs"
+    "release:check": "node scripts/release/preflight.mjs",
+    "security:audit": "node scripts/security/audit-dependencies.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.7",

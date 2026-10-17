@@ -19,6 +19,7 @@ WORKDIR /app
 
 # Copy package files first for better layer caching
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY patches ./patches
 COPY apps/web/package.json ./apps/web/
 COPY packages/typescript-config/package.json ./packages/typescript-config/
 COPY packages/libs/package.json ./packages/libs/
@@ -56,7 +57,7 @@ RUN node /app/scripts/release/licenses.mjs web /app/licenses/web
 FROM nginx:1.30.4-alpine@sha256:dc5069ad14f19660b141b21236140b91656bf89bbc3e2417c70ae650cd66104c AS runtime
 
 # Create non-root user and configure nginx in a single layer
-RUN apk add --no-cache libcrypto3=3.5.8-r0 libssl3=3.5.8-r0 libuuid=2.42.3-r1 && \
+RUN apk add --no-cache 'libcrypto3>=3.5.9-r0' 'libssl3>=3.5.9-r0' libuuid=2.42.3-r1 && \
   addgroup -g 1001 appuser && \
   adduser -u 1001 -G appuser -D appuser && \
   # Set permissions for nginx directories
