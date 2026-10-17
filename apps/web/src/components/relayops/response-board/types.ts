@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { RelayOpsIncidentStatus } from "@/lib/relayops-lifecycle";
 
 export const responseBoardLaneStatuses = [
@@ -17,6 +18,8 @@ export type ResponseBoardIncident = {
   status: RelayOpsIncidentStatus;
   severity: "unknown" | "sev1" | "sev2" | "sev3" | "sev4";
   version: number;
+  commander?: { id: string; name: string } | null;
+  detectedAt?: string;
   lastUpdateAt?: string;
   service: { id: string; name: string; slug?: string };
 };
@@ -118,6 +121,7 @@ export type ResponseBoardLabels = {
 };
 
 export type ResponseBoardProps = {
+  emptyAction?: ReactNode;
   incidents: ResponseBoardIncident[];
   labels: ResponseBoardLabels;
   onTransition: (

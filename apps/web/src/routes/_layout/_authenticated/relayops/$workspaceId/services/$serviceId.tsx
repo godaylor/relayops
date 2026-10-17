@@ -92,10 +92,10 @@ function ServiceDetail() {
         {t("relayops:service.backToCatalog")}
       </Button>
 
-      <section className="rounded-xl border border-[#17211f]/10 bg-white p-5 dark:border-white/10 dark:bg-[#101a18] sm:p-7">
+      <section className="rounded-xl border border-[#1b1d36]/10 bg-white p-5 dark:border-white/10 dark:bg-[#1a1c35] sm:p-7">
         <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
           <div className="flex min-w-0 gap-4">
-            <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-[#245ebe]/8 text-[#245ebe] dark:text-[#8fb6ff]">
+            <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-[#6757ec]/8 text-[#6757ec] dark:text-[#b3a5ff]">
               <Server className="size-6" />
             </span>
             <div className="min-w-0">
@@ -247,7 +247,7 @@ function ServiceDetail() {
                     href={item.repositoryUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex min-h-11 items-center justify-between rounded-md border px-3 text-sm hover:bg-[#e2e9e6]/45"
+                    className="flex min-h-11 items-center justify-between rounded-md border px-3 text-sm hover:bg-[#eeedf8]/45"
                   >
                     {t("relayops:service.repository")}
                     <ExternalLink className="size-4" />
@@ -258,7 +258,7 @@ function ServiceDetail() {
                     href={item.runbookUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex min-h-11 items-center justify-between rounded-md border px-3 text-sm hover:bg-[#e2e9e6]/45"
+                    className="flex min-h-11 items-center justify-between rounded-md border px-3 text-sm hover:bg-[#eeedf8]/45"
                   >
                     {t("relayops:service.runbook")}
                     <ExternalLink className="size-4" />

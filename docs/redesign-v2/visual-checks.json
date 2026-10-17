@@ -1,0 +1,369 @@
+{
+	"date": "2026-10-17T20:47:11.313Z",
+	"status": "passed",
+	"completedAt": "2026-10-17T20:48:08.055Z",
+	"failure": null,
+	"baseURL": "http://127.0.0.1:32041",
+	"screenshots": [
+		"auth-light-1440.png",
+		"auth-light-390.png",
+		"auth-dark-1440.png",
+		"auth-dark-390.png",
+		"overview-light-1440.png",
+		"incidents-light-1440.png",
+		"board-light-1440.png",
+		"room-light-1440.png",
+		"services-light-1440.png",
+		"analytics-default-excludes-demo-light-1440.png",
+		"analytics-light-1440.png",
+		"overview-light-390.png",
+		"incidents-light-390.png",
+		"board-light-390.png",
+		"room-light-390.png",
+		"services-light-390.png",
+		"analytics-light-390.png",
+		"overview-dark-1440.png",
+		"incidents-dark-1440.png",
+		"board-dark-1440.png",
+		"room-dark-1440.png",
+		"services-dark-1440.png",
+		"analytics-dark-1440.png",
+		"overview-dark-390.png",
+		"incidents-dark-390.png",
+		"board-dark-390.png",
+		"room-dark-390.png",
+		"services-dark-390.png",
+		"analytics-dark-390.png",
+		"account-menu-light-1440.png",
+		"mobile-navigation-light-390.png",
+		"board-empty-light-390.png",
+		"board-empty-light-1440.png",
+		"incidents-loading-light-1440.png",
+		"incidents-error-light-1440.png",
+		"auth-reduced-motion-1440.png"
+	],
+	"errors": [],
+	"overflow": [
+		{
+			"name": "auth-light",
+			"width": 1440,
+			"extra": 0
+		},
+		{
+			"name": "auth-light",
+			"width": 390,
+			"extra": 0
+		},
+		{
+			"name": "auth-dark",
+			"width": 1440,
+			"extra": 0
+		},
+		{
+			"name": "auth-dark",
+			"width": 390,
+			"extra": 0
+		},
+		{
+			"name": "auth",
+			"width": 320,
+			"extra": 0
+		},
+		{
+			"name": "auth",
+			"width": 768,
+			"extra": 0
+		},
+		{
+			"name": "overview-light",
+			"width": 1440,
+			"extra": 0
+		},
+		{
+			"name": "incidents-light",
+			"width": 1440,
+			"extra": 0
+		},
+		{
+			"name": "board-light",
+			"width": 1440,
+			"extra": 0
+		},
+		{
+			"name": "room-light",
+			"width": 1440,
+			"extra": 0
+		},
+		{
+			"name": "services-light",
+			"width": 1440,
+			"extra": 0
+		},
+		{
+			"name": "analytics-light",
+			"width": 1440,
+			"extra": 0
+		},
+		{
+			"name": "overview-light",
+			"width": 390,
+			"extra": 0
+		},
+		{
+			"name": "incidents-light",
+			"width": 390,
+			"extra": 0
+		},
+		{
+			"name": "board-light",
+			"width": 390,
+			"extra": 0
+		},
+		{
+			"name": "room-light",
+			"width": 390,
+			"extra": 0
+		},
+		{
+			"name": "services-light",
+			"width": 390,
+			"extra": 0
+		},
+		{
+			"name": "analytics-light",
+			"width": 390,
+			"extra": 0
+		},
+		{
+			"name": "overview-dark",
+			"width": 1440,
+			"extra": 0
+		},
+		{
+			"name": "incidents-dark",
+			"width": 1440,
+			"extra": 0
+		},
+		{
+			"name": "board-dark",
+			"width": 1440,
+			"extra": 0
+		},
+		{
+			"name": "room-dark",
+			"width": 1440,
+			"extra": 0
+		},
+		{
+			"name": "services-dark",
+			"width": 1440,
+			"extra": 0
+		},
+		{
+			"name": "analytics-dark",
+			"width": 1440,
+			"extra": 0
+		},
+		{
+			"name": "overview-dark",
+			"width": 390,
+			"extra": 0
+		},
+		{
+			"name": "incidents-dark",
+			"width": 390,
+			"extra": 0
+		},
+		{
+			"name": "board-dark",
+			"width": 390,
+			"extra": 0
+		},
+		{
+			"name": "room-dark",
+			"width": 390,
+			"extra": 0
+		},
+		{
+			"name": "services-dark",
+			"width": 390,
+			"extra": 0
+		},
+		{
+			"name": "analytics-dark",
+			"width": 390,
+			"extra": 0
+		},
+		{
+			"name": "overview",
+			"width": 320,
+			"extra": 0
+		},
+		{
+			"name": "overview",
+			"width": 768,
+			"extra": 0
+		},
+		{
+			"name": "incidents",
+			"width": 320,
+			"extra": 0
+		},
+		{
+			"name": "incidents",
+			"width": 768,
+			"extra": 0
+		},
+		{
+			"name": "board",
+			"width": 320,
+			"extra": 0
+		},
+		{
+			"name": "board",
+			"width": 768,
+			"extra": 0
+		},
+		{
+			"name": "room",
+			"width": 320,
+			"extra": 0
+		},
+		{
+			"name": "room",
+			"width": 768,
+			"extra": 0
+		},
+		{
+			"name": "services",
+			"width": 320,
+			"extra": 0
+		},
+		{
+			"name": "services",
+			"width": 768,
+			"extra": 0
+		},
+		{
+			"name": "analytics",
+			"width": 320,
+			"extra": 0
+		},
+		{
+			"name": "analytics",
+			"width": 768,
+			"extra": 0
+		}
+	],
+	"accessibility": [
+		{
+			"name": "auth-light",
+			"seriousCritical": []
+		},
+		{
+			"name": "auth-dark",
+			"seriousCritical": []
+		},
+		{
+			"name": "overview-light-1440",
+			"seriousCritical": []
+		},
+		{
+			"name": "incidents-light-1440",
+			"seriousCritical": []
+		},
+		{
+			"name": "board-light-1440",
+			"seriousCritical": []
+		},
+		{
+			"name": "room-light-1440",
+			"seriousCritical": []
+		},
+		{
+			"name": "services-light-1440",
+			"seriousCritical": []
+		},
+		{
+			"name": "analytics-light-1440",
+			"seriousCritical": []
+		},
+		{
+			"name": "board-light-390",
+			"seriousCritical": []
+		},
+		{
+			"name": "room-light-390",
+			"seriousCritical": []
+		},
+		{
+			"name": "overview-dark-1440",
+			"seriousCritical": []
+		},
+		{
+			"name": "incidents-dark-1440",
+			"seriousCritical": []
+		},
+		{
+			"name": "board-dark-1440",
+			"seriousCritical": []
+		},
+		{
+			"name": "room-dark-1440",
+			"seriousCritical": []
+		},
+		{
+			"name": "services-dark-1440",
+			"seriousCritical": []
+		},
+		{
+			"name": "analytics-dark-1440",
+			"seriousCritical": []
+		},
+		{
+			"name": "board-dark-390",
+			"seriousCritical": []
+		},
+		{
+			"name": "room-dark-390",
+			"seriousCritical": []
+		},
+		{
+			"name": "board-empty",
+			"seriousCritical": []
+		}
+	],
+	"issues": [],
+	"motion": {
+		"stageBefore": "0",
+		"stageAfter": "1",
+		"frameBefore": {
+			"dash": "-11.2282px",
+			"traveler": 47.70960235595703,
+			"offsetDistance": "1.18192%",
+			"animations": 9
+		},
+		"frameAfter": {
+			"dash": "-134.063px",
+			"traveler": 151.51834106445312,
+			"offsetDistance": "14.1119%",
+			"animations": 6
+		},
+		"pointerBefore": "matrix(1, 0, 0, 1, 0, 0)",
+		"pointerTransform": "matrix(1, 0, 0, 1, 7.43442, 2.31722)",
+		"reduced": {
+			"stageStable": true,
+			"SVGTravelerRemoved": true,
+			"reducedAnimations": ["none", "none"]
+		}
+	},
+	"interactions": {
+		"analyticsDemoPolicy": "Default exclusion is explicit; the UI checkbox updates the shareable URL and returns volume=1 from the real API",
+		"accountThemeLanguage": "UI controls and RU/EN persistence passed",
+		"mobileNavigation": "Sheet opens, navigates and closes",
+		"loadingErrorRetry": "Delayed request, HTTP 500, retry recovery passed"
+	},
+	"workspaceId": "Dj5oiV1Vv0JnzsASE1Dc2qtdjsf74fUK",
+	"emptyWorkspaceId": "u8G97CrjPaY5ylLLVs8PWZ7xsQTyDqCa",
+	"demoVerified": true
+}

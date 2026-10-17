@@ -58,7 +58,7 @@ const healthTone = {
   major_outage:
     "border-[#b73a34]/25 bg-[#b73a34]/8 text-[#8d2c28] dark:text-[#f2a09b]",
   maintenance:
-    "border-[#245ebe]/25 bg-[#245ebe]/8 text-[#245ebe] dark:text-[#91b1ee]",
+    "border-[#6757ec]/25 bg-[#6757ec]/8 text-[#6757ec] dark:text-[#91b1ee]",
 } as const;
 
 function ServiceCatalog() {
@@ -102,10 +102,10 @@ function ServiceCatalog() {
   const filtered = Boolean(search.q) || search.status !== "active";
 
   return (
-    <div className="space-y-6">
+    <div className="sbor-services space-y-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <p className="font-mono text-[#245ebe] text-xs tracking-[0.16em] dark:text-[#8fb6ff]">
+          <p className="font-mono text-[#6757ec] text-xs tracking-[0.16em] dark:text-[#b3a5ff]">
             {t("relayops:catalog.eyebrow")}
           </p>
           <h1 className="mt-1 font-semibold text-3xl tracking-tight">
@@ -125,7 +125,7 @@ function ServiceCatalog() {
 
       {showCreate ? (
         <section
-          className="rounded-lg border border-[#245ebe]/25 bg-white p-5 dark:bg-[#101a18] sm:p-6"
+          className="rounded-lg border border-[#6757ec]/25 bg-white p-5 dark:bg-[#1a1c35] sm:p-6"
           aria-labelledby="create-service-title"
         >
           <h2 id="create-service-title" className="font-semibold text-xl">
@@ -153,7 +153,7 @@ function ServiceCatalog() {
 
       <search>
         <form
-          className="grid gap-3 rounded-lg border border-[#17211f]/10 bg-white p-3 dark:border-white/10 dark:bg-[#101a18] sm:grid-cols-[minmax(14rem,1fr)_12rem_auto]"
+          className="grid gap-3 rounded-lg border border-[#1b1d36]/10 bg-white p-3 dark:border-white/10 dark:bg-[#1a1c35] sm:grid-cols-[minmax(14rem,1fr)_12rem_auto]"
           onSubmit={applyFilters}
         >
           <label className="relative" htmlFor="relayops-service-search">
@@ -173,7 +173,7 @@ function ServiceCatalog() {
               id="relayops-service-status"
               name="status"
               defaultValue={search.status}
-              className="min-h-11 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#245ebe]"
+              className="min-h-11 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6757ec]"
             >
               <option value="active">{t("relayops:catalog.active")}</option>
               <option value="archived">{t("relayops:catalog.archived")}</option>
@@ -187,12 +187,12 @@ function ServiceCatalog() {
       </search>
 
       {services.data.length === 0 ? (
-        <section className="grid min-h-72 place-items-center rounded-lg border border-[#17211f]/10 bg-white p-8 text-center dark:border-white/10 dark:bg-[#101a18]">
+        <section className="grid min-h-72 place-items-center rounded-lg border border-[#1b1d36]/10 bg-white p-8 text-center dark:border-white/10 dark:bg-[#1a1c35]">
           <div className="max-w-md">
             {filtered ? (
               <FilterX className="mx-auto size-9 text-muted-foreground" />
             ) : (
-              <Server className="mx-auto size-9 text-[#245ebe] dark:text-[#8fb6ff]" />
+              <Server className="mx-auto size-9 text-[#6757ec] dark:text-[#b3a5ff]" />
             )}
             <h2 className="mt-4 font-semibold text-xl">
               {filtered
@@ -219,8 +219,8 @@ function ServiceCatalog() {
         </section>
       ) : (
         <section aria-label={t("relayops:catalog.results")}>
-          <div className="hidden overflow-hidden rounded-lg border border-[#17211f]/10 bg-white dark:border-white/10 dark:bg-[#101a18] md:block">
-            <div className="grid grid-cols-[minmax(16rem,1fr)_8rem_10rem_12rem_2rem] gap-4 border-b bg-[#e2e9e6]/45 px-5 py-3 font-medium text-xs uppercase tracking-wide dark:bg-white/5">
+          <div className="hidden overflow-hidden rounded-lg border border-[#1b1d36]/10 bg-white dark:border-white/10 dark:bg-[#1a1c35] md:block">
+            <div className="grid grid-cols-[minmax(16rem,1fr)_8rem_10rem_12rem_2rem] gap-4 border-b bg-[#eeedf8]/45 px-5 py-3 font-medium text-xs uppercase tracking-wide dark:bg-white/5">
               <span>{t("relayops:catalog.columnService")}</span>
               <span>{t("relayops:catalog.columnTier")}</span>
               <span>{t("relayops:catalog.columnHealth")}</span>
@@ -232,7 +232,7 @@ function ServiceCatalog() {
                 key={service.id}
                 to="/relayops/$workspaceId/services/$serviceId"
                 params={{ workspaceId, serviceId: service.id }}
-                className="grid min-h-16 grid-cols-[minmax(16rem,1fr)_8rem_10rem_12rem_2rem] items-center gap-4 border-b px-5 py-3 last:border-b-0 hover:bg-[#e2e9e6]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#245ebe]"
+                className="grid min-h-16 grid-cols-[minmax(16rem,1fr)_8rem_10rem_12rem_2rem] items-center gap-4 border-b px-5 py-3 last:border-b-0 hover:bg-[#eeedf8]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#6757ec]"
               >
                 <span className="min-w-0">
                   <span className="flex items-center gap-2 font-medium">
@@ -265,7 +265,7 @@ function ServiceCatalog() {
                 key={service.id}
                 to="/relayops/$workspaceId/services/$serviceId"
                 params={{ workspaceId, serviceId: service.id }}
-                className="rounded-lg border border-[#17211f]/10 bg-white p-4 dark:border-white/10 dark:bg-[#101a18]"
+                className="rounded-lg border border-[#1b1d36]/10 bg-white p-4 dark:border-white/10 dark:bg-[#1a1c35]"
               >
                 <div className="flex items-start justify-between gap-3">
                   <span>

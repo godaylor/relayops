@@ -15,6 +15,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
+import { LayoutGroup, motion, useReducedMotion } from "framer-motion";
 import {
   Ban,
   CheckCircle2,
@@ -31,11 +32,14 @@ import {
 import {
   type ComponentType,
   type CSSProperties,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
+import { useTranslation } from "react-i18next";
+import { SignalScene } from "@/components/relayops/signal-scene";
 import {
   Alert,
   AlertAction,
@@ -54,6 +58,7 @@ import {
   MenuTrigger,
 } from "@/components/ui/menu";
 import { cn } from "@/lib/cn";
+import { formatRelayOpsDateTime } from "@/lib/relayops-format";
 import type { RelayOpsIncidentStatus } from "@/lib/relayops-lifecycle";
 import {
   defaultResolveResponseBoardConflict,
@@ -179,6 +184,8 @@ function IncidentCard({
   onMove,
   onOpenIncident,
 }: IncidentCardProps) {
+  const { t } = useTranslation();
+  const reduceMotion = useReducedMotion();
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
@@ -200,11 +207,16 @@ function IncidentCard({
         isDragging && "border-ring ring-2 ring-ring/30",
       )}
       data-response-board-card-id={incident.id}
+      data-severity={incident.severity}
       ref={setNodeRef}
       render={<li />}
       style={style}
     >
-      <div className="flex min-w-0 items-start gap-2">
+      <motion.div
+        layoutId={reduceMotion ? undefined : `board-card-${incident.id}`}
+        transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
+        className="sbor-board-card-body flex min-w-0 items-start gap-2"
+      >
         {!dragDisabled ? (
           <Button
             {...attributes}
@@ -212,6 +224,7 @@ function IncidentCard({
             aria-label={labels.dragHandle(incident.title)}
             className="-ms-1 min-h-11 min-w-11 cursor-grab touch-none active:cursor-grabbing"
             data-response-board-control
+            data-response-board-drag
             disabled={pending}
             size="icon-xl"
             variant="ghost"
@@ -243,7 +256,7 @@ function IncidentCard({
               {incident.title}
             </p>
           )}
-          <p className="mt-1 truncate text-muted-foreground text-xs">
+          <p className="sbor-card-service mt-1 truncate text-muted-foreground text-xs">
             {incident.service.name}
           </p>
         </div>
@@ -302,6 +315,29 @@ function IncidentCard({
             </MenuGroup>
           </MenuPopup>
         </Menu>
+      </motion.div>
+      <div className="sbor-card-meta">
+        <span className="sbor-card-owner">
+          <span className="sbor-avatar">
+            {incident.commander?.name
+              .split(/\s+/)
+              .slice(0, 2)
+              .map((word) => word[0])
+              .join("")
+              .toUpperCase() ?? "—"}
+          </span>
+          <span>
+            {incident.commander?.name ?? t("relayops:brand.unassignedLabel")}
+          </span>
+        </span>
+        {incident.lastUpdateAt ? (
+          <time dateTime={incident.lastUpdateAt}>
+            {formatRelayOpsDateTime(incident.lastUpdateAt, {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </time>
+        ) : null}
       </div>
       {pending ? (
         <div className="flex items-center gap-2 text-muted-foreground text-xs">
@@ -350,7 +386,7 @@ function BoardLane({
       aria-disabled={activeIncident && !validTarget ? true : undefined}
       aria-label={labels.statusById[status]}
       className={cn(
-        "flex min-h-80 w-80 shrink-0 flex-col rounded-2xl border bg-muted/24 p-3 transition-[border-color,box-shadow,background-color] duration-150 motion-reduce:transition-none",
+        "flex min-h-80 w-[min(20rem,calc(100vw-2rem))] shrink-0 flex-col rounded-2xl border bg-muted/24 p-3 transition-[border-color,box-shadow,background-color] duration-150 motion-reduce:transition-none",
         over && validTarget && "border-ring bg-accent/40 ring-2 ring-ring/30",
         over && !validTarget && "border-destructive ring-2 ring-destructive/30",
       )}
@@ -364,7 +400,7 @@ function BoardLane({
         <LaneIcon aria-hidden="true" className="size-4.5" />
         <h2 className="font-semibold text-sm">{labels.statusById[status]}</h2>
         <Badge className="ms-auto" variant="secondary">
-          {labels.count(incidents.length)}
+          {incidents.length}
         </Badge>
       </header>
 
@@ -432,6 +468,7 @@ function OverlayCard({
 
 export function ResponseBoard({
   incidents,
+  emptyAction,
   labels,
   onTransition,
   canTransition,
@@ -442,6 +479,49 @@ export function ResponseBoard({
   onDiscardConflict,
   onOpenIncident,
 }: ResponseBoardProps) {
+  const { t } = useTranslation();
+  const boardScroll = useRef<HTMLDivElement>(null);
+  const initializedLane = useRef(false);
+  const [mobileLane, setMobileLane] = useState<RelayOpsIncidentStatus>(
+    () =>
+      incidents.find(
+        (incident) =>
+          incident.status !== "resolved" && incident.status !== "dismissed",
+      )?.status ?? "detected",
+  );
+  const scrollToLane = useCallback((status: RelayOpsIncidentStatus) => {
+    setMobileLane(status);
+    const scroller = boardScroll.current;
+    const lane = scroller?.querySelector<HTMLElement>(
+      `[data-response-board-lane="${status}"]`,
+    );
+    if (scroller && lane)
+      scroller.scrollTo({
+        left:
+          lane.getBoundingClientRect().left -
+          scroller.getBoundingClientRect().left +
+          scroller.scrollLeft,
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "instant"
+          : "smooth",
+      });
+  }, []);
+  useEffect(() => {
+    if (
+      initializedLane.current ||
+      window.innerWidth > 700 ||
+      incidents.length === 0
+    )
+      return;
+    const first = incidents.find(
+      (incident) =>
+        incident.status !== "resolved" && incident.status !== "dismissed",
+    );
+    if (first) {
+      initializedLane.current = true;
+      scrollToLane(first.status);
+    }
+  }, [incidents, scrollToLane]);
   const reducedMotion = usePrefersReducedMotion();
   const dragDisabled = !dndEnabled || reducedMotion;
   const [projectedById, setProjectedById] = useState(
@@ -739,24 +819,97 @@ export function ResponseBoard({
   };
 
   return (
-    <section aria-labelledby="response-board-title" className="space-y-3">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="font-semibold text-xl" id="response-board-title">
-            {labels.title}
-          </h1>
-          <p className="mt-1 text-muted-foreground text-sm">
-            {labels.description}
-          </p>
+    <section
+      aria-labelledby="response-board-title"
+      className={cn(
+        "sbor-response-board space-y-3",
+        incidents.length === 0 && "is-empty",
+      )}
+    >
+      <div className="sbor-board-intro">
+        <div className="sbor-board-heading">
+          <p className="sbor-eyebrow">{t("relayops:brand.boardEyebrow")}</p>
+          <div>
+            <h1 className="font-semibold text-xl" id="response-board-title">
+              {labels.title}
+            </h1>
+            <p className="mt-1 text-muted-foreground text-sm">
+              {t("relayops:brand.boardSubtitle")}
+            </p>
+          </div>
         </div>
+        <SignalScene compact />
         {dragDisabled ? (
-          <Badge className="min-h-8" variant="outline">
+          <Badge
+            className="min-h-8 max-w-full whitespace-normal py-2"
+            variant="outline"
+          >
             <LockKeyhole />
             {reducedMotion ? labels.reducedMotionFallback : labels.dndDisabled}
           </Badge>
         ) : null}
       </div>
 
+      <div className="sbor-board-summary">
+        <span>
+          <i className="sbor-state-dot" />
+          <strong>
+            {
+              projectedIncidents.filter(
+                (incident) =>
+                  incident.status !== "resolved" &&
+                  incident.status !== "dismissed",
+              ).length
+            }
+          </strong>
+          {t("relayops:brand.activeLabel")}
+        </span>
+        <span>
+          <i className="sbor-state-dot is-success" />
+          <strong>
+            {
+              projectedIncidents.filter(
+                (incident) => incident.status === "resolved",
+              ).length
+            }
+          </strong>
+          {t("relayops:brand.resolvedLabel")}
+        </span>
+        <span className="sbor-board-summary-note">
+          {t("relayops:brand.sharedRhythm")}
+        </span>
+      </div>
+      {incidents.length === 0 ? (
+        <div className="sbor-board-empty">
+          <span className="sbor-empty-orbit">
+            <Shield size={27} />
+          </span>
+          <div>
+            <h2>{t("relayops:brand.noBoardTitle")}</h2>
+            <p>{t("relayops:brand.noBoardDescription")}</p>
+            {emptyAction}
+          </div>
+        </div>
+      ) : null}
+      <fieldset className="sbor-board-mobile-stages" aria-label={labels.title}>
+        {responseBoardLaneStatuses.map((status) => (
+          <button
+            type="button"
+            key={status}
+            data-active={mobileLane === status}
+            onClick={() => scrollToLane(status)}
+          >
+            {labels.statusById[status]}
+            <span>
+              {
+                projectedIncidents.filter(
+                  (incident) => incident.status === status,
+                ).length
+              }
+            </span>
+          </button>
+        ))}
+      </fieldset>
       {lastError ? (
         <Alert variant="error">
           <AlertTitle>{labels.failedTitle}</AlertTitle>
@@ -840,29 +993,39 @@ export function ResponseBoard({
         onDragStart={handleDragStart}
         sensors={sensors}
       >
-        <div className="overflow-x-auto pb-3 [-webkit-overflow-scrolling:touch]">
-          <div className="flex min-w-max gap-3">
-            {responseBoardLaneStatuses.map((status) => (
-              <BoardLane
-                activeIncident={activeIncident}
-                canMove={canMove}
-                dragDisabled={dragDisabled}
-                incidents={projectedIncidents.filter(
-                  (incident) => incident.status === status,
-                )}
-                key={status}
-                labels={labels}
-                onMove={(incident, target, origin, focusTarget) =>
-                  void performTransition(incident, target, origin, focusTarget)
-                }
-                onOpenIncident={onOpenIncident}
-                over={overStatus === status}
-                pendingIds={pendingIds}
-                status={status}
-              />
-            ))}
+        <LayoutGroup>
+          <div
+            ref={boardScroll}
+            className="sbor-board-scroll overflow-x-auto pb-3 [-webkit-overflow-scrolling:touch]"
+          >
+            <div className="sbor-board-lanes flex min-w-max gap-3">
+              {responseBoardLaneStatuses.map((status) => (
+                <BoardLane
+                  activeIncident={activeIncident}
+                  canMove={canMove}
+                  dragDisabled={dragDisabled}
+                  incidents={projectedIncidents.filter(
+                    (incident) => incident.status === status,
+                  )}
+                  key={status}
+                  labels={labels}
+                  onMove={(incident, target, origin, focusTarget) =>
+                    void performTransition(
+                      incident,
+                      target,
+                      origin,
+                      focusTarget,
+                    )
+                  }
+                  onOpenIncident={onOpenIncident}
+                  over={overStatus === status}
+                  pendingIds={pendingIds}
+                  status={status}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        </LayoutGroup>
         <DragOverlay dropAnimation={reducedMotion ? null : undefined}>
           {activeIncident && !reducedMotion ? (
             <OverlayCard incident={activeIncident} labels={labels} />

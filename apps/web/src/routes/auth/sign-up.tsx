@@ -1,8 +1,4 @@
-import {
-  createFileRoute,
-  useNavigate,
-  useSearch,
-} from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { UserCheck } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -17,7 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import useGetConfig from "@/hooks/queries/config/use-get-config";
 import useInstanceStatus from "@/hooks/queries/instance/use-instance-status";
-import { authClient } from "@/lib/auth-client";
+import { useGuestDemoAccess } from "@/hooks/use-guest-demo-access";
 import { toast } from "@/lib/toast";
 
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as
@@ -36,9 +32,8 @@ export const Route = createFileRoute("/auth/sign-up")({
 
 function SignUp() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const search = useSearch({ from: "/auth/sign-up" });
-  const [isGuestLoading, setIsGuestLoading] = useState(false);
+  const { isPending: isGuestLoading, openGuestDemo } = useGuestDemoAccess();
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const handleTurnstileVerify = useCallback((token: string) => {
     setTurnstileToken(token);
@@ -71,6 +66,14 @@ function SignUp() {
   const invitationId = search.invitationId;
   const prefillEmail = search.email;
   const isInstanceAdminSetup = instanceStatus?.hasUsers === false;
+  const selfServiceAllowed =
+    !config?.disableRegistration || !!invitationId || isInstanceAdminSetup;
+  const hasGuest =
+    config?.hasGuestAccess &&
+    !invitationId &&
+    !isInstanceAdminSetup &&
+    !config?.disablePasswordRegistration &&
+    selfServiceAllowed;
 
   const baseUrl = import.meta.env.VITE_CLIENT_URL ?? window.location.origin;
   const callbackURL = invitationId
@@ -80,21 +83,7 @@ function SignUp() {
 
   const handleGuestAccess = async () => {
     if (captchaPending) return;
-    setIsGuestLoading(true);
-    try {
-      const result = await authClient.signIn.anonymous();
-      if (result.error) {
-        throw new Error(result.error.message);
-      }
-      toast.success(t("auth:signIn.guestSuccess"));
-      navigate({ to: "/dashboard" });
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : t("auth:signIn.guestError"),
-      );
-    } finally {
-      setIsGuestLoading(false);
-    }
+    await openGuestDemo();
   };
 
   return (
@@ -121,6 +110,22 @@ function SignUp() {
                 : config?.disablePasswordRegistration
                   ? t("auth:signUp.subtitlePasswordDisabled")
                   : t("auth:signUp.subtitleDefault")
+        }
+        guestAction={
+          hasGuest ? (
+            <Button
+              variant="outline"
+              data-testid="guest-quick-entry"
+              className="sbor-quick-entry"
+              onClick={handleGuestAccess}
+              disabled={isGuestLoading || captchaPending}
+            >
+              <UserCheck className="size-5" />
+              {isGuestLoading
+                ? t("relayops:guest.preparing")
+                : t("auth:signUp.continueAsGuest")}
+            </Button>
+          ) : undefined
         }
       >
         <div className="space-y-4 mt-6">
@@ -162,16 +167,6 @@ function SignUp() {
             // or doing first-user instance setup; otherwise the alternatives
             // would either bypass the policy or send the user into a flow
             // the backend will reject.
-            const selfServiceAllowed =
-              !config?.disableRegistration ||
-              !!invitationId ||
-              isInstanceAdminSetup;
-            const hasGuest =
-              config?.hasGuestAccess &&
-              !invitationId &&
-              !isInstanceAdminSetup &&
-              !config?.disablePasswordRegistration &&
-              selfServiceAllowed;
             const hasAnySso =
               selfServiceAllowed &&
               (config?.hasGoogleSignIn ||
@@ -187,13 +182,14 @@ function SignUp() {
                   {hasGuest && (
                     <Button
                       variant="outline"
+                      data-testid="guest-demo-entry"
                       onClick={handleGuestAccess}
                       disabled={isGuestLoading || captchaPending}
                       className="w-full"
                     >
                       <UserCheck className="w-4 h-4 mr-2" />
                       {isGuestLoading
-                        ? t("auth:signUp.signingIn")
+                        ? t("relayops:guest.preparing")
                         : t("auth:signUp.continueAsGuest")}
                     </Button>
                   )}

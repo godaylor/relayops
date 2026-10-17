@@ -47,6 +47,7 @@ test("V3 newcomer guide, assignment, saved solution, responsive layouts and sign
     .click();
   await page.getByLabel("Workspace Name").fill(`Training ${suffix}`);
   await page.getByRole("button", { name: "Create RelayOps workspace" }).click();
+  await page.locator(".relay-account-menu > summary").click();
   await expect(
     page.getByText("Signed in: V3 Training Owner", { exact: true }),
   ).toBeVisible();

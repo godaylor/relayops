@@ -49,7 +49,7 @@ function ManageAndLegacyArchive() {
   return (
     <div className="mx-auto max-w-6xl space-y-7">
       <div>
-        <p className="font-mono text-[#245ebe] text-xs tracking-[0.16em] dark:text-[#8fb6ff]">
+        <p className="font-mono text-[#6757ec] text-xs tracking-[0.16em] dark:text-[#b3a5ff]">
           {t("relayops:manage.eyebrow")}
         </p>
         <h1 className="mt-1 font-semibold text-3xl tracking-tight">
@@ -64,9 +64,9 @@ function ManageAndLegacyArchive() {
         <Link
           to="/dashboard/workspace/$workspaceId/members"
           params={{ workspaceId }}
-          className="flex min-h-24 items-center gap-4 rounded-lg border border-[#17211f]/10 bg-white p-4 hover:bg-[#e2e9e6]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#245ebe] dark:border-white/10 dark:bg-[#101a18]"
+          className="flex min-h-24 items-center gap-4 rounded-lg border border-[#1b1d36]/10 bg-white p-4 hover:bg-[#eeedf8]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6757ec] dark:border-white/10 dark:bg-[#1a1c35]"
         >
-          <span className="grid size-10 place-items-center rounded-md bg-[#245ebe]/8 text-[#245ebe] dark:text-[#8fb6ff]">
+          <span className="grid size-10 place-items-center rounded-md bg-[#6757ec]/8 text-[#6757ec] dark:text-[#b3a5ff]">
             <Users className="size-5" />
           </span>
           <span>
@@ -76,7 +76,7 @@ function ManageAndLegacyArchive() {
             </span>
           </span>
         </Link>
-        <div className="flex min-h-24 items-center gap-4 rounded-lg border border-[#17211f]/10 bg-white p-4 dark:border-white/10 dark:bg-[#101a18]">
+        <div className="flex min-h-24 items-center gap-4 rounded-lg border border-[#1b1d36]/10 bg-white p-4 dark:border-white/10 dark:bg-[#1a1c35]">
           <span className="grid size-10 place-items-center rounded-md bg-emerald-700/8 text-emerald-700">
             <LockKeyhole className="size-5" />
           </span>
@@ -91,7 +91,7 @@ function ManageAndLegacyArchive() {
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-lg border border-[#17211f]/10 bg-white dark:border-white/10 dark:bg-[#101a18]">
+      <section className="overflow-hidden rounded-lg border border-[#1b1d36]/10 bg-white dark:border-white/10 dark:bg-[#1a1c35]">
         <div className="flex flex-col justify-between gap-4 border-b p-5 sm:flex-row sm:items-center">
           <div>
             <div className="flex items-center gap-2">

@@ -51,6 +51,7 @@ const page = {
 
 describe("IncidentWorkbench inspector", () => {
   it("localizes enum facets and groups without changing canonical URL values", () => {
+    const onSearchChange = vi.fn();
     const labels = {
       ...workbenchLabels,
       statusById: { ...workbenchLabels.statusById, detected: "Сообщён" },
@@ -69,12 +70,15 @@ describe("IncidentWorkbench inspector", () => {
             status: [{ value: "detected", label: "detected", count: 1 }],
           },
         }}
-        onSearchChange={vi.fn()}
+        onSearchChange={onSearchChange}
         onSelectIncident={vi.fn()}
       />,
     );
-    expect(screen.getByRole("option", { name: "Сообщён (1)" })).toHaveValue(
-      "detected",
+    fireEvent.click(screen.getByLabelText("Сообщён"));
+    expect(onSearchChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: expect.not.arrayContaining(["detected"]),
+      }),
     );
     expect(screen.getByText("Сообщён · 1")).toBeInTheDocument();
   });

@@ -32,7 +32,7 @@ export function EmailShell({
       <Body style={main}>
         <Container style={container}>
           <Section style={content}>
-            <Text style={badge}>RelayOps</Text>
+            <Text style={badge}>Сборитм</Text>
             <Heading style={heading}>{title}</Heading>
             {subtitle ? <Text style={subtitleText}>{subtitle}</Text> : null}
             <Section style={body}>{children}</Section>

@@ -64,6 +64,7 @@ export const listServicesQuery = z.object({
 
 export const createDemoDataBody = z.object({
   serviceId: z.string().min(1),
+  locale: z.enum(["en-US", "ru-RU"]).optional(),
 });
 
 export const createIncidentBody = z.object({

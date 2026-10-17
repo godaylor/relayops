@@ -14,6 +14,35 @@ import {
 } from "./virtualized-incident-table";
 
 describe("VirtualizedIncidentTable", () => {
+  it("keeps mobile cards bounded and returns their button as the inspector focus target", () => {
+    vi.stubGlobal("innerWidth", 390);
+    try {
+      const onSelect = vi.fn();
+      const { container } = render(
+        <VirtualizedIncidentTable
+          items={Array.from({ length: 100 }, (_, index) =>
+            workbenchItem(index),
+          )}
+          columns={defaultWorkbenchColumns}
+          sort={defaultWorkbenchSort}
+          density="compact"
+          selectedIds={new Set()}
+          labels={workbenchLabels}
+          viewportHeight={240}
+          onSortChange={vi.fn()}
+          onSelectIncident={onSelect}
+          onSelectionChange={vi.fn()}
+        />,
+      );
+      expect(screen.getAllByRole("listitem").length).toBeLessThan(20);
+      const trigger = container.querySelector(".relay-mobile-incident button");
+      if (!trigger) throw new Error("Expected a mobile incident button");
+      fireEvent.click(trigger);
+      expect(onSelect).toHaveBeenCalledWith("incident-0", trigger);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
   it("renders a bounded viewport and supports keyboard row opening", () => {
     const onSelect = vi.fn();
     render(
@@ -89,13 +118,13 @@ describe("VirtualizedIncidentTable", () => {
     fireEvent.click(screen.getByText("Columns"));
     fireEvent.click(screen.getByLabelText("Widen: Key"));
     expect(onChange).toHaveBeenCalledWith([
-      { id: "key", pin: "left", width: 136 },
-      { id: "severity", pin: "left", width: 92 },
+      { id: "key", pin: "left", width: 120 },
+      { id: "title", pin: null, width: 280 },
     ]);
     fireEvent.click(screen.getByLabelText("Pin column: Key"));
     expect(onChange).toHaveBeenLastCalledWith([
-      { id: "key", pin: "right", width: 112 },
-      { id: "severity", pin: "left", width: 92 },
+      { id: "key", pin: "right", width: 96 },
+      { id: "title", pin: null, width: 280 },
     ]);
   });
 

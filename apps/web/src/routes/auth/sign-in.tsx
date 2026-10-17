@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import useGetConfig from "@/hooks/queries/config/use-get-config";
 import useInstanceStatus from "@/hooks/queries/instance/use-instance-status";
+import { useGuestDemoAccess } from "@/hooks/use-guest-demo-access";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/cn";
 import { toast } from "@/lib/toast";
@@ -47,7 +48,7 @@ function SignIn() {
   const [isGithubLoading, setIsGithubLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isDiscordLoading, setIsDiscordLoading] = useState(false);
-  const [isGuestLoading, setIsGuestLoading] = useState(false);
+  const { isPending: isGuestLoading, openGuestDemo } = useGuestDemoAccess();
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [autoLoginFailed, setAutoLoginFailed] = useState(false);
   const lastLoginMethod = authClient.getLastUsedLoginMethod();
@@ -205,21 +206,7 @@ function SignIn() {
 
   const handleGuestAccess = async () => {
     if (captchaPending) return;
-    setIsGuestLoading(true);
-    try {
-      const result = await authClient.signIn.anonymous();
-      if (result.error) {
-        throw new Error(result.error.message);
-      }
-      toast.success(t("auth:signIn.guestSuccess"));
-      handleSignInSuccess();
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : t("auth:signIn.guestError"),
-      );
-    } finally {
-      setIsGuestLoading(false);
-    }
+    await openGuestDemo();
   };
 
   useEffect(() => {
@@ -271,6 +258,22 @@ function SignIn() {
           invitationId
             ? t("auth:signIn.invitationSubtitle")
             : t("auth:signIn.subtitle")
+        }
+        guestAction={
+          config?.hasGuestAccess && !invitationId ? (
+            <Button
+              variant="outline"
+              data-testid="guest-quick-entry"
+              className="sbor-quick-entry"
+              onClick={handleGuestAccess}
+              disabled={isGuestLoading || captchaPending}
+            >
+              <UserCheck className="size-5" />
+              {isGuestLoading
+                ? t("relayops:guest.preparing")
+                : t("auth:signUp.continueAsGuest")}
+            </Button>
+          ) : undefined
         }
       >
         <div className="mt-6">
@@ -424,13 +427,14 @@ function SignIn() {
                   <>
                     <Button
                       variant="outline"
+                      data-testid="guest-demo-entry"
                       onClick={handleGuestAccess}
                       disabled={isGuestLoading || captchaPending}
                       className="w-full"
                     >
                       <UserCheck className="w-5 h-5 mr-2" />
                       {isGuestLoading
-                        ? t("auth:signIn.signingIn")
+                        ? t("relayops:guest.preparing")
                         : t("auth:signUp.continueAsGuest")}
                     </Button>
                     {captchaConfigured && TURNSTILE_SITE_KEY && (

@@ -13,7 +13,7 @@ describe("getInvitationEmailSubject", () => {
       workspaceName,
     );
 
-    expect(subject).toBe("Alice invited you to join Produkt on RelayOps");
+    expect(subject).toBe("Alice invited you to join Produkt on Сборитм");
   });
 
   it("uses Russian copy for Russian locales", () => {
@@ -28,7 +28,7 @@ describe("getInvitationEmailSubject", () => {
     );
 
     expect(subject).toBe(
-      "Alice приглашает вас присоединиться к Продукт в RelayOps",
+      "Alice приглашает вас присоединиться к Продукт в Сборитм",
     );
   });
 
@@ -44,7 +44,7 @@ describe("getInvitationEmailSubject", () => {
     );
 
     expect(subject).toBe(
-      "Alice приглашает вас присоединиться к Producto в RelayOps",
+      "Alice приглашает вас присоединиться к Producto в Сборитм",
     );
   });
 });

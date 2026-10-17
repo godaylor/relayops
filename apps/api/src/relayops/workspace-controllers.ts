@@ -173,12 +173,17 @@ export async function createDemoIncident(
   workspaceId: string,
   actorUserId: string,
   serviceId: string,
+  locale: "en-US" | "ru-RU" = "en-US",
 ) {
+  const russian = locale === "ru-RU";
   return createIncident(workspaceId, actorUserId, {
     serviceId,
-    title: "Checkout latency above error budget",
-    summary:
-      "Deterministic demo incident. Use it to explore the Incident Room, then remove all demo data from Overview.",
+    title: russian
+      ? "Оплата картой проходит с задержкой"
+      : "Checkout latency above error budget",
+    summary: russian
+      ? "Учебный инцидент: платёжный шлюз отвечает медленнее обычного. Назначьте ответственного, запишите обновление и завершите инцидент с итогом."
+      : "Deterministic demo incident. Use it to explore the Incident Room, then remove all demo data from Overview.",
     severity: "sev2",
     impact: "degraded",
     idempotencyKey: `demo:${DEMO_DATA_SET_ID}:${serviceId}`,

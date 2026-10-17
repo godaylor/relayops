@@ -1,0 +1,112 @@
+[
+	{
+		"route": "",
+		"reducedMotion": true,
+		"sizes": [
+			{
+				"width": 320,
+				"overflow": false
+			},
+			{
+				"width": 390,
+				"overflow": false
+			},
+			{
+				"width": 768,
+				"overflow": false
+			},
+			{
+				"width": 1440,
+				"overflow": false
+			}
+		]
+	},
+	{
+		"route": "/incidents",
+		"reducedMotion": true,
+		"sizes": [
+			{
+				"width": 320,
+				"overflow": false
+			},
+			{
+				"width": 390,
+				"overflow": false
+			},
+			{
+				"width": 768,
+				"overflow": false
+			},
+			{
+				"width": 1440,
+				"overflow": false
+			}
+		]
+	},
+	{
+		"route": "/board",
+		"reducedMotion": true,
+		"sizes": [
+			{
+				"width": 320,
+				"overflow": false
+			},
+			{
+				"width": 390,
+				"overflow": false
+			},
+			{
+				"width": 768,
+				"overflow": false
+			},
+			{
+				"width": 1440,
+				"overflow": false
+			}
+		]
+	},
+	{
+		"route": "/services",
+		"reducedMotion": true,
+		"sizes": [
+			{
+				"width": 320,
+				"overflow": false
+			},
+			{
+				"width": 390,
+				"overflow": false
+			},
+			{
+				"width": 768,
+				"overflow": false
+			},
+			{
+				"width": 1440,
+				"overflow": false
+			}
+		]
+	},
+	{
+		"route": "/analytics",
+		"reducedMotion": true,
+		"sizes": [
+			{
+				"width": 320,
+				"overflow": false
+			},
+			{
+				"width": 390,
+				"overflow": false
+			},
+			{
+				"width": 768,
+				"overflow": false
+			},
+			{
+				"width": 1440,
+				"overflow": false
+			}
+		]
+	}
+]

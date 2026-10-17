@@ -97,7 +97,10 @@ function visit(manifestPath, includeDev = false) {
     if (hash !== exact.hash) throw new Error(`License changed for ${pkg.name}`);
     license = exact.expression;
   }
-  if (pkg.name.startsWith("@fontsource-variable/geist")) {
+  if (
+    pkg.name.startsWith("@fontsource-variable/geist") ||
+    pkg.name === "@fontsource-variable/onest"
+  ) {
     mkdirSync(join(out, "fonts"), { recursive: true });
     copyFileSync(
       join(packageDir, "LICENSE"),

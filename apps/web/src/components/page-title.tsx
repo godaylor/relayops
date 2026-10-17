@@ -8,7 +8,7 @@ type PageTitleProps = {
 
 export default function PageTitle({
   title,
-  suffix = "RelayOps",
+  suffix = "Сборитм",
   hideAppName = false,
 }: PageTitleProps) {
   useEffect(() => {

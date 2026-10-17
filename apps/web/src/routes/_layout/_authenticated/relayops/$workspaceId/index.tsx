@@ -18,6 +18,7 @@ import {
   RelayOpsSkeleton,
 } from "@/components/relayops/route-state";
 import { ServiceForm } from "@/components/relayops/service-form";
+import { SignalScene } from "@/components/relayops/signal-scene";
 import {
   AlertDialog,
   AlertDialogClose,
@@ -60,12 +61,15 @@ function Metric({
   tone?: "default" | "warning" | "danger";
 }) {
   const colors = {
-    default: "text-[#245ebe] bg-[#245ebe]/8 dark:text-[#8fb6ff]",
+    default: "text-[#6757ec] bg-[#6757ec]/8 dark:text-[#b3a5ff]",
     warning: "text-[#b9651b] bg-[#b9651b]/8",
     danger: "text-[#b73a34] bg-[#b73a34]/8",
   };
   return (
-    <article className="rounded-lg border border-[#17211f]/10 bg-white p-4 dark:border-white/10 dark:bg-[#101a18]">
+    <article
+      data-sbor-metric
+      className="rounded-lg border border-[#1b1d36]/10 bg-white p-4 dark:border-white/10 dark:bg-[#1a1c35]"
+    >
       <div
         className={`grid size-9 place-items-center rounded-md ${colors[tone]}`}
       >
@@ -126,11 +130,11 @@ function OperationsOverview() {
     return (
       <section className="mx-auto max-w-4xl">
         <div className="mb-6 flex items-center gap-3">
-          <span className="grid size-10 place-items-center rounded-md bg-[#245ebe] text-white">
+          <span className="grid size-10 place-items-center rounded-md bg-[#6757ec] text-white">
             <Radio className="size-5" />
           </span>
           <div>
-            <p className="font-mono text-[#245ebe] text-xs tracking-[0.16em] dark:text-[#8fb6ff]">
+            <p className="font-mono text-[#6757ec] text-xs tracking-[0.16em] dark:text-[#b3a5ff]">
               {t("relayops:onboarding.eyebrow")}
             </p>
             <h1 className="font-semibold text-2xl tracking-tight sm:text-3xl">
@@ -148,8 +152,8 @@ function OperationsOverview() {
               key={step}
               className={`rounded-md border p-3 ${
                 index === 0 || (index === 1 && !createdService)
-                  ? "border-[#245ebe]/30 bg-[#245ebe]/5"
-                  : "border-[#17211f]/10 bg-white dark:border-white/10 dark:bg-[#101a18]"
+                  ? "border-[#6757ec]/30 bg-[#6757ec]/5"
+                  : "border-[#1b1d36]/10 bg-white dark:border-white/10 dark:bg-[#1a1c35]"
               }`}
             >
               <span className="mr-2 font-mono text-muted-foreground">
@@ -159,7 +163,7 @@ function OperationsOverview() {
             </li>
           ))}
         </ol>
-        <div className="rounded-xl border border-[#17211f]/10 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#101a18] sm:p-7">
+        <div className="rounded-xl border border-[#1b1d36]/10 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#1a1c35] sm:p-7">
           {!createdService ? (
             <>
               <h2 className="font-semibold text-xl">
@@ -256,34 +260,24 @@ function OperationsOverview() {
   }
 
   return (
-    <div className="space-y-7">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+    <div className="sbor-overview space-y-7">
+      <div className="sbor-overview-hero">
         <div>
-          <p className="font-mono text-[#245ebe] text-xs tracking-[0.16em] dark:text-[#8fb6ff]">
-            {t("relayops:overview.eyebrow")}
+          <p className="font-mono text-[#6757ec] text-xs tracking-[0.16em] dark:text-[#b3a5ff]">
+            {t("relayops:brand.overviewEyebrow")}
           </p>
           <h1 className="mt-1 font-semibold text-3xl tracking-tight">
-            {t("relayops:overview.title")}
+            {t("relayops:brand.overviewTitle")}
           </h1>
           <p className="mt-2 text-muted-foreground text-sm">
-            {t("relayops:overview.description")}
+            {t("relayops:brand.overviewDescription")}
           </p>
         </div>
-        <Button
-          render={
-            <Link
-              to="/relayops/$workspaceId/services"
-              params={{ workspaceId }}
-            />
-          }
-        >
-          <Server className="size-4" />
-          {t("relayops:overview.openCatalog")}
-        </Button>
+        <SignalScene compact />
       </div>
 
       <section
-        className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+        className="sbor-metrics"
         aria-label={t("relayops:overview.metrics")}
       >
         <Metric
@@ -315,7 +309,7 @@ function OperationsOverview() {
         id="operational-insights"
         className="grid scroll-mt-36 gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(20rem,.75fr)]"
       >
-        <section className="rounded-lg border border-[#17211f]/10 bg-white dark:border-white/10 dark:bg-[#101a18]">
+        <section className="sbor-overview-panel">
           <div className="border-b px-5 py-4">
             <h2 className="font-semibold">
               {t("relayops:overview.activeTitle")}
@@ -343,10 +337,10 @@ function OperationsOverview() {
                   key={incident.id}
                   to="/relayops/$workspaceId/incidents/$incidentId"
                   params={{ workspaceId, incidentId: incident.id }}
-                  className="flex min-h-16 items-center justify-between gap-3 px-5 py-3 hover:bg-[#e2e9e6]/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#245ebe]"
+                  className="flex min-h-16 items-center justify-between gap-3 px-5 py-3 hover:bg-[#eeedf8]/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#6757ec]"
                 >
                   <span>
-                    <span className="font-mono text-[#245ebe] text-xs dark:text-[#8fb6ff]">
+                    <span className="font-mono text-[#6757ec] text-xs dark:text-[#b3a5ff]">
                       {incident.key}
                     </span>
                     <span className="mt-1 block font-medium">
@@ -365,7 +359,7 @@ function OperationsOverview() {
           )}
         </section>
 
-        <section className="rounded-lg border border-[#17211f]/10 bg-white dark:border-white/10 dark:bg-[#101a18]">
+        <section className="sbor-overview-panel">
           <div className="border-b px-5 py-4">
             <h2 className="font-semibold">
               {t("relayops:overview.latestTitle")}
@@ -380,10 +374,10 @@ function OperationsOverview() {
             </p>
           ) : (
             <div className="relative p-5 pl-8">
-              <span className="absolute top-5 bottom-5 left-[1.05rem] w-px bg-[#245ebe]/25" />
+              <span className="absolute top-5 bottom-5 left-[1.05rem] w-px bg-[#6757ec]/25" />
               {overview.data.latestUpdates.map((update) => (
                 <article key={update.id} className="relative mb-5 last:mb-0">
-                  <span className="absolute top-1.5 -left-[1.18rem] size-2.5 rounded-full bg-[#245ebe]" />
+                  <span className="absolute top-1.5 -left-[1.18rem] size-2.5 rounded-full bg-[#6757ec]" />
                   <p className="font-medium text-sm">{update.incidentTitle}</p>
                   <p className="mt-1 text-muted-foreground text-xs">
                     {update.serviceName} ·{" "}
@@ -397,48 +391,51 @@ function OperationsOverview() {
       </div>
 
       {overview.data.demoDataCount > 0 ? (
-        <section className="flex flex-col justify-between gap-4 rounded-lg border border-[#b9651b]/30 bg-[#b9651b]/8 p-4 sm:flex-row sm:items-center">
-          <div>
-            <h2 className="font-medium">{t("relayops:demo.title")}</h2>
-            <p className="mt-1 text-muted-foreground text-sm">
+        <details className="sbor-demo-note">
+          <summary>
+            <span className="sbor-demo-tag">DEMO</span>
+            <span>{t("relayops:demo.title")}</span>
+          </summary>
+          <div className="sbor-demo-options">
+            <p>
               {t("relayops:demo.description", {
                 count: overview.data.demoDataCount,
               })}
             </p>
+            {canCleanupDemo.allowed ? (
+              <AlertDialog>
+                <AlertDialogTrigger
+                  render={<Button variant="destructive-outline" />}
+                >
+                  <Trash2 className="size-4" />
+                  {t("relayops:demo.remove")}
+                </AlertDialogTrigger>
+                <AlertDialogPopup>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      {t("relayops:demo.confirmTitle")}
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {t("relayops:demo.confirmDescription")}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogClose render={<Button variant="outline" />}>
+                      {t("relayops:demo.cancel")}
+                    </AlertDialogClose>
+                    <Button
+                      variant="destructive"
+                      loading={removeDemo.isPending}
+                      onClick={() => removeDemo.mutate()}
+                    >
+                      {t("relayops:demo.confirm")}
+                    </Button>
+                  </AlertDialogFooter>
+                </AlertDialogPopup>
+              </AlertDialog>
+            ) : null}
           </div>
-          {canCleanupDemo.allowed ? (
-            <AlertDialog>
-              <AlertDialogTrigger
-                render={<Button variant="destructive-outline" />}
-              >
-                <Trash2 className="size-4" />
-                {t("relayops:demo.remove")}
-              </AlertDialogTrigger>
-              <AlertDialogPopup>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    {t("relayops:demo.confirmTitle")}
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {t("relayops:demo.confirmDescription")}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogClose render={<Button variant="outline" />}>
-                    {t("relayops:demo.cancel")}
-                  </AlertDialogClose>
-                  <Button
-                    variant="destructive"
-                    loading={removeDemo.isPending}
-                    onClick={() => removeDemo.mutate()}
-                  >
-                    {t("relayops:demo.confirm")}
-                  </Button>
-                </AlertDialogFooter>
-              </AlertDialogPopup>
-            </AlertDialog>
-          ) : null}
-        </section>
+        </details>
       ) : null}
     </div>
   );

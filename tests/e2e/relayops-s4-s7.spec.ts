@@ -8,13 +8,21 @@ async function openDemoIncident(page: Page) {
   await page.getByLabel("Full Name").fill("RelayOps Gate Admin");
   await page.getByLabel("Email").fill(`${suffix}@example.test`);
   await page.locator('input[name="password"]').fill("RelayOps-password-123!");
-  await page.getByRole("button", { name: "Create Account" }).click();
+  await page
+    .getByRole("button", { name: "Create Account" })
+    .click({ noWaitAfter: true });
   await page.getByLabel("Workspace Name").fill(`RelayOps ${suffix}`);
-  await page.getByRole("button", { name: "Create RelayOps workspace" }).click();
+  await page
+    .getByRole("button", { name: "Create RelayOps workspace" })
+    .click({ noWaitAfter: true });
   await page.getByLabel("Service name").fill("Checkout API");
   await page.getByLabel("Service identifier").fill(`checkout-${suffix}`);
-  await page.getByRole("button", { name: "Create first service" }).click();
-  await page.getByRole("button", { name: "Create demo incident" }).click();
+  await page
+    .getByRole("button", { name: "Create first service" })
+    .click({ noWaitAfter: true });
+  await page
+    .getByRole("button", { name: "Create demo incident" })
+    .click({ noWaitAfter: true });
   await expect(page).toHaveURL(/\/relayops\/[^/]+\/incidents\/[^/?]+/);
 
   const match = page.url().match(/\/relayops\/([^/]+)\/incidents\/([^/?]+)/);
@@ -76,16 +84,31 @@ test("Workbench URL survives save, refresh, history and a second authorized sess
   await page
     .getByRole("searchbox", { name: "Search incidents" })
     .fill("Checkout");
-  await page.getByRole("button", { name: "Apply filters" }).click();
+  await page
+    .getByRole("button", { name: "Apply filters" })
+    .click({ noWaitAfter: true });
   await expect
     .poll(() => new URL(page.url()).searchParams.get("q"))
     .toBe("Checkout");
 
-  await page.locator("#workbench-severity").selectOption(["sev2"]);
+  await page
+    .locator(".relay-advanced-filters > summary")
+    .click({ noWaitAfter: true });
+  await page
+    .locator(".relay-facet")
+    .filter({ has: page.locator("#workbench-severity") })
+    .locator("summary")
+    .click({ noWaitAfter: true });
+  await page.locator("#workbench-severity input").click({ noWaitAfter: true });
   await expect
     .poll(() => new URL(page.url()).searchParams.get("severity"))
     .toContain("sev2");
-  await expect(page.locator("#workbench-severity")).toHaveValues(["sev2"]);
+  await expect(page.locator("#workbench-severity input")).toBeChecked();
+  await page
+    .locator(".relay-facet")
+    .filter({ has: page.locator("#workbench-severity") })
+    .locator("summary")
+    .click({ noWaitAfter: true });
   await groupSelect(page).selectOption("severity");
   await expect
     .poll(() => new URL(page.url()).searchParams.get("group"))
@@ -97,18 +120,29 @@ test("Workbench URL survives save, refresh, history and a second authorized sess
     .toBe("comfortable");
   await expect(page.getByLabel("Density")).toHaveValue("comfortable");
 
-  await page.getByText("Columns", { exact: true }).click();
-  await page.getByLabel("Responders", { exact: true }).click();
+  await page.getByText("Columns", { exact: true }).click({ noWaitAfter: true });
+  await page
+    .getByLabel("Responders", { exact: true })
+    .click({ noWaitAfter: true });
+  await page
+    .getByLabel("Responders", { exact: true })
+    .click({ noWaitAfter: true });
   await expect
     .poll(() => new URL(page.url()).searchParams.get("columns"))
     .not.toContain("responders");
   await expect(
     page.getByLabel("Responders", { exact: true }),
   ).not.toBeChecked();
-  await page.getByText("Columns", { exact: true }).click();
+  await page.getByText("Columns", { exact: true }).click({ noWaitAfter: true });
 
+  await page
+    .locator(".relay-view-disclosure > summary")
+    .click({ noWaitAfter: true });
+  await page.locator(".relay-save-view > summary").click({ noWaitAfter: true });
   await page.getByLabel("View name").fill("Checkout response");
-  await page.getByRole("button", { name: "Save current view" }).click();
+  await page
+    .getByRole("button", { name: "Save current view" })
+    .click({ noWaitAfter: true });
   await expect
     .poll(() => new URL(page.url()).searchParams.get("view"))
     .not.toBeNull();
@@ -125,7 +159,7 @@ test("Workbench URL survives save, refresh, history and a second authorized sess
   await page.goForward();
   await expect(page.getByLabel("Density")).toHaveValue("compact");
 
-  await page.getByTestId("workbench-row").first().click();
+  await page.getByTestId("workbench-row").first().click({ noWaitAfter: true });
   await expect
     .poll(() => new URL(page.url()).searchParams.get("incidentId"))
     .not.toBeNull();
@@ -175,8 +209,12 @@ test("Workbench URL survives save, refresh, history and a second authorized sess
   await expect(
     secondPage.getByText("Incident inspector", { exact: true }),
   ).toBeVisible();
-  await secondPage.getByRole("button", { name: "Close inspector" }).click();
-  await secondPage.getByText("Columns", { exact: true }).click();
+  await secondPage
+    .getByRole("button", { name: "Close inspector" })
+    .click({ noWaitAfter: true });
+  await secondPage
+    .getByText("Columns", { exact: true })
+    .click({ noWaitAfter: true });
   await expect(
     secondPage.getByLabel("Responders", { exact: true }),
   ).not.toBeChecked();

@@ -237,7 +237,7 @@ export function OnboardingFlow() {
   return (
     <>
       <PageTitle title={t("auth:onboarding.workspacePageTitle")} />
-      <div className="min-h-screen w-full bg-background flex flex-col items-center justify-center p-4">
+      <div className="relay-auth relay-onboarding min-h-screen w-full flex flex-col items-center justify-center p-4">
         <AnimatePresence mode="wait">
           {step === "workspace" && renderWorkspaceStep()}
           {step === "success" && renderSuccessStep()}

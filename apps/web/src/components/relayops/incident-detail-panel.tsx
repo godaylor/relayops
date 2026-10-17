@@ -1,11 +1,16 @@
 import { Link } from "@tanstack/react-router";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   Activity,
+  ArrowRight,
+  Check,
   CheckCircle2,
+  ChevronDown,
   Clock3,
-  Radio,
+  MessageSquare,
   Server,
   ShieldAlert,
+  UserRound,
   Users,
 } from "lucide-react";
 import { type RefObject, useState } from "react";
@@ -43,21 +48,33 @@ const eventKeys = {
   "incident.resolved": "relayops:timeline.resolved",
   "incident.dismissed": "relayops:timeline.dismissed",
   "incident.reopened": "relayops:timeline.reopened",
+  "incident.signal_attached": "relayops:signals.attached",
 } as const;
 
-function TimelineSummary({
-  payload,
-}: {
-  type: string;
-  payload: Record<string, unknown>;
-}) {
+function TimelineSummary({ payload }: { payload: Record<string, unknown> }) {
+  const { t } = useTranslation();
   const message = typeof payload.message === "string" ? payload.message : null;
   const reason = typeof payload.reason === "string" ? payload.reason : null;
+  const resolution =
+    typeof payload.resolutionSummary === "string"
+      ? payload.resolutionSummary
+      : null;
+  const from = typeof payload.from === "string" ? payload.from : null;
+  const to = typeof payload.to === "string" ? payload.to : null;
 
   return (
     <>
-      {message || reason ? (
-        <p className="mt-2 whitespace-pre-wrap text-sm">{message ?? reason}</p>
+      {from && to && from in statusKeys && to in statusKeys ? (
+        <div className="sbor-timeline-transition">
+          <span>{t(statusKeys[from as keyof typeof statusKeys])}</span>
+          <ArrowRight aria-hidden="true" />
+          <span>{t(statusKeys[to as keyof typeof statusKeys])}</span>
+        </div>
+      ) : null}
+      {message || reason || resolution ? (
+        <p className="sbor-timeline-message">
+          {message ?? reason ?? resolution}
+        </p>
       ) : null}
     </>
   );
@@ -72,16 +89,32 @@ function TimestampFact({
 }) {
   const { t } = useTranslation();
   return (
-    <div>
-      <dt className="text-muted-foreground text-xs uppercase tracking-wide">
+    <div className="sbor-response-time" data-recorded={Boolean(value)}>
+      <dt>
+        <span aria-hidden="true">{value ? <Check /> : <span />}</span>
         {label}
       </dt>
-      <dd className="mt-1 text-sm">
+      <dd>
         {value
           ? formatRelayOpsDateTime(value)
           : t("relayops:incidentRoom.notRecorded")}
       </dd>
     </div>
+  );
+}
+
+function PersonAvatar({ name }: { name?: string }) {
+  const initials = name
+    ?.trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toLocaleUpperCase();
+  return (
+    <span className="sbor-person-avatar" aria-hidden="true">
+      {initials || <UserRound />}
+    </span>
   );
 }
 
@@ -95,19 +128,23 @@ function DemoChecklist() {
   ];
 
   return (
-    <section aria-labelledby="demo-checklist-heading">
-      <h2 id="demo-checklist-heading" className="font-semibold">
-        {t("relayops:incidentRoom.checklistTitle")}
-      </h2>
-      <p className="mt-2 text-muted-foreground text-sm">
+    <section
+      className="sbor-demo-checklist"
+      aria-labelledby="demo-checklist-heading"
+    >
+      <div className="sbor-room-section-title">
+        <CheckCircle2 aria-hidden="true" />
+        <h2 id="demo-checklist-heading">
+          {t("relayops:incidentRoom.checklistTitle")}
+        </h2>
+        <Badge variant="outline">{t("relayops:incidentRoom.demoBadge")}</Badge>
+      </div>
+      <p className="sbor-room-caption">
         {t("relayops:incidentRoom.demoChecklistDescription")}
       </p>
-      <div className="mt-4 space-y-2">
+      <div className="sbor-checklist-items">
         {labels.map((label, index) => (
-          <label
-            key={label}
-            className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border bg-white px-3 text-sm dark:bg-[#101a18]"
-          >
+          <label key={label} data-checked={checked[index]}>
             <input
               type="checkbox"
               checked={checked[index]}
@@ -118,20 +155,13 @@ function DemoChecklist() {
                   ),
                 )
               }
-              className="size-4 accent-[#245ebe]"
             />
-            <span
-              className={
-                checked[index] ? "text-muted-foreground line-through" : ""
-              }
-            >
-              {label}
-            </span>
+            <span>{label}</span>
           </label>
         ))}
         {checked.every(Boolean) ? (
-          <p className="flex items-center gap-2 pt-2 text-emerald-700 text-sm">
-            <CheckCircle2 className="size-4" aria-hidden="true" />
+          <p role="status" className="sbor-checklist-success">
+            <CheckCircle2 aria-hidden="true" />
             {t("relayops:incidentRoom.checklistComplete")}
           </p>
         ) : null}
@@ -139,6 +169,7 @@ function DemoChecklist() {
     </section>
   );
 }
+
 export function IncidentDetailPanel({
   workspaceId,
   detail,
@@ -151,6 +182,7 @@ export function IncidentDetailPanel({
   showCommands?: boolean;
 }) {
   const { t } = useTranslation();
+  const reduceMotion = useReducedMotion();
   const {
     incident,
     service,
@@ -163,121 +195,275 @@ export function IncidentDetailPanel({
     workspaceId,
     service.ownerTeamId,
   );
+  const participants = new Map(
+    [...(commander ? [commander] : []), ...responders].map((participant) => [
+      participant.id,
+      participant.name,
+    ]),
+  );
 
   return (
-    <section className="min-w-0 [overflow-wrap:anywhere] rounded-xl border border-[#17211f]/10 bg-white dark:border-white/10 dark:bg-[#101a18]">
-      <div className="border-b p-5 sm:p-7">
-        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono text-[#245ebe] text-sm dark:text-[#8fb6ff]">
-                {incident.key}
-              </span>
-              {incident.isDemo ? (
-                <Badge className="bg-[#9a4d0d] text-white">
-                  {t("relayops:incidentRoom.demoBadge")}
-                </Badge>
-              ) : null}
-              <Badge variant="outline">{t(statusKeys[incident.status])}</Badge>
-              <Badge variant="secondary">
-                {t(impactKeys[incident.impact as keyof typeof impactKeys])}
-              </Badge>
-            </div>
-            <h1
-              ref={headingRef}
-              tabIndex={-1}
-              className="mt-3 max-w-4xl font-semibold text-3xl tracking-tight outline-none sm:text-4xl"
+    <section
+      className="relay-incident-room sbor-incident-room"
+      data-status={incident.status}
+    >
+      <header className="sbor-room-header">
+        <div className="sbor-room-heading">
+          <div className="sbor-room-identifiers">
+            <span className="sbor-room-key">{incident.key}</span>
+            <span
+              className="sbor-room-severity"
+              data-severity={incident.severity}
             >
-              {incident.title}
-            </h1>
-            {incident.summary ? (
-              <p className="mt-3 max-w-3xl text-muted-foreground">
-                {incident.summary}
+              <ShieldAlert aria-hidden="true" />
+              {incident.severity.toUpperCase()}
+            </span>
+            {incident.isDemo ? (
+              <Badge className="sbor-demo-badge">
+                {t("relayops:incidentRoom.demoBadge")}
+              </Badge>
+            ) : null}
+            <Badge variant="outline" className="sbor-impact-badge">
+              {t(impactKeys[incident.impact as keyof typeof impactKeys])}
+            </Badge>
+          </div>
+          <h1 ref={headingRef} tabIndex={-1} className="sbor-room-title">
+            {incident.title}
+          </h1>
+          {incident.summary ? (
+            <p className="sbor-room-summary">{incident.summary}</p>
+          ) : null}
+          <div className="sbor-room-meta">
+            <Link
+              to="/relayops/$workspaceId/services/$serviceId"
+              params={{ workspaceId, serviceId: service.id }}
+              className="sbor-room-service"
+            >
+              <Server aria-hidden="true" />
+              {service.name}
+              <ArrowRight aria-hidden="true" />
+            </Link>
+            <span>
+              <Clock3 aria-hidden="true" />
+              {t("relayops:incidentRoom.freshness", {
+                time: formatRelayOpsDateTime(incident.lastUpdateAt),
+              })}
+            </span>
+          </div>
+        </div>
+        <div className="sbor-room-owner">
+          <PersonAvatar name={commander?.name} />
+          <div>
+            <span>{t("relayops:incidentRoom.commander")}</span>
+            <strong>
+              {commander?.name ?? t("relayops:incidentRoom.unassigned")}
+            </strong>
+          </div>
+        </div>
+      </header>
+
+      <ol
+        className="sbor-room-lifecycle"
+        aria-label={t("relayops:commands.transition")}
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: The overflowing lifecycle needs native keyboard scrolling.
+        tabIndex={0}
+      >
+        {(
+          [
+            "detected",
+            "triaging",
+            "mitigating",
+            "monitoring",
+            "resolved",
+          ] as const
+        ).map((status, index) => (
+          <li
+            key={status}
+            aria-current={incident.status === status ? "step" : undefined}
+          >
+            <span className="sbor-lifecycle-node" aria-hidden="true">
+              {incident.status === status ? (
+                <Activity />
+              ) : (
+                String(index + 1).padStart(2, "0")
+              )}
+            </span>
+            <span>{t(statusKeys[status])}</span>
+          </li>
+        ))}
+        {incident.status === "dismissed" ? (
+          <li aria-current="step">
+            <span className="sbor-lifecycle-node" aria-hidden="true">
+              <Check />
+            </span>
+            <span>{t(statusKeys.dismissed)}</span>
+          </li>
+        ) : null}
+      </ol>
+
+      <div className="sbor-room-body">
+        <div className="sbor-room-main">
+          {incident.resolutionSummary ? (
+            <section className="sbor-resolution-summary">
+              <CheckCircle2 aria-hidden="true" />
+              <div>
+                <h2>{t("relayops:incidentRoom.resolutionSummary")}</h2>
+                <p>{incident.resolutionSummary}</p>
+              </div>
+            </section>
+          ) : null}
+
+          <section
+            className="sbor-room-history"
+            aria-labelledby="timeline-heading"
+          >
+            <div className="sbor-room-section-title">
+              <Activity aria-hidden="true" />
+              <h2 id="timeline-heading">{t("relayops:timeline.title")}</h2>
+              <span className="sbor-section-count">{timeline.length}</span>
+            </div>
+            {timeline.length === 0 ? (
+              <p className="sbor-timeline-empty">
+                {t("relayops:incidentRoom.noTimeline")}
               </p>
             ) : null}
-          </div>
-          <Badge className="self-start bg-[#b73a34] px-3 py-1.5 text-white">
-            {incident.severity.toUpperCase()}
-          </Badge>
-        </div>
-
-        <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
-          <Link
-            to="/relayops/$workspaceId/services/$serviceId"
-            params={{ workspaceId, serviceId: service.id }}
-            className="flex min-h-11 items-center gap-2 text-[#245ebe] hover:underline dark:text-[#8fb6ff]"
-          >
-            <Server className="size-4" aria-hidden="true" />
-            {service.name}
-          </Link>
-          <span className="flex min-h-11 items-center gap-2 text-muted-foreground">
-            <Radio className="size-4" aria-hidden="true" />
-            {t("relayops:incidentRoom.authoritative")}
-          </span>
-          <span className="flex min-h-11 items-center gap-2 text-muted-foreground">
-            <Clock3 className="size-4" aria-hidden="true" />
-            {t("relayops:incidentRoom.freshness", {
-              time: formatRelayOpsDateTime(incident.lastUpdateAt),
-            })}
-          </span>
-        </div>
-      </div>
-
-      <div className="grid lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <section className="p-5 sm:p-7" aria-labelledby="timeline-heading">
-          <div className="flex items-center gap-2">
-            <Activity
-              className="size-5 text-[#245ebe] dark:text-[#8fb6ff]"
-              aria-hidden="true"
-            />
-            <h2 id="timeline-heading" className="font-semibold text-xl">
-              {t("relayops:timeline.title")}
-            </h2>
-          </div>
-          <div className="relative mt-6 border-l-2 border-[#245ebe]/20 pl-7">
-            {timeline.map((event) => (
-              <article
-                key={event.id}
-                className="relative mb-6 rounded-lg border bg-[#f4f6f5] p-4 [content-visibility:auto] last:mb-0 dark:bg-[#0b1210]"
-              >
-                <span className="absolute top-5 -left-[2.08rem] size-3 rounded-full border-2 border-white bg-[#245ebe] dark:border-[#101a18]" />
-                <div className="flex flex-wrap justify-between gap-2">
-                  <strong className="font-mono text-sm">
-                    {t(
-                      eventKeys[event.type as keyof typeof eventKeys] ??
-                        "relayops:timeline.fallback",
-                    )}
-                  </strong>
-                  <time
-                    dateTime={new Date(event.occurredAt).toISOString()}
-                    className="text-muted-foreground text-xs"
+            <ol className="sbor-timeline">
+              <AnimatePresence initial={false}>
+                {timeline.map((event) => (
+                  <motion.li
+                    key={event.id}
+                    initial={{
+                      opacity: 0,
+                      transform: reduceMotion ? "none" : "translateY(10px)",
+                    }}
+                    animate={{
+                      opacity: 1,
+                      transform: reduceMotion ? "none" : "translateY(0px)",
+                    }}
+                    transition={{ duration: 0.24, ease: [0.23, 1, 0.32, 1] }}
+                    className="sbor-timeline-event"
+                    data-event={event.type}
                   >
-                    {formatRelayOpsDateTime(event.occurredAt)}
-                  </time>
-                </div>
-                <TimelineSummary type={event.type} payload={event.payload} />
-                <p className="mt-3 font-mono text-muted-foreground text-xs">
-                  {t("relayops:incidentRoom.version", {
-                    version: event.incidentVersion,
-                  })}
-                </p>
-              </article>
-            ))}
-          </div>
-        </section>
+                    <span className="sbor-timeline-icon" aria-hidden="true">
+                      {event.type === "incident.update_published" ? (
+                        <MessageSquare />
+                      ) : event.type === "incident.resolved" ? (
+                        <CheckCircle2 />
+                      ) : event.type === "incident.assignment_changed" ? (
+                        <Users />
+                      ) : (
+                        <Activity />
+                      )}
+                    </span>
+                    <article>
+                      <div className="sbor-timeline-heading">
+                        <h3>
+                          {t(
+                            eventKeys[event.type as keyof typeof eventKeys] ??
+                              "relayops:timeline.fallback",
+                          )}
+                        </h3>
+                        <div className="sbor-timeline-attribution">
+                          {event.actorUserId &&
+                          participants.has(event.actorUserId) ? (
+                            <span>
+                              <PersonAvatar
+                                name={participants.get(event.actorUserId)}
+                              />
+                              {participants.get(event.actorUserId)}
+                            </span>
+                          ) : null}
+                          <time
+                            dateTime={new Date(event.occurredAt).toISOString()}
+                          >
+                            {formatRelayOpsDateTime(event.occurredAt)}
+                          </time>
+                          <details className="sbor-event-details">
+                            <summary
+                              aria-label={t(
+                                "relayops:incidentRoom.technicalDetails",
+                              )}
+                              title={t(
+                                "relayops:incidentRoom.technicalDetails",
+                              )}
+                            >
+                              <ChevronDown aria-hidden="true" />
+                            </summary>
+                            <p>
+                              {t("relayops:incidentRoom.version", {
+                                version: event.incidentVersion,
+                              })}
+                            </p>
+                          </details>
+                        </div>
+                      </div>
+                      <TimelineSummary payload={event.payload} />
+                    </article>
+                  </motion.li>
+                ))}
+              </AnimatePresence>
+            </ol>
+          </section>
+        </div>
 
-        <aside className="space-y-6 border-t bg-[#e2e9e6]/25 p-5 dark:bg-white/[.025] lg:border-t-0 lg:border-l sm:p-7">
-          <div>
-            <div className="flex items-center gap-2">
-              <ShieldAlert
-                className="size-5 text-[#b9651b]"
-                aria-hidden="true"
-              />
-              <h2 className="font-semibold">
-                {t("relayops:incidentRoom.operationalState")}
-              </h2>
+        {showCommands ? (
+          <div className="sbor-room-command-area">
+            <IncidentCommandPanel
+              workspaceId={workspaceId}
+              detail={detail}
+              capabilityContext={{
+                primaryServiceOwned: ownership.primaryServiceOwned,
+              }}
+            />
+          </div>
+        ) : null}
+
+        <aside className="sbor-room-sidebar">
+          <section>
+            <div className="sbor-room-section-title">
+              <Users aria-hidden="true" />
+              <h2>{t("relayops:incidentRoom.responseTeam")}</h2>
             </div>
-            <dl className="mt-5 grid gap-4">
+            <dl className="sbor-team-facts">
+              <div>
+                <dt>{t("relayops:incidentRoom.responders")}</dt>
+                <dd>
+                  {responders.length > 0 ? (
+                    <ul className="sbor-responder-list">
+                      {responders.map((responder) => (
+                        <li key={responder.id}>
+                          <PersonAvatar name={responder.name} />
+                          <span>{responder.name}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    t("relayops:incidentRoom.none")
+                  )}
+                </dd>
+              </div>
+              <div>
+                <dt>{t("relayops:incidentRoom.affectedServices")}</dt>
+                <dd className="sbor-affected-services">
+                  {affectedServices.length > 0
+                    ? affectedServices.map((item) => (
+                        <span key={item.id}>
+                          <Server aria-hidden="true" />
+                          {item.name}
+                        </span>
+                      ))
+                    : t("relayops:incidentRoom.none")}
+                </dd>
+              </div>
+            </dl>
+          </section>
+
+          <section>
+            <div className="sbor-room-section-title">
+              <Clock3 aria-hidden="true" />
+              <h2>{t("relayops:incidentRoom.operationalState")}</h2>
+            </div>
+            <dl className="sbor-response-times">
               <TimestampFact
                 label={t("relayops:incidentRoom.detectedAt")}
                 value={incident.detectedAt}
@@ -295,74 +481,22 @@ export function IncidentDetailPanel({
                 value={incident.resolvedAt}
               />
             </dl>
-          </div>
-
-          <div>
-            <div className="flex items-center gap-2">
-              <Users
-                className="size-5 text-[#245ebe] dark:text-[#8fb6ff]"
-                aria-hidden="true"
-              />
-              <h2 className="font-semibold">
-                {t("relayops:incidentRoom.responseTeam")}
-              </h2>
-            </div>
-            <dl className="mt-4 space-y-4 text-sm">
-              <div>
-                <dt className="text-muted-foreground">
-                  {t("relayops:incidentRoom.commander")}
-                </dt>
-                <dd className="mt-1 font-medium">
-                  {commander?.name ?? t("relayops:incidentRoom.unassigned")}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-muted-foreground">
-                  {t("relayops:incidentRoom.responders")}
-                </dt>
-                <dd className="mt-1">
-                  {responders.length > 0
-                    ? responders.map((responder) => responder.name).join(", ")
-                    : t("relayops:incidentRoom.none")}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-muted-foreground">
-                  {t("relayops:incidentRoom.affectedServices")}
-                </dt>
-                <dd className="mt-1">
-                  {affectedServices.length > 0
-                    ? affectedServices.map((item) => item.name).join(", ")
-                    : t("relayops:incidentRoom.none")}
-                </dd>
-              </div>
-            </dl>
-          </div>
-
+          </section>
           {incident.isDemo ? <DemoChecklist /> : null}
-
-          {incident.resolutionSummary ? (
-            <div>
-              <h2 className="font-semibold">
-                {t("relayops:incidentRoom.resolutionSummary")}
-              </h2>
-              <p className="mt-2 whitespace-pre-wrap text-sm">
-                {incident.resolutionSummary}
-              </p>
-            </div>
-          ) : null}
+          <details className="sbor-room-technical">
+            <summary>
+              <ChevronDown aria-hidden="true" />
+              {t("relayops:incidentRoom.technicalDetails")}
+            </summary>
+            <p>{t("relayops:incidentRoom.authoritative")}</p>
+            <p>
+              {t("relayops:incidentRoom.version", {
+                version: incident.version,
+              })}
+            </p>
+          </details>
         </aside>
       </div>
-
-      {showCommands ? (
-        <IncidentCommandPanel
-          workspaceId={workspaceId}
-          detail={detail}
-          capabilityContext={{
-            primaryServiceOwned: ownership.primaryServiceOwned,
-          }}
-        />
-      ) : null}
     </section>
   );
 }

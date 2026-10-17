@@ -1,0 +1,74 @@
+{
+	"date": "2026-10-17",
+	"direction": "Quiet response / concept C",
+	"runtime": "http://127.0.0.1:32041",
+	"scope": "Existing React RelayOps application; no API or database schema changes",
+	"palette": {
+		"ink": "#182c38",
+		"canvas": "#f5f8fa",
+		"sidebar": "#eaf0f3",
+		"action": "#126b70",
+		"border": "#dce5ea",
+		"urgency": "#b73a34"
+	},
+	"typography": "Locally bundled Geist Variable + Geist Mono Variable; existing license provenance retained",
+	"references": [
+		"https://linear.app/now/how-we-redesigned-the-linear-ui",
+		"https://incident.io/changelog/insights-updates-enhanced-analytics-and-reporting-features"
+	],
+	"decisions": [
+		"Stable desktop sidebar; mobile horizontal navigation",
+		"Account details and help remain discoverable without permanent explanatory panels",
+		"Saved views and advanced filters use disclosures; search stays visible",
+		"Default table focuses on title, severity, state, affected services, coordinator and elapsed time; all original columns remain selectable",
+		"Mobile cards remain virtualized, preserve selection and inspector focus; full table and sorting available",
+		"Incident commands precede append-only history; lifecycle track highlights only current state, without implying skipped transitions happened",
+		"Light default for new preferences; previously saved dark/system preferences preserved",
+		"No invented operational data or new integrations; test records explicitly named Demo"
+	],
+	"checks": {
+		"webTypecheck": "passed",
+		"productionWebBuild": "passed",
+		"focusedTests": "40 passed across 12 files",
+		"i18n": "all locales in sync",
+		"biome": "no errors on changed files; existing non-blocking suggestions in E2E files",
+		"browserRealAPI": [
+			"Registration, workspace and service creation",
+			"Guest sign-in to onboarding",
+			"Create incident, assign coordinator, publish update",
+			"Second independent browser context receives updates",
+			"Offline/reconnect restores authoritative state",
+			"Resolution summary survives reload and appears remotely",
+			"Actual invited Viewer has no write controls; API update returns 403",
+			"Saved view persists and filter state lives in URL",
+			"Keyboard board transition",
+			"Mobile inspector Escape restores original button focus"
+		],
+		"browserSimulations": [
+			"Delayed overview response: loading skeleton",
+			"Overview HTTP 500: retryable error",
+			"Unmatched query: filtered empty state"
+		],
+		"accessibility": "axe serious/critical: zero on Overview, Workbench, Board, Services, Analytics; mobile Workbench also zero; dark Workbench and mobile authentication also zero",
+		"responsive": "320, 390, 768 and 1440 px: no document or shell horizontal overflow across five main routes, including reduced motion",
+		"automatedE2E": [
+			"Response Board / two-browser realtime / presence / signal intake: passed, 8.9s",
+			"Viewer / Responder / Commander / Service Owner / Admin action visibility: passed, 8.0s",
+			"Workbench URL / saved preset / refresh / browser history / second authorized session: passed, 6.4s"
+		]
+	},
+	"limitations": [
+		"Full repository-wide release/security/performance matrix was not rerun; this is a UI change, not release approval",
+		"External OAuth, SMTP delivery and production CAPTCHA were not tested",
+		"New helper labels have English fallback outside Russian/English",
+		"Generated mockups are visual references; generated fictional integrations and task-board semantics were deliberately excluded from implementation"
+	],
+	"operations": {
+		"composeProject": "relayops-redesign-20261017",
+		"appContainer": "relayops-redesign-20261017-app-1",
+		"dbContainer": "relayops-redesign-20261017-postgres-1",
+		"ports": [32040, 32041],
+		"data": "Isolated disposable verification PostgreSQL; existing project volumes and other projects untouched",
+		"git": "No commit, push or publication"
+	}
+}

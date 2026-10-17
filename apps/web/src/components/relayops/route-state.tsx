@@ -2,6 +2,7 @@ import { AlertTriangle, LockKeyhole, RotateCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { RelayOpsApiError } from "@/fetchers/relayops";
+import { WorkspaceAccessRecovery } from "./workspace-access-recovery";
 
 const SKELETON_ROW_KEYS = [
   "one",
@@ -18,7 +19,7 @@ export function RelayOpsSkeleton({ rows = 4 }: { rows?: number }) {
   const { t } = useTranslation();
   return (
     <div
-      className="animate-pulse space-y-3"
+      className="animate-pulse space-y-3 motion-reduce:animate-none"
       role="status"
       aria-label={t("relayops:states.loading")}
     >
@@ -26,7 +27,7 @@ export function RelayOpsSkeleton({ rows = 4 }: { rows?: number }) {
       {SKELETON_ROW_KEYS.slice(0, rows).map((key) => (
         <div
           key={key}
-          className="h-16 rounded-md border border-[#17211f]/8 bg-white/70 dark:border-white/10 dark:bg-white/5"
+          className="h-16 rounded-md border border-[#1b1d36]/8 bg-white/70 dark:border-white/10 dark:bg-white/5"
         />
       ))}
     </div>
@@ -48,17 +49,18 @@ export function RelayOpsErrorState({
   if (denied) {
     return (
       <section
-        className="grid min-h-72 place-items-center rounded-md border bg-white p-8 text-center dark:bg-[#101a18]"
+        className="grid min-h-72 place-items-center rounded-md border bg-white p-8 text-center dark:bg-[#1a1c35]"
         aria-labelledby="relayops-denied-title"
       >
         <div className="max-w-md">
-          <LockKeyhole className="mx-auto mb-4 size-8 text-[#245ebe] dark:text-[#8fb6ff]" />
+          <LockKeyhole className="mx-auto mb-4 size-8 text-[#6757ec] dark:text-[#b3a5ff]" />
           <h1 id="relayops-denied-title" className="font-semibold text-xl">
             {t("relayops:states.deniedTitle")}
           </h1>
           <p className="mt-2 text-muted-foreground text-sm">
             {t("relayops:states.deniedDescription")}
           </p>
+          <WorkspaceAccessRecovery />
         </div>
       </section>
     );
@@ -66,7 +68,7 @@ export function RelayOpsErrorState({
 
   return (
     <section
-      className="grid min-h-72 place-items-center rounded-md border bg-white p-8 text-center dark:bg-[#101a18]"
+      className="grid min-h-72 place-items-center rounded-md border bg-white p-8 text-center dark:bg-[#1a1c35]"
       aria-labelledby="relayops-error-title"
     >
       <div className="max-w-md">

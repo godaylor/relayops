@@ -12,6 +12,6 @@ describe("PasswordResetEmail", () => {
       }),
     );
     expect(html).toContain("パスワードのリセット");
-    expect(html).toContain("RelayOps セキュリティメール");
+    expect(html).toContain("Сборитм セキュリティメール");
   });
 });

@@ -1,0 +1,132 @@
+{
+	"date": "2026-10-17",
+	"product": "Сборитм",
+	"previousName": "RelayOps",
+	"runtime": "http://127.0.0.1:32041",
+	"gallery": "http://127.0.0.1:32041/redesign-v2/",
+	"status": "passed",
+	"delivery": {
+		"environment": "Isolated local verification Compose project relayops-redesign-20261017",
+		"appContainer": "relayops-redesign-20261017-app-1",
+		"postgresContainer": "relayops-redesign-20261017-postgres-1",
+		"webPort": 32041,
+		"postgresHostPort": 32040,
+		"method": "Compiled web/API artifacts updated in the existing local app container; no public deployment",
+		"databaseSchemaChanged": false,
+		"existingUserDataPreserved": true,
+		"otherProjectProcessesAndContainersPreserved": true,
+		"commitPushPublishPerformed": false
+	},
+	"changes": [
+		"Russian product identity, original SVG logo and generated glass-signal brand artwork",
+		"Locally bundled Onest with Cyrillic, complete light/dark theme tokens and coherent navigation",
+		"Pointer-reactive depth, live signal path, staged product explanation, navigation/card/timeline/save feedback with reduced motion",
+		"Fresh guest prepares its own private workspace/service and server-marked DEMO incident, never follows a foreign workspace redirect",
+		"Retries reuse the same anonymous identity and committed data, including simulated demo-data failure",
+		"Authorization recovery opens own workspace or changes account while preserving the requested deep link",
+		"Guest DEMO endpoint accepts optional en-US/ru-RU locale; existing default/idempotency/authorization unchanged",
+		"Incident room integrates owner, lifecycle, command composer, append-only history and progressive resolution",
+		"Mobile first action visible immediately; active incident precedes metrics; cards stay virtualized without empty height",
+		"Analytics explicitly exposes persisted includeDemo URL filter and explains the default exclusion; durations/percentages use locale formatting"
+	],
+	"checks": {
+		"webUnit": {
+			"status": "passed",
+			"files": 14,
+			"tests": 48
+		},
+		"apiUnit": {
+			"status": "passed",
+			"files": 2,
+			"tests": 9
+		},
+		"typechecks": {
+			"web": "passed",
+			"api": "passed"
+		},
+		"builds": {
+			"web": "passed",
+			"api": "passed"
+		},
+		"i18n": "All locales in sync with en-US; Russian primary experience verified",
+		"biome": "Targeted changed feature files and verification tests passed; no broad mutating repository lint run",
+		"guestBrowser": {
+			"browser": "Installed Google Chrome",
+			"suite": "3 passed",
+			"additional": "Russian mobile quick-entry passed on the updated implementation",
+			"scenarios": [
+				"Fresh separate browser from a foreign link enters its own saved private demo",
+				"Refresh/re-entry reuse session and records",
+				"Cross-workspace API403; switching to correct account opens original deep link",
+				"Partial demo preparation HTTP500 retry produces exactly one workspace/service/incident"
+			]
+		},
+		"incidentBrowser": {
+			"scenario": "S10 ten-step",
+			"status": "1 passed",
+			"elapsedSeconds": 16.6,
+			"steps": [
+				"Registration",
+				"Service and incident/signal creation",
+				"Coordinator assignment through UI",
+				"Second participant",
+				"Keyboard board state transition",
+				"Realtime updates",
+				"409 conflict/reapply",
+				"Offline/reconnect",
+				"Progressive resolution",
+				"Analytics drilldown",
+				"Viewer API403"
+			],
+			"observedRealtimeMs": [209, 119, 94],
+			"sampleSize": 3,
+			"performanceNote": "Observed DOM delivery for these three local updates, not a production load benchmark",
+			"axeSeriousCritical": 0
+		},
+		"visual": {
+			"status": "passed",
+			"screenshots": 36,
+			"axeScreens": 19,
+			"seriousCritical": 0,
+			"overflow": 42,
+			"issues": [],
+			"errors": [],
+			"evidence": "visual-checks.json",
+			"method": "Independent visual matrix, then targeted resume checks for the final CSS/control fixes"
+		},
+		"gallery": {
+			"status": "1 passed",
+			"viewports": [1440, 390],
+			"checks": [
+				"Six pages in both themes",
+				"Four before/after comparisons",
+				"Enter/Escape lightbox and focus return",
+				"No horizontal overflow, pageerror or unexpected missing resources"
+			]
+		},
+		"motion": {
+			"evidence": "visual-checks.json",
+			"recording": "motion.webm",
+			"verified": [
+				"Explanation stage changes",
+				"CSS signal dash offset changes",
+				"CSS path traveler moves in rendered viewport",
+				"Pointer changes the image transform",
+				"Reduced motion keeps a stable scene and disables movement"
+			]
+		}
+	},
+	"artifacts": {
+		"webIndexSha256": "5a6c8875aeb758876a88ea467486aeab171c647fda7ae8a9066fce8a9e06c97d",
+		"serverBundleSha256": "112ce54760cc7ad90443c9f458ff5402bd50834b695cf992b6e00b66a83b1aa6",
+		"brandWebpSha256": "1049fc92f6f83d00c5a52b1e420e9bf12eff063e080d94c7683ea260aaad3b33",
+		"licenses": "Current web artifact inventory:549 packages,0 unresolved license metadata; Onest OFL included",
+		"provenance": "asset-provenance.json"
+	},
+	"limits": [
+		"The public deployment remains unchanged; this is the verified local implementation",
+		"Exact-name open search found no product collision, but formal trademark/domain clearance is not completed",
+		"Desktop Chrome and responsive/mobile emulation verified; no claim of exhaustive Safari/Firefox/real-device coverage",
+		"Full release infrastructure/security matrix was not rerun for this visual change; existing release gates still apply"
+	]
+}
