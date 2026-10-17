@@ -5,7 +5,10 @@ import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import en from "../../i18n/en-US.json";
+import ru from "../../i18n/ru-RU.json";
 import packageJson from "../../package.json";
+import { installStartupRecovery } from "./src/lib/startup-recovery";
 
 const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN;
 const sentryOrg = process.env.SENTRY_ORG;
@@ -17,6 +20,30 @@ export default defineConfig({
   },
   base: "/",
   plugins: [
+    {
+      name: "startup-recovery",
+      transformIndexHtml: {
+        order: "post",
+        handler: (html) =>
+          html.replace(
+            "<!-- startup-recovery -->",
+            `<script>(${installStartupRecovery.toString()})(${JSON.stringify({
+              "en-US": {
+                appName: en.common.appName,
+                title: en.common.error.title,
+                description: en.common.error.description,
+                refreshPage: en.common.error.refreshPage,
+              },
+              "ru-RU": {
+                appName: ru.common.appName,
+                title: ru.common.error.title,
+                description: ru.common.error.description,
+                refreshPage: ru.common.error.refreshPage,
+              },
+            }).replace(/</g, "\\u003c")})</script>`,
+          ),
+      },
+    },
     tanstackRouter({
       autoCodeSplitting: true,
       // Keep co-located route tests out of the generated route tree.
