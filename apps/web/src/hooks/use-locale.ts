@@ -24,6 +24,9 @@ export function useLocale() {
     document.documentElement.lang = resolved;
     await i18n.changeLanguage(resolved);
 
+    const { data: session } = await authClient.getSession();
+    if (!session?.user) return;
+
     const { error } = await authClient.updateUser({ locale: resolved });
     if (!error) {
       await queryClient.invalidateQueries({ queryKey: ["session"] });
