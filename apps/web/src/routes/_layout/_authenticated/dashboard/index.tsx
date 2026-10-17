@@ -48,7 +48,7 @@ export const Route = createFileRoute("/_layout/_authenticated/dashboard/")({
 
       const firstWorkspace = workspaces[0];
 
-      authClient.organization.setActive({
+      await authClient.organization.setActive({
         organizationId: firstWorkspace.id,
       });
 

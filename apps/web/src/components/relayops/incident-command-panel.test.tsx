@@ -25,6 +25,7 @@ import { i18n } from "@/lib/i18n";
 import { IncidentCommandPanel } from "./incident-command-panel";
 
 const publishUpdate = vi.hoisted(() => vi.fn());
+const transitionIncident = vi.hoisted(() => vi.fn());
 const capabilityAllowed = vi.hoisted(() => vi.fn());
 
 vi.mock("@/hooks/relayops/use-relayops-capability", () => ({
@@ -40,6 +41,7 @@ vi.mock("@/fetchers/relayops", async (importOriginal) => {
   return {
     ...actual,
     publishRelayOpsIncidentUpdate: publishUpdate,
+    transitionRelayOpsIncident: transitionIncident,
   };
 });
 
@@ -127,6 +129,7 @@ beforeAll(async () => {
 
 beforeEach(() => {
   publishUpdate.mockReset();
+  transitionIncident.mockReset();
   capabilityAllowed.mockReset();
   capabilityAllowed.mockReturnValue(true);
 });
@@ -146,6 +149,34 @@ it("waits for a progress update before allowing another status change", async ()
 });
 
 describe("RelayOps IncidentCommandPanel", () => {
+  it("opens recovery details before resolving and submits the entered summary", async () => {
+    transitionIncident.mockResolvedValueOnce({
+      ...detail,
+      incident: { ...detail.incident, status: "resolved", version: 3 },
+    });
+    renderPanel();
+    const resolve = screen.getByRole("button", { name: "Resolved" });
+    const summary = screen.getByLabelText("Resolution summary");
+
+    expect(summary).not.toBeVisible();
+    fireEvent.click(resolve);
+    await waitFor(() => expect(summary).toBeVisible());
+    expect(resolve).toBeDisabled();
+    expect(transitionIncident).not.toHaveBeenCalled();
+
+    fireEvent.change(summary, {
+      target: { value: "Payment failover restored checkout." },
+    });
+    fireEvent.click(resolve);
+    await waitFor(() => expect(transitionIncident).toHaveBeenCalledOnce());
+    expect(transitionIncident.mock.calls[0]?.[2]).toMatchObject({
+      expectedVersion: 2,
+      idempotencyKey: expect.any(String),
+      to: "resolved",
+      resolutionSummary: "Payment failover restored checkout.",
+    });
+  });
+
   it("preserves the draft on 409 and reapplies it with the same idempotency key", async () => {
     const current = withVersion(3);
     publishUpdate

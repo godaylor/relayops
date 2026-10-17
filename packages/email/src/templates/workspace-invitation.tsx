@@ -28,15 +28,15 @@ export type WorkspaceInvitationEmailCopy = {
 // tsc, so the import would survive into dist and resolve outside the published
 // files at runtime.
 const DEFAULT_COPY: WorkspaceInvitationEmailCopy = {
-  subject: "{{inviterName}} invited you to join {{workspaceName}} on RelayOps",
-  preview: "You're invited to {{workspaceName}} on RelayOps",
+  subject: "{{inviterName}} invited you to join {{workspaceName}} on Сборитм",
+  preview: "You're invited to {{workspaceName}} on Сборитм",
   title: "Join {{workspaceName}}",
   subtitle:
-    "{{inviterName}} ({{inviterEmail}}) invited you to collaborate in RelayOps.",
+    "{{inviterName}} ({{inviterEmail}}) invited you to collaborate in Сборитм.",
   cta: "Accept invitation",
   sameEmail: "You can accept with the same email that received this message.",
   ignore: "If this wasn't expected, you can safely ignore this email.",
-  footer: "RelayOps workspace invitation",
+  footer: "Сборитм workspace invitation",
 };
 
 function interpolate(template: string, values: Record<string, string>) {
@@ -81,16 +81,15 @@ WorkspaceInvitationEmail.PreviewProps = {
   invitationLink: "https://relayops.example/invite/abc123",
   to: "invitee@example.com",
   copy: {
-    subject:
-      "{{inviterName}} invited you to join {{workspaceName}} on RelayOps",
-    preview: "You're invited to {{workspaceName}} on RelayOps",
+    subject: "{{inviterName}} invited you to join {{workspaceName}} on Сборитм",
+    preview: "You're invited to {{workspaceName}} on Сборитм",
     title: "Join {{workspaceName}}",
     subtitle:
-      "{{inviterName}} ({{inviterEmail}}) invited you to collaborate in RelayOps.",
+      "{{inviterName}} ({{inviterEmail}}) invited you to collaborate in Сборитм.",
     cta: "Accept invitation",
     sameEmail: "You can accept with the same email that received this message.",
     ignore: "If this wasn't expected, you can safely ignore this email.",
-    footer: "RelayOps workspace invitation",
+    footer: "Сборитм workspace invitation",
   },
 } as WorkspaceInvitationEmailProps;
 

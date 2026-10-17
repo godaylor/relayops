@@ -382,10 +382,11 @@ export async function deleteRelayOpsSavedView(
 export async function createRelayOpsDemoIncident(
   workspaceId: string,
   serviceId: string,
+  locale?: "en-US" | "ru-RU",
 ) {
   const response = await relayops["demo-data"].$post({
     param: { workspaceId },
-    json: { serviceId },
+    json: { serviceId, locale },
   });
   return expectJson<RelayOpsIncidentDetail>(response, 201);
 }

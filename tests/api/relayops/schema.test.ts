@@ -3,6 +3,7 @@ import {
   assignIncidentParticipantsBody,
   changeIncidentSeverityBody,
   correctIncidentTimestampsBody,
+  createDemoDataBody,
   createIncidentBody,
   createServiceBody,
   incidentTimelineQuery,
@@ -11,6 +12,17 @@ import {
 } from "../../../apps/api/src/relayops/schema";
 
 describe("RelayOps request validators", () => {
+  it("accepts only supported optional demo locales", () => {
+    expect(createDemoDataBody.parse({ serviceId: "svc" })).toEqual({
+      serviceId: "svc",
+    });
+    expect(
+      createDemoDataBody.parse({ serviceId: "svc", locale: "ru-RU" }),
+    ).toEqual({ serviceId: "svc", locale: "ru-RU" });
+    expect(() =>
+      createDemoDataBody.parse({ serviceId: "svc", locale: "unknown" }),
+    ).toThrow();
+  });
   it("accepts the minimal Service and Incident payloads", () => {
     expect(createServiceBody.parse({ name: "API", slug: "api" })).toEqual({
       name: "API",

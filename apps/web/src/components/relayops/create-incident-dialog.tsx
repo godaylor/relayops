@@ -43,7 +43,7 @@ export function CreateIncidentDialog({
         <Plus className="size-4" />
         {t("relayops:incident.submit")}
       </DialogTrigger>
-      <DialogPopup>
+      <DialogPopup className="relay-dialog">
         {open && (
           <CreateIncidentForm
             workspaceId={workspaceId}

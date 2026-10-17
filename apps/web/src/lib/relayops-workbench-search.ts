@@ -110,16 +110,13 @@ export const defaultWorkbenchSort: WorkbenchSort[] = [
 ];
 
 export const defaultWorkbenchColumns: WorkbenchColumnConfig[] = [
-  { id: "key", pin: "left", width: 112 },
-  { id: "severity", pin: "left", width: 92 },
-  { id: "status", pin: null, width: 124 },
-  { id: "title", pin: null, width: 300 },
-  { id: "affectedServices", pin: null, width: 220 },
-  { id: "commander", pin: null, width: 180 },
-  { id: "responders", pin: null, width: 220 },
-  { id: "detectedAt", pin: null, width: 180 },
-  { id: "elapsed", pin: null, width: 140 },
-  { id: "lastUpdateAt", pin: null, width: 180 },
+  { id: "key", pin: "left", width: 96 },
+  { id: "title", pin: null, width: 280 },
+  { id: "severity", pin: null, width: 90 },
+  { id: "status", pin: null, width: 120 },
+  { id: "affectedServices", pin: null, width: 160 },
+  { id: "commander", pin: null, width: 150 },
+  { id: "elapsed", pin: null, width: 100 },
 ];
 
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;

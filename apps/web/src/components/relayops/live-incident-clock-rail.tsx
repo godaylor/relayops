@@ -21,7 +21,7 @@ const severityTone = {
   sev1: "border-[#b73a34]",
   sev2: "border-[#b73a34]",
   sev3: "border-[#b9651b]",
-  sev4: "border-[#245ebe]",
+  sev4: "border-[#6757ec]",
 } as const;
 
 export function LiveIncidentClockRail({
@@ -48,7 +48,7 @@ export function LiveIncidentClockRail({
 
   return (
     <aside
-      className="relayops-clock-rail border-b border-white/15 bg-[#17211f] text-[#f4f6f5]"
+      className="relayops-clock-rail border-b border-white/15 bg-[#1b1d36] text-[#f5f4fb]"
       aria-labelledby="relayops-clock-rail-title"
       aria-busy={loading}
     >

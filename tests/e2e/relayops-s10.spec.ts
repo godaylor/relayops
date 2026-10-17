@@ -20,12 +20,10 @@ const axeSource = readFileSync(
 async function expectShellWithinViewport(page: Page) {
   const selectors = [
     "[data-relayops-shell]",
-    "[data-relayops-shell] > header",
-    "[data-relayops-shell] nav",
-    ".relayops-clock-rail",
+    ".sbor-topbar",
     "#relayops-main",
     "#relayops-main h1",
-    "[data-relayops-shell] > footer",
+    ".sbor-footer",
   ];
   for (const selector of selectors) {
     const block = page.locator(selector);
@@ -106,7 +104,7 @@ async function onboardAdmin(page: Page) {
   await page.locator('input[name="password"]').fill("RelayOps-password-123!");
   await page.getByRole("button", { name: "Create Account" }).click();
   await page.getByLabel("Workspace Name").fill(`RelayOps ${suffix}`);
-  await page.getByRole("button", { name: "Create RelayOps workspace" }).click();
+  await page.getByRole("button", { name: "Create Сборитм workspace" }).click();
   await page.getByLabel("Service name").fill("Checkout API");
   await page.getByLabel("Service identifier").fill(`checkout-${suffix}`);
   await page.getByRole("button", { name: "Create first service" }).click();
@@ -134,7 +132,11 @@ async function onboardAdmin(page: Page) {
     page.getByText("Checkout latency above SLO", { exact: true }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Attach to incident" }).click();
-  await expect(page.getByText("Attached", { exact: true })).toBeVisible();
+  await expect(
+    page
+      .getByRole("region", { name: "Observations", exact: true })
+      .getByText("Attached", { exact: true }),
+  ).toBeVisible();
 
   return {
     suffix,
@@ -222,6 +224,53 @@ async function moveFromBoard(page: Page, title: string, target: string) {
   await expect(option).toBeHidden();
 }
 
+async function captureRoomProof(page: Page) {
+  const account = page.locator(".sbor-account-menu");
+  const setTheme = async (light: boolean) => {
+    await account.locator(":scope > summary").click();
+    const theme = account.getByRole("switch", { name: "Theme", exact: true });
+    if ((await theme.getAttribute("aria-checked")) !== String(light)) {
+      await theme.click();
+    }
+    await account.locator(":scope > summary").click();
+    await expect(page.locator("html")).toHaveClass(light ? /light/ : /dark/);
+  };
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  for (const light of [true, false]) {
+    await setTheme(light);
+    const path = resolve(
+      `docs/redesign/sbor-room-${light ? "light" : "dark"}.png`,
+    );
+    await page.screenshot({ path, fullPage: true, animations: "disabled" });
+    await test.info().attach(light ? "room-light" : "room-dark", {
+      path,
+      contentType: "image/png",
+    });
+  }
+  await setTheme(true);
+  await page.setViewportSize({ width: 390, height: 844 });
+  const overflow = await page.evaluate(
+    () =>
+      document.documentElement.scrollWidth -
+      document.documentElement.clientWidth,
+  );
+  expect(
+    overflow,
+    "Room creates page-level horizontal overflow",
+  ).toBeLessThanOrEqual(1);
+  const path = resolve("docs/redesign/sbor-room-mobile.png");
+  await page.screenshot({ path, fullPage: true, animations: "disabled" });
+  await test.info().attach("room-mobile", { path, contentType: "image/png" });
+  await page.locator(".sbor-room-history").scrollIntoViewIfNeeded();
+  const historyPath = resolve("docs/redesign/sbor-room-mobile-history.png");
+  await page.screenshot({ path: historyPath, animations: "disabled" });
+  await test.info().attach("room-mobile-history", {
+    path: historyPath,
+    contentType: "image/png",
+  });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+}
+
 async function createWorkbenchFixture(
   page: Page,
   workspaceId: string,
@@ -269,11 +318,11 @@ test("S10 ten-step clean-DB demo proves two users, keyboard lifecycle, conflict,
 
   await page.goto(`/relayops/${workspaceId}`);
   await expect(
-    page.getByRole("complementary", { name: "Live incident clock rail" }),
+    page.getByRole("complementary", { name: "Active now" }),
   ).toBeVisible();
   await expect(
     page
-      .getByRole("complementary", { name: "Live incident clock rail" })
+      .getByRole("complementary", { name: "Active now" })
       .getByRole("link", { name: new RegExp(incidentTitle) }),
   ).toBeVisible();
 
@@ -292,6 +341,20 @@ test("S10 ten-step clean-DB demo proves two users, keyboard lifecycle, conflict,
     workspaceId,
   );
 
+  await page.goto(`/relayops/${workspaceId}/incidents/${incidentId}`);
+  await page
+    .getByLabel("Response coordinator", { exact: true })
+    .selectOption(commander.userId);
+  await page
+    .getByRole("button", { name: "Save coordinator", exact: true })
+    .click();
+  await expect(page.locator(".sbor-assignment-disclosure")).not.toHaveAttribute(
+    "open",
+  );
+  await expect(
+    page.locator(".sbor-assignment-disclosure").locator("summary strong"),
+  ).toBeVisible();
+
   const current = await jsonCommand<{ incident: { version: number } }>(
     page,
     `/api/relayops/workspaces/${workspaceId}/incidents/${incidentId}`,
@@ -304,7 +367,6 @@ test("S10 ten-step clean-DB demo proves two users, keyboard lifecycle, conflict,
       body: {
         expectedVersion: current.incident.version,
         idempotencyKey: `s10-assign-${crypto.randomUUID()}`,
-        commanderId: commander.userId,
         responderIds: [commander.userId],
       },
     },
@@ -347,11 +409,30 @@ test("S10 ten-step clean-DB demo proves two users, keyboard lifecycle, conflict,
       `Expected incident version ${synchronized.incident.version}`,
       { exact: true },
     ),
-  ).toBeVisible();
+  ).toHaveText(`Expected incident version ${synchronized.incident.version}`);
   await commander.page.goto(`/relayops/${workspaceId}/incidents/${incidentId}`);
+  await expect(commander.page.locator(".sbor-timeline")).toBeVisible();
   for (let index = 1; index <= 3; index += 1) {
     const message = `S10 realtime proof ${index}`;
     await page.getByLabel("Progress update").fill(message);
+    // Record insertion in the receiving browser, rather than the time of the
+    // next Playwright assertion poll (which can add up to a second).
+    await commander.page.evaluate((expectedMessage) => {
+      const receiver = window as Window & { __sborRealtimeReceipt?: number };
+      delete receiver.__sborRealtimeReceipt;
+      const timeline = document.querySelector(".sbor-timeline");
+      if (!timeline) throw new Error("Receiving timeline is missing");
+      const observer = new MutationObserver(() => {
+        if (!timeline.textContent?.includes(expectedMessage)) return;
+        observer.disconnect();
+        receiver.__sborRealtimeReceipt = Date.now();
+      });
+      observer.observe(timeline, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
+    }, message);
     const startedAt = Date.now();
     await page.getByRole("button", { name: "Publish update" }).click();
     await expect(
@@ -359,13 +440,26 @@ test("S10 ten-step clean-DB demo proves two users, keyboard lifecycle, conflict,
     ).toBeVisible({
       timeout: 5_000,
     });
-    realtimeLatencies.push(Date.now() - startedAt);
+    await commander.page.waitForFunction(
+      () =>
+        typeof (window as Window & { __sborRealtimeReceipt?: number })
+          .__sborRealtimeReceipt === "number",
+    );
+    const receivedAt = await commander.page.evaluate(
+      () =>
+        (window as Window & { __sborRealtimeReceipt: number })
+          .__sborRealtimeReceipt,
+    );
+    realtimeLatencies.push(receivedAt - startedAt);
   }
   const p95 =
     [...realtimeLatencies].sort((a, b) => a - b)[
       Math.ceil(realtimeLatencies.length * 0.95) - 1
     ] ?? Number.POSITIVE_INFINITY;
-  expect(p95).toBeLessThanOrEqual(750);
+  console.log(
+    `Realtime DOM receipt samples: ${realtimeLatencies.join(", ")} ms; p95=${p95} ms`,
+  );
+  expect.soft(p95, "Realtime DOM receipt p95").toBeLessThanOrEqual(750);
 
   await page.getByLabel("Progress update").fill("Draft survives conflict");
   const stale = await jsonCommand<unknown>(
@@ -414,8 +508,11 @@ test("S10 ten-step clean-DB demo proves two users, keyboard lifecycle, conflict,
   });
   expect(Date.now() - reconnectStarted).toBeLessThanOrEqual(5_000);
 
+  await captureRoomProof(commander.page);
+
   await commander.page.getByRole("button", { name: "Mitigating" }).click();
   await commander.page.getByRole("button", { name: "Monitoring" }).click();
+  await commander.page.getByRole("button", { name: "Resolved" }).click();
   await commander.page
     .getByLabel("Resolution summary")
     .fill("Checkout latency returned below the SLO.");
@@ -423,6 +520,14 @@ test("S10 ten-step clean-DB demo proves two users, keyboard lifecycle, conflict,
   await expect(
     commander.page.getByText("Resolved", { exact: true }).first(),
   ).toBeVisible();
+  await expect(
+    commander.page.locator(".sbor-resolution-summary"),
+  ).toContainText("Checkout latency returned below the SLO.");
+  await commander.page.screenshot({
+    path: resolve("docs/redesign/sbor-room-resolved.png"),
+    fullPage: true,
+    animations: "disabled",
+  });
 
   const today = new Date().toISOString().slice(0, 10);
   await page.goto(
@@ -560,12 +665,23 @@ test("S10 responsive, zoom, forced-colors, reduced-motion, focus and table-FPS m
     { name: "mobile", width: 390, height: 844 },
   ]) {
     await page.setViewportSize(viewport);
-    await expect(
-      page.getByRole("navigation", { name: "Primary navigation" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("complementary", { name: "Live incident clock rail" }),
-    ).toBeVisible();
+    if (viewport.width <= 960) {
+      await page.getByRole("button", { name: "Primary navigation" }).click();
+      await expect(
+        page.getByRole("navigation", { name: "Primary navigation" }),
+      ).toBeVisible();
+      await page.keyboard.press("Escape");
+    } else {
+      await expect(
+        page.getByRole("navigation", { name: "Primary navigation" }),
+      ).toBeVisible();
+    }
+    const rail = page.getByRole("complementary", {
+      name: "Active now",
+      includeHidden: true,
+    });
+    if (viewport.width > 960) await expect(rail).toBeVisible();
+    else await expect(rail).toBeHidden();
     await expectShellWithinViewport(page);
     await test.info().attach(`relayops-${viewport.name}`, {
       body: await page.screenshot({ fullPage: true }),
@@ -597,7 +713,7 @@ test("S10 responsive, zoom, forced-colors, reduced-motion, focus and table-FPS m
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   const railTransition = await page
-    .getByRole("complementary", { name: "Live incident clock rail" })
+    .getByRole("complementary", { name: "Active now" })
     .getByRole("link")
     .first()
     .evaluate((element) => getComputedStyle(element).transitionDuration);
@@ -627,7 +743,9 @@ test("390px shell fits all six key screens in RU and EN", async ({ page }) => {
     ["analytics", "/analytics"],
   ];
   for (const locale of ["RU", "EN"]) {
+    await page.locator(".sbor-account-menu > summary").click();
     await page.getByRole("button", { name: locale, exact: true }).click();
+    await page.locator(".sbor-account-menu > summary").click();
     await expect(page.locator("html")).toHaveAttribute(
       "lang",
       locale === "RU" ? "ru-RU" : "en-US",
@@ -640,13 +758,9 @@ test("390px shell fits all six key screens in RU and EN", async ({ page }) => {
         "false",
       );
       await expectShellWithinViewport(page);
-      await page
-        .locator("[data-relayops-shell] > footer")
-        .scrollIntoViewIfNeeded();
-      await expect(
-        page.locator("[data-relayops-shell] > footer"),
-      ).toBeInViewport();
-      await page.locator("[data-relayops-shell]").evaluate((node) => {
+      await page.locator(".sbor-footer").scrollIntoViewIfNeeded();
+      await expect(page.locator(".sbor-footer")).toBeInViewport();
+      await page.locator(".sbor-app-column").evaluate((node) => {
         node.scrollTop = 0;
       });
       const screenshotPath = test

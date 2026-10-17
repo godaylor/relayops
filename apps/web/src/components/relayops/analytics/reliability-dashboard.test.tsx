@@ -113,6 +113,13 @@ describe("ReliabilityDashboard", () => {
     expect(onSearchChange).toHaveBeenCalledWith(
       expect.objectContaining({ service: ["service-1"] }),
     );
+    fireEvent.click(screen.getByLabelText("relayops:analytics.includeDemo"));
+    expect(onSearchChange).toHaveBeenCalledWith(
+      expect.objectContaining({ includeDemo: true }),
+    );
+    expect(
+      screen.getByText("relayops:analytics.demoExcluded"),
+    ).toBeInTheDocument();
   });
 
   it("has no automated axe violations and hides unauthorized export", async () => {

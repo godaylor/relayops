@@ -52,7 +52,7 @@ export function IncidentWorkbench({
   onRetrySavedViewDraft,
 }: IncidentWorkbenchProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
-  const lastRowTrigger = useRef<HTMLTableRowElement | null>(null);
+  const lastRowTrigger = useRef<HTMLElement | null>(null);
   const inspectorHeading = useRef<HTMLHeadingElement | null>(null);
 
   useEffect(() => {
@@ -113,7 +113,7 @@ export function IncidentWorkbench({
   const filtered = hasDatasetFilters(search);
 
   return (
-    <div className="space-y-4">
+    <div className="sbor-workbench space-y-4">
       <header className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
         <div>
           <h1 className="font-semibold text-3xl tracking-tight">
@@ -252,7 +252,7 @@ export function IncidentWorkbench({
           if (!open) closeInspector();
         }}
       >
-        <SheetPopup side="right" className="max-w-4xl">
+        <SheetPopup side="right" className="relay-dialog max-w-4xl">
           <SheetHeader>
             <SheetTitle>{labels.inspectorTitle}</SheetTitle>
             <SheetDescription>{labels.inspectorDescription}</SheetDescription>

@@ -27,15 +27,30 @@ type ReliabilityDashboardProps = {
 function duration(value: number | null) {
   if (value === null) return "—";
   const seconds = Math.round(value / 1_000);
-  if (seconds < 60) return `${seconds}s`;
+  const format = (amount: number, unit: "second" | "minute" | "hour") =>
+    new Intl.NumberFormat(getRelayOpsLocale(), {
+      style: "unit",
+      unit,
+      unitDisplay: "narrow",
+      maximumFractionDigits: 1,
+    }).format(amount);
+  if (seconds < 60) return format(seconds, "second");
   const minutes = Math.round(seconds / 60);
-  if (minutes < 60) return `${minutes}m`;
+  if (minutes < 60) return format(minutes, "minute");
   const hours = minutes / 60;
-  return `${hours < 10 ? hours.toFixed(1) : Math.round(hours)}h`;
+  return format(
+    hours < 10 ? Math.round(hours * 10) / 10 : Math.round(hours),
+    "hour",
+  );
 }
 
 function rate(value: number | null) {
-  return value === null ? "—" : `${value.toFixed(value % 1 ? 1 : 0)}%`;
+  return value === null
+    ? "—"
+    : new Intl.NumberFormat(getRelayOpsLocale(), {
+        style: "percent",
+        maximumFractionDigits: 1,
+      }).format(value / 100);
 }
 
 function MetricCard({
@@ -50,7 +65,7 @@ function MetricCard({
   comparison?: string;
 }) {
   return (
-    <article className="rounded-lg border border-[#17211f]/10 bg-white p-4 dark:border-white/10 dark:bg-[#101a18]">
+    <article className="rounded-lg border border-[#1b1d36]/10 bg-white p-4 dark:border-white/10 dark:bg-[#1a1c35]">
       <p className="font-mono text-[0.68rem] text-muted-foreground uppercase tracking-[0.16em]">
         {label}
       </p>
@@ -59,7 +74,7 @@ function MetricCard({
       </p>
       <p className="mt-1 text-muted-foreground text-xs">{detail}</p>
       {comparison ? (
-        <p className="mt-3 border-[#17211f]/8 border-t pt-2 text-muted-foreground text-xs dark:border-white/10">
+        <p className="mt-3 border-[#1b1d36]/8 border-t pt-2 text-muted-foreground text-xs dark:border-white/10">
           {comparison}
         </p>
       ) : null}
@@ -158,9 +173,9 @@ export function ReliabilityDashboard({
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col justify-between gap-4 border-[#17211f]/10 border-b pb-5 dark:border-white/10 lg:flex-row lg:items-end">
+      <header className="flex flex-col justify-between gap-4 border-[#1b1d36]/10 border-b pb-5 dark:border-white/10 lg:flex-row lg:items-end">
         <div>
-          <p className="font-mono text-[#245ebe] text-xs tracking-[0.18em] dark:text-[#8fb6ff]">
+          <p className="font-mono text-[#6757ec] text-xs tracking-[0.18em] dark:text-[#b3a5ff]">
             {t("relayops:analytics.eyebrow")}
           </p>
           <h1 className="mt-2 font-semibold text-3xl tracking-tight sm:text-4xl">
@@ -185,7 +200,7 @@ export function ReliabilityDashboard({
 
       <section
         aria-labelledby="reliability-filters"
-        className="rounded-xl border border-[#17211f]/10 bg-white p-4 dark:border-white/10 dark:bg-[#101a18]"
+        className="rounded-xl border border-[#1b1d36]/10 bg-white p-4 dark:border-white/10 dark:bg-[#1a1c35]"
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 id="reliability-filters" className="font-semibold text-lg">
@@ -299,11 +314,35 @@ export function ReliabilityDashboard({
                 onChange={(event) =>
                   onSearchChange({ ...search, compare: event.target.checked })
                 }
-                className="size-4 accent-[#245ebe]"
+                className="size-4 accent-[#6757ec]"
               />
               {t("relayops:analytics.compare")}
             </label>
           </div>
+        </div>
+        <div className="sbor-analytics-demo-policy mt-4 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
+          <label className="flex min-h-9 cursor-pointer items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={search.includeDemo}
+              aria-describedby="analytics-demo-policy"
+              onChange={(event) =>
+                onSearchChange({ ...search, includeDemo: event.target.checked })
+              }
+              className="size-4 accent-[#6757ec]"
+            />
+            {t("relayops:analytics.includeDemo")}
+          </label>
+          <p
+            id="analytics-demo-policy"
+            className="max-w-xl text-muted-foreground text-xs leading-5"
+          >
+            {t(
+              search.includeDemo
+                ? "relayops:analytics.demoIncluded"
+                : "relayops:analytics.demoExcluded",
+            )}
+          </p>
         </div>
       </section>
 
@@ -327,7 +366,7 @@ export function ReliabilityDashboard({
       </section>
 
       <section className="grid gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(20rem,0.8fr)]">
-        <article className="rounded-xl border border-[#17211f]/10 bg-white p-4 dark:border-white/10 dark:bg-[#101a18]">
+        <article className="rounded-xl border border-[#1b1d36]/10 bg-white p-4 dark:border-white/10 dark:bg-[#1a1c35]">
           <h2 className="font-semibold text-xl">
             {t("relayops:analytics.volumeTrend")}
           </h2>
@@ -335,7 +374,7 @@ export function ReliabilityDashboard({
             {t("relayops:analytics.drilldownHint")}
           </p>
           {data.series.length > 0 ? (
-            <ul className="mt-5 flex min-h-48 items-end gap-1 overflow-x-auto border-[#17211f]/8 border-b pb-2 dark:border-white/10">
+            <ul className="mt-5 flex min-h-48 items-end gap-1 overflow-x-auto border-[#1b1d36]/8 border-b pb-2 dark:border-white/10">
               {data.series.map((item) => (
                 <li
                   key={item.bucket}
@@ -343,7 +382,7 @@ export function ReliabilityDashboard({
                 >
                   <button
                     type="button"
-                    className="group flex min-h-11 w-full items-end rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#245ebe]"
+                    className="group flex min-h-11 w-full items-end rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6757ec]"
                     aria-label={t("relayops:analytics.openBucket", {
                       date: item.bucket,
                       count: item.volume,
@@ -352,7 +391,7 @@ export function ReliabilityDashboard({
                   >
                     <span
                       aria-hidden="true"
-                      className="flex w-full min-w-5 items-start justify-center rounded-sm bg-[#245ebe] pt-1 font-mono text-[0.62rem] text-white transition-colors group-hover:bg-[#184a9c]"
+                      className="flex w-full min-w-5 items-start justify-center rounded-sm bg-[#6757ec] pt-1 font-mono text-[0.62rem] text-white transition-colors group-hover:bg-[#184a9c]"
                       style={{
                         height: `${Math.max(14, (item.volume / maxVolume) * 176)}px`,
                       }}
@@ -370,8 +409,8 @@ export function ReliabilityDashboard({
           )}
         </article>
 
-        <article className="rounded-xl border border-[#17211f]/10 bg-[#17211f] p-4 text-white dark:border-white/10">
-          <p className="font-mono text-[#8fb6ff] text-xs tracking-[0.16em]">
+        <article className="rounded-xl border border-[#1b1d36]/10 bg-[#1b1d36] p-4 text-white dark:border-white/10">
+          <p className="font-mono text-[#b3a5ff] text-xs tracking-[0.16em]">
             {t("relayops:analytics.hotspotEyebrow")}
           </p>
           <h2 className="mt-2 font-semibold text-xl">
@@ -403,7 +442,7 @@ export function ReliabilityDashboard({
 
       <section
         aria-labelledby="reliability-table"
-        className="rounded-xl border border-[#17211f]/10 bg-white p-4 dark:border-white/10 dark:bg-[#101a18]"
+        className="rounded-xl border border-[#1b1d36]/10 bg-white p-4 dark:border-white/10 dark:bg-[#1a1c35]"
       >
         <div className="flex items-center gap-2">
           <h2 id="reliability-table" className="font-semibold text-xl">
@@ -411,7 +450,7 @@ export function ReliabilityDashboard({
           </h2>
           <ExternalLink
             aria-hidden="true"
-            className="size-4 text-[#245ebe] dark:text-[#8fb6ff]"
+            className="size-4 text-[#6757ec] dark:text-[#b3a5ff]"
           />
         </div>
         <p className="mt-1 text-muted-foreground text-sm">
@@ -420,7 +459,7 @@ export function ReliabilityDashboard({
         <div className="mt-4 overflow-x-auto">
           <table className="w-full border-collapse text-left text-sm">
             <thead>
-              <tr className="border-[#17211f]/10 border-b dark:border-white/10">
+              <tr className="border-[#1b1d36]/10 border-b dark:border-white/10">
                 <th scope="col" className="px-3 py-2 font-medium">
                   {t("relayops:analytics.date")}
                 </th>
@@ -436,7 +475,7 @@ export function ReliabilityDashboard({
               {data.series.map((item) => (
                 <tr
                   key={item.bucket}
-                  className="border-[#17211f]/8 border-b last:border-0 dark:border-white/8"
+                  className="border-[#1b1d36]/8 border-b last:border-0 dark:border-white/8"
                 >
                   <th scope="row" className="px-3 py-2 font-mono font-normal">
                     {item.bucket}

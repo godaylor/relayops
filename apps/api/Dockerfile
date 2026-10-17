@@ -10,6 +10,7 @@ WORKDIR /app
 
 # Copy only package files first for better caching
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY patches ./patches
 COPY packages/typescript-config/package.json ./packages/typescript-config/
 COPY packages/email/package.json ./packages/email/
 COPY packages/libs/package.json ./packages/libs/
@@ -56,6 +57,7 @@ RUN corepack enable && corepack prepare pnpm@10.32.1 --activate
 WORKDIR /app
 
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY patches ./patches
 COPY packages/typescript-config/package.json ./packages/typescript-config/
 COPY packages/libs/package.json ./packages/libs/
 COPY packages/email/package.json ./packages/email/
@@ -70,7 +72,7 @@ RUN --mount=type=cache,id=relayops-pnpm,target=/pnpm/store,sharing=locked \
 FROM node:24.19.0-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS runtime
 
 # Set up user in a single layer
-RUN apk add --no-cache libcrypto3=3.5.8-r0 libssl3=3.5.8-r0 && \
+RUN apk add --no-cache 'libcrypto3>=3.5.9-r0' 'libssl3>=3.5.9-r0' && \
   rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack && \
   rm -f /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack /usr/local/bin/pnpm /usr/local/bin/pnpx /usr/local/bin/yarn /usr/local/bin/yarnpkg && \
   addgroup -g 1001 appuser && \

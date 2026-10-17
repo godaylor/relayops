@@ -1,0 +1,83 @@
+{
+	"date": "2026-10-17",
+	"brand": {
+		"name": "Сборитм",
+		"latin": "Sboritm",
+		"meaning": "Сбор + ритм: разрозненные сигналы становятся согласованными действиями",
+		"nameSearch": {
+			"queries": [
+				"\"Сборитм\"",
+				"\"Sboritm\"",
+				"\"Сборитм\" приложение",
+				"\"Sboritm\" software",
+				"\"Sboritm\" GitHub"
+			],
+			"result": "No exact product collision found in the open web search performed for this task",
+			"trademarkClearance": false,
+			"registryReference": "https://rospatent.gov.ru/opendata/7730176088-tz"
+		}
+	},
+	"assets": [
+		{
+			"file": "apps/web/public/brand/signal-sculpture.webp",
+			"study": "docs/redesign-v2/brand-art.png",
+			"source": "OpenAI imagegen, created for this project",
+			"outputId": "exec-19298a13-b493-486a-860a-fc86f99f7a0e",
+			"promptSummary": "Original translucent cobalt open-C optical-glass sculpture, three amber fiber threads converging into one route, luminous node, midnight-indigo negative space; no text/UI/people. Wide cinematic studio product rendering.",
+			"processing": "WebP format/size optimization to 1600px wide, quality87; final95,870 bytes. No semantic edit."
+		},
+		{
+			"file": "docs/redesign-v2/board-direction.png",
+			"source": "OpenAI imagegen design study",
+			"outputId": "exec-af91d937-ecd8-4a50-a2c6-f87e53016891",
+			"purpose": "Composition reference; illustrative UI and sample people are not operational records"
+		},
+		{
+			"file": "docs/redesign-v2/key-screens.png",
+			"source": "OpenAI imagegen design study based on this project’s two original references",
+			"outputId": "exec-7a8d835f-79c7-42da-896e-f76d7841d00a",
+			"purpose": "Coherent sign-in, incident room, mobile and dark-theme design studies. Contains illustrative concepts, not screenshots of supported features."
+		},
+		{
+			"files": [
+				"docs/redesign-v2/brand-mark.png",
+				"apps/web/public/brand/sboritm-mark-128.webp",
+				"apps/web/public/brand/sboritm-mark-256.webp",
+				"apps/web/public/brand/sboritm-mark-512.webp",
+				"apps/web/public/favicon.svg",
+				"apps/web/public/favicon.ico"
+			],
+			"source": "OpenAI built-in imagegen transparent derivative of the original brand sculpture; same source image used for actual UI mark and favicons",
+			"outputId": "exec-acfc9ee0-9268-45be-a8c5-54b49aa332e7",
+			"prompt": "Extract the existing cobalt blue glass C / Cyrillic С and its three amber optical filaments converging on the lower right amber node. Preserve silhouette, proportions, glass refractions and colors. Remove background, floor, cast shadow. Center on transparent square, 5% padding. Strong recognizable glass edges at 40–96px. No new symbol, text or frame.",
+			"processing": "Only resizing/format optimization via scripts/release/brand.mjs; transparent WebP 128/256/512 plus PNG/ICO/SVG-embedded raster."
+		}
+	],
+	"font": {
+		"package": "@fontsource-variable/onest",
+		"version": "5.3.1",
+		"license": "SIL OFL 1.1",
+		"copyright": "Copyright 2021 The Onest Project Authors",
+		"source": "https://github.com/simpals/onest",
+		"licenseFile": "licenses/fonts/onest-OFL.txt",
+		"artifactLicenseFile": "/licenses/fonts/onest-OFL.txt",
+		"selfHosted": true
+	},
+	"upstream": {
+		"project": "Kaneo",
+		"source": "https://github.com/usekaneo/kaneo",
+		"copyright": "Copyright (c) 2024 Andrej Acevski",
+		"license": "MIT",
+		"rootLicensePreserved": true,
+		"visibleProvenance": true,
+		"endorsement": false
+	},
+	"screenshots": {
+		"source": "Actual Google Chrome browser captures of the isolated local app, real API and PostgreSQL",
+		"trainingData": "Marked DEMO in the application; no invented operational metrics or fictional people injected into the app"
+	},
+	"references": [
+		"https://linear.app/now/how-we-redesigned-the-linear-ui",
+		"https://incident.io/changelog/insights-updates-enhanced-analytics-and-reporting-features"
+	]
+}

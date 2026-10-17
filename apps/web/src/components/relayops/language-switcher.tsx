@@ -13,7 +13,7 @@ export function RelayOpsLanguageSwitcher() {
   const { locale, setLocale } = useLocale();
 
   return (
-    <fieldset className="flex min-h-8 items-center rounded-md border bg-white p-0.5 dark:bg-[#101a18]">
+    <fieldset className="flex min-h-8 items-center rounded-md border bg-white p-0.5 dark:bg-[#1a1c35]">
       <legend className="sr-only">{t("preferencesPage.language")}</legend>
       {publicLocales.map((candidate) => (
         <Button

@@ -3,8 +3,8 @@
 		"eyebrow": "Self-hosted incident operations",
 		"title": "One incident.\nOne shared picture.",
 		"intro": "Keep services, incoming signals and response decisions together. A durable timeline gives the next responder the context to continue.",
-		"open": "Open local RelayOps",
-		"local": "Static portfolio demo is published on GitHub Pages. The live RelayOps runtime is not publicly hosted.",
+		"open": "Open local Сборитм",
+		"local": "Static portfolio demo is published on GitHub Pages. The live Сборитм runtime is not publicly hosted.",
 		"flow": "From observation to resolution",
 		"service": "Service",
 		"signal": "Signal",
@@ -25,7 +25,7 @@
 		"analyticsText": "MTTA, MTTR, explicit samples and links back to the incidents.",
 		"architecture": "PostgreSQL is the record. Realtime keeps the team current.",
 		"architectureText": "A single instance runs without Redis. Existing Kaneo data remains in an explicit read-only archive; incidents are a separate domain.",
-		"provenance": "Derived from the MIT-licensed Kaneo project. Original copyright: Andrej Acevski. RelayOps is an independent fork and is not endorsed by Kaneo.",
+		"provenance": "Derived from the MIT-licensed Kaneo project. Original copyright: Andrej Acevski. Сборитм is an independent fork and is not endorsed by Kaneo.",
 		"licenses": "Licenses and notices",
 		"upstream": "Upstream Kaneo",
 		"language": "Language"
@@ -2184,10 +2184,68 @@
 		}
 	},
 	"relayops": {
+		"brand": {
+			"name": "Сборитм",
+			"category": "Incident response, in sync",
+			"promise": "From the first signal to a shared outcome",
+			"heroTitle": "Signal received.\nTeam, together.",
+			"heroDescription": "Understand the impact, bring the team together and keep every decision in one shared incident room.",
+			"tryProduct": "See how a response comes together",
+			"entryEyebrow": "Your team’s response space",
+			"accessNote": "Try a private demo without signing up. Your browser gets its own workspace with saved training data. Team workspaces stay private.",
+			"builtForTeams": "Built for teams that keep services running.",
+			"visualDemo": "How it works · illustrative example",
+			"sceneSignal": "A signal becomes an incident",
+			"sceneSignalDetail": "Payment gateway · elevated response time",
+			"sceneOwner": "Someone takes the lead",
+			"sceneOwnerDetail": "A coordinator brings the team together",
+			"sceneAction": "The team moves forward",
+			"sceneActionDetail": "Findings and actions appear in the shared history",
+			"sceneResolved": "Service restored. Context preserved.",
+			"sceneResolvedDetail": "The outcome is recorded for the next response",
+			"sharedRhythm": "One signal. One shared response.",
+			"navigationCaption": "Response workspace",
+			"workspaceBoundary": "Private team workspace",
+			"guestIdentity": "Demo participant",
+			"demoMode": "Private demonstration",
+			"workspaceLabel": "Team workspace",
+			"boardEyebrow": "The response, in motion",
+			"boardSubtitle": "From first signal to recovery. Everyone knows the next step.",
+			"activeLabel": "In response",
+			"resolvedLabel": "Resolved",
+			"unassignedLabel": "Need a coordinator",
+			"overviewEyebrow": "The shared picture",
+			"overviewTitle": "See the signal.\nAlign the response.",
+			"overviewDescription": "Active incidents, affected services and the team’s latest decisions — together.",
+			"allQuiet": "A clear picture. A ready team.",
+			"demoNotice": "Training data · saved in your private workspace",
+			"noBoardTitle": "The next response starts here",
+			"noBoardDescription": "Create an incident or open Overview to prepare your first service. The board will show how the response moves forward."
+		},
+		"access": {
+			"explanation": "Access to this link depends on your account and role. Each browser signs in separately. Open your own workspace or sign in with a member account.",
+			"ownWorkspace": "Open my workspace",
+			"signIn": "Sign in with another account",
+			"signingOut": "Opening sign in…",
+			"signOutError": "Could not sign out. Try again."
+		},
+		"guest": {
+			"preparing": "Preparing your private demo…",
+			"workspaceName": "Demo response shift",
+			"workspaceDescription": "Private training workspace. All demo incidents are explicitly marked.",
+			"serviceName": "Payment gateway · demo",
+			"serviceDescription": "Training service for exploring coordinated incident response."
+		},
+		"redesign": {
+			"table": "All columns and sorting",
+			"cards": "Compact list",
+			"filters": "Filters and table options",
+			"connectionHelp": "If the app takes a while to load"
+		},
 		"back": "Back to workspace",
-		"createPanel": "Create RelayOps records",
+		"createPanel": "Create Сборитм records",
 		"creating": "Creating...",
-		"entry": "Open RelayOps tracer",
+		"entry": "Open Сборитм tracer",
 		"incident": {
 			"error": "Incident could not be created. Try again.",
 			"name": "Incident title",
@@ -2210,7 +2268,7 @@
 			"retry": "Retry",
 			"title": "Authoritative incident record"
 		},
-		"pageTitle": "RelayOps tracer",
+		"pageTitle": "Сборитм tracer",
 		"service": {
 			"description": "Description (optional)",
 			"error": "Service could not be created. Check the slug and try again.",
@@ -2265,15 +2323,15 @@
 		"tracerLabel": "Production vertical tracer",
 		"activation": {
 			"activating": "Activating...",
-			"adminRequired": "A workspace administrator must activate RelayOps.",
-			"description": "RelayOps becomes the primary experience. Existing Kaneo projects and tasks remain intact in a read-only archive with JSON export.",
-			"error": "RelayOps could not be activated. Try again.",
+			"adminRequired": "A workspace administrator must activate Сборитм.",
+			"description": "Сборитм becomes the primary experience. Existing Kaneo projects and tasks remain intact in a read-only archive with JSON export.",
+			"error": "Сборитм could not be activated. Try again.",
 			"eyebrow": "EXPLICIT PRODUCT ROLLOUT",
 			"keepLegacy": "Keep legacy workspace",
 			"legacyNotice": "{{projects}} projects and {{tasks}} tasks will be preserved. No records are converted or deleted.",
-			"pageTitle": "Activate RelayOps",
-			"submit": "Activate RelayOps",
-			"title": "Move this workspace to RelayOps"
+			"pageTitle": "Activate Сборитм",
+			"submit": "Activate Сборитм",
+			"title": "Move this workspace to Сборитм"
 		},
 		"catalog": {
 			"active": "Active",
@@ -2289,7 +2347,7 @@
 			"createDescription": "Register an operational system without creating hidden dependencies.",
 			"createTitle": "Create service",
 			"description": "Ownership, service criticality, health and trusted external references in one place.",
-			"emptyDescription": "Create the first Service to start operating in RelayOps.",
+			"emptyDescription": "Create the first Service to start operating in Сборитм.",
 			"emptyTitle": "No services yet",
 			"eyebrow": "SERVICE CATALOG",
 			"filteredEmptyDescription": "Change the search or archive filter to see more services.",
@@ -2314,7 +2372,7 @@
 		"demo": {
 			"cancel": "Keep demo data",
 			"confirm": "Remove marked data",
-			"confirmDescription": "Only records carrying the RelayOps demo provenance marker are deleted. User-created data is preserved.",
+			"confirmDescription": "Only records carrying the Сборитм demo provenance marker are deleted. User-created data is preserved.",
 			"confirmTitle": "Remove all marked demo data?",
 			"description": "{{count}} marked demo Incident is available for training.",
 			"remove": "Remove demo data",
@@ -2353,10 +2411,12 @@
 			"responders": "Responders",
 			"affectedServices": "Affected services",
 			"none": "None",
-			"resolutionSummary": "Resolution summary"
+			"resolutionSummary": "Resolution summary",
+			"technicalDetails": "Technical details",
+			"noTimeline": "Updates will appear here as the team responds."
 		},
 		"legacy": {
-			"description": "Existing projects and tasks are preserved unchanged. RelayOps does not convert, dual-write or delete them.",
+			"description": "Existing projects and tasks are preserved unchanged. Сборитм does not convert, dual-write or delete them.",
 			"emptyDescription": "This workspace did not contain Kaneo projects or tasks.",
 			"emptyTitle": "No legacy records",
 			"export": "Export JSON",
@@ -2368,7 +2428,7 @@
 		"manage": {
 			"apiAuthority": "API-enforced capabilities",
 			"apiAuthorityDescription": "UI visibility never replaces server authorization.",
-			"description": "Manage access and inspect preserved Kaneo records without mixing legacy writes into RelayOps.",
+			"description": "Manage access and inspect preserved Kaneo records without mixing legacy writes into Сборитм.",
 			"eyebrow": "MANAGE",
 			"team": "Members and roles",
 			"teamDescription": "Manage workspace membership and authorization.",
@@ -2392,7 +2452,7 @@
 			"demoError": "The demo incident could not be created.",
 			"demoSafety": "Demo records are explicitly marked. Removing demo data never deletes user-created Services or Incidents.",
 			"eyebrow": "GUIDED SETUP",
-			"serviceDenied": "You can view RelayOps, but you do not have permission to create a Service.",
+			"serviceDenied": "You can view Сборитм, but you do not have permission to create a Service.",
 			"serviceDescription": "Use a stable slug and add ownership or runbook links when they are available.",
 			"serviceReady": "{{name}} is ready",
 			"serviceTitle": "Define the system your team operates",
@@ -2401,7 +2461,7 @@
 			"stepService": "First service",
 			"stepWorkspace": "Workspace",
 			"title": "Bring your first service online",
-			"createWorkspace": "Create RelayOps workspace"
+			"createWorkspace": "Create Сборитм workspace"
 		},
 		"overview": {
 			"activeDescription": "Detected incidents that still require an operational response.",
@@ -2422,17 +2482,17 @@
 			"title": "Current operational state"
 		},
 		"shell": {
-			"provenance": "RelayOps is derived from the MIT-licensed Kaneo project and is not officially endorsed by Kaneo.",
+			"provenance": "Сборитм is derived from the MIT-licensed Kaneo project and is not officially endorsed by Kaneo.",
 			"subtitle": "Incident operations"
 		},
 		"skipToContent": "Skip to main content",
 		"states": {
 			"deniedDescription": "You do not have permission to view this workspace resource.",
 			"deniedTitle": "Access denied",
-			"loading": "Loading RelayOps",
+			"loading": "Loading Сборитм",
 			"retry": "Try again",
 			"retryableDescription": "The request can be retried without losing any work.",
-			"retryableTitle": "RelayOps is temporarily unavailable",
+			"retryableTitle": "Сборитм is temporarily unavailable",
 			"unrecoverableDescription": "The server returned status {{status}}. Check the link or contact a workspace administrator.",
 			"unrecoverableTitle": "This resource cannot be opened"
 		},
@@ -2474,7 +2534,8 @@
 			"discard": "Discard draft",
 			"failedTitle": "Command failed",
 			"failed": "The incident command could not be completed.",
-			"saved": "Saved"
+			"saved": "Saved",
+			"updateHint": "Keep the team aligned: findings, actions, next step."
 		},
 		"lifecycle": {
 			"detected": "Detected",
@@ -2584,7 +2645,10 @@
 			"volume": "Incident volume",
 			"volumeTrend": "Detected incident volume",
 			"explanation": "How to read these numbers",
-			"explanationBody": "Response time runs from reporting to acknowledgement. Resolution time runs from reporting to a saved solution. Recovery time ends when monitoring starts. The median is the middle result; 90% of measured results are at or below the p90 value. Missing timestamps are excluded, not treated as zero."
+			"explanationBody": "Response time runs from reporting to acknowledgement. Resolution time runs from reporting to a saved solution. Recovery time ends when monitoring starts. The median is the middle result; 90% of measured results are at or below the p90 value. Missing timestamps are excluded, not treated as zero.",
+			"includeDemo": "Include training incidents",
+			"demoExcluded": "DEMO incidents are excluded from these metrics. Include them to explore the training results.",
+			"demoIncluded": "Training incidents marked DEMO are included in these metrics."
 		},
 		"workbench": {
 			"applyFilters": "Apply filters",
@@ -2748,8 +2812,8 @@
 		"currentPlan": "Current plan",
 		"currentPlanSubtitle": "Your workspace's active plan and billing status.",
 		"currentTeamPrice": "${{price}} / user / {{period}}",
-		"description": "Manage the RelayOps Cloud subscription for this workspace.",
-		"disabled": "Billing isn't enabled on this instance. Self-hosted RelayOps includes every feature, free forever.",
+		"description": "Manage the Сборитм Cloud subscription for this workspace.",
+		"disabled": "Billing isn't enabled on this instance. Self-hosted Сборитм includes every feature, free forever.",
 		"features": {
 			"backups": "Automatic backups and updates",
 			"emailSupport": "Email support",
@@ -2759,7 +2823,7 @@
 			"unlimitedMembers": "Unlimited team members",
 			"unlimitedWork": "Unlimited projects and tasks"
 		},
-		"foundingDescription": "This workspace has free access to RelayOps Cloud as an early supporter. Thank you for being here from the start.",
+		"foundingDescription": "This workspace has free access to Сборитм Cloud as an early supporter. Thank you for being here from the start.",
 		"foundingFree": "Founding Free",
 		"free": "Free",
 		"freeTrial": "Free trial",
@@ -2821,7 +2885,7 @@
 			"enterCode": "Enter a code",
 			"noCode": "No device code was provided.",
 			"signInSubtitle": "Sign in to approve or deny this device request.",
-			"subtitle": "A device is requesting access to your RelayOps account.",
+			"subtitle": "A device is requesting access to your Сборитм account.",
 			"title": "Approve device"
 		},
 		"loading": "Loading…",
@@ -2834,7 +2898,7 @@
 			"loading": "Loading request…",
 			"redirectUri": "Redirect URI",
 			"restart": "Return to your MCP client and start the connection again.",
-			"reviewSubtitle": "Review this request before granting access to your RelayOps account.",
+			"reviewSubtitle": "Review this request before granting access to your Сборитм account.",
 			"signInSubtitle": "Sign in before approving this MCP client.",
 			"title": "Authorize MCP client",
 			"warning": "This client will be able to act as you and access your workspaces. Only continue if you initiated this connection."

@@ -3,9 +3,12 @@ import {
   type CSSProperties,
   type KeyboardEvent,
   memo,
+  useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
+import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -65,7 +68,7 @@ function cellContent(
   switch (columnId) {
     case "key":
       return (
-        <span className="font-mono text-[#245ebe] dark:text-[#8fb6ff]">
+        <span className="font-mono text-[#6757ec] dark:text-[#b3a5ff]">
           {row.key}
         </span>
       );
@@ -79,10 +82,18 @@ function cellContent(
         </span>
       );
     case "status":
-      return <Badge variant="outline">{labels.statusById[row.status]}</Badge>;
+      return (
+        <Badge
+          className="sbor-status"
+          data-status={row.status}
+          variant="outline"
+        >
+          {labels.statusById[row.status]}
+        </Badge>
+      );
     case "severity":
       return (
-        <Badge className="bg-[#b73a34] text-white">
+        <Badge className="sbor-severity" data-severity={row.severity}>
           {labels.severityById[row.severity]}
         </Badge>
       );
@@ -93,7 +104,21 @@ function cellContent(
     case "affectedServices":
       return row.affectedServices.map((service) => service.name).join(", ");
     case "commander":
-      return row.commander?.name ?? "—";
+      return row.commander ? (
+        <span className="sbor-table-owner">
+          <span className="sbor-avatar">
+            {row.commander.name
+              .split(/\s+/)
+              .slice(0, 2)
+              .map((word) => word[0])
+              .join("")
+              .toUpperCase()}
+          </span>
+          {row.commander.name}
+        </span>
+      ) : (
+        "—"
+      );
     case "responders":
       return (
         row.responders.map((responder) => responder.name).join(", ") || "—"
@@ -325,7 +350,7 @@ type VirtualizedIncidentTableProps = {
   hasMore?: boolean;
   isLoadingMore?: boolean;
   onSortChange: (sort: WorkbenchSort[]) => void;
-  onSelectIncident: (incidentId: string, trigger: HTMLTableRowElement) => void;
+  onSelectIncident: (incidentId: string, trigger: HTMLElement) => void;
   onSelectionChange: (ids: Set<string>) => void;
   onLoadMore?: () => void;
 };
@@ -346,8 +371,40 @@ export const VirtualizedIncidentTable = memo(function VirtualizedIncidentTable({
   onSelectionChange,
   onLoadMore,
 }: VirtualizedIncidentTableProps) {
+  const versions = useRef(
+    new Map(items.map((item) => [item.id, item.version])),
+  );
+  const [changedIds, setChangedIds] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    const changed = new Set(
+      items
+        .filter(
+          (item) =>
+            versions.current.has(item.id) &&
+            versions.current.get(item.id) !== item.version,
+        )
+        .map((item) => item.id),
+    );
+    versions.current = new Map(items.map((item) => [item.id, item.version]));
+    if (!changed.size) {
+      setChangedIds(new Set());
+      return;
+    }
+    setChangedIds(changed);
+    const timer = window.setTimeout(() => setChangedIds(new Set()), 1400);
+    return () => window.clearTimeout(timer);
+  }, [items]);
   const [scrollTop, setScrollTop] = useState(0);
-  const rowHeight = density === "compact" ? 44 : 58;
+  const { t } = useTranslation();
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 640);
+  const [showTable, setShowTable] = useState(false);
+  useEffect(() => {
+    const resize = () => setIsMobile(window.innerWidth <= 640);
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, []);
+  const cards = isMobile && !showTable;
+  const rowHeight = cards ? 120 : density === "compact" ? 44 : 58;
   const startIndex = Math.max(0, Math.floor(scrollTop / rowHeight) - overscan);
   const visibleCount = Math.ceil(viewportHeight / rowHeight) + overscan * 2;
   const endIndex = Math.min(items.length, startIndex + visibleCount);
@@ -371,7 +428,12 @@ export const VirtualizedIncidentTable = memo(function VirtualizedIncidentTable({
     <div
       data-testid="workbench-scroll-viewport"
       className="relative overflow-auto rounded-xl border bg-background"
-      style={{ height: viewportHeight }}
+      style={{
+        height: Math.min(
+          viewportHeight,
+          44 + Math.max(1, items.length) * rowHeight,
+        ),
+      }}
       onScroll={(event) => {
         const target = event.currentTarget;
         setScrollTop(target.scrollTop);
@@ -385,116 +447,184 @@ export const VirtualizedIncidentTable = memo(function VirtualizedIncidentTable({
         }
       }}
     >
-      <table
-        className="border-separate border-spacing-0 text-sm"
-        style={{ width: tableWidth, minWidth: "100%" }}
-        aria-rowcount={items.length + 1}
-      >
-        <TableHeader className="sticky top-0 z-20 bg-background shadow-sm">
-          <TableRow>
-            <TableHead
-              className="sticky left-0 z-30 w-11 min-w-11 bg-background"
-              aria-label={labels.selectIncident}
-            />
-            {columns.map((column) => {
-              const sortField = sortableColumns[column.id];
-              const activeSort = sort.find((item) => item.field === sortField);
-              return (
-                <TableHead
-                  key={column.id}
-                  className={column.pin ? "bg-background" : undefined}
-                  style={pinnedStyle(column, offsets)}
-                  aria-sort={
-                    activeSort?.direction === "asc"
-                      ? "ascending"
-                      : activeSort?.direction === "desc"
-                        ? "descending"
-                        : undefined
-                  }
-                >
-                  {sortField ? (
-                    <button
-                      type="button"
-                      className="flex w-full items-center gap-1 text-left"
-                      aria-label={`${labels.sortColumn}: ${labels.columnsById[column.id]}`}
-                      onClick={(event) =>
-                        onSortChange(nextSort(sort, sortField, event.shiftKey))
-                      }
-                    >
-                      {labels.columnsById[column.id]}
-                      {activeSort?.direction === "asc" ? (
-                        <ArrowUp className="size-3.5" />
-                      ) : activeSort?.direction === "desc" ? (
-                        <ArrowDown className="size-3.5" />
-                      ) : null}
-                    </button>
-                  ) : (
-                    labels.columnsById[column.id]
-                  )}
-                </TableHead>
-              );
-            })}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {topSpacer > 0 ? (
-            <tr style={{ height: topSpacer }}>
-              <td colSpan={columns.length + 1} />
-            </tr>
-          ) : null}
+      {isMobile ? (
+        <div className="sticky top-0 z-30 border-b bg-background p-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowTable(!showTable)}
+          >
+            {cards
+              ? t("relayops:redesign.table")
+              : t("relayops:redesign.cards")}
+          </Button>
+        </div>
+      ) : null}
+      {cards ? (
+        <ul aria-label={labels.title}>
+          <li aria-hidden="true" style={{ height: topSpacer }} />
           {visibleItems.map((row) => (
-            <TableRow
+            <li
               key={row.id}
-              data-testid="workbench-row"
-              data-state={
-                row.id === selectedIncidentId ? "selected" : undefined
-              }
-              tabIndex={0}
+              className="relay-mobile-incident"
+              data-updated={changedIds.has(row.id) || undefined}
               style={{ height: rowHeight }}
-              onClick={(event) => openRow(row, event)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  openRow(row, event);
-                }
-              }}
             >
-              <TableCell className="sticky left-0 z-10 w-11 min-w-11 bg-background">
-                <input
-                  type="checkbox"
-                  aria-label={`${labels.selectIncident}: ${row.key}`}
-                  checked={selectedIds.has(row.id)}
-                  onClick={(event) => event.stopPropagation()}
-                  onChange={(event) => {
-                    const next = new Set(selectedIds);
-                    if (event.target.checked) next.add(row.id);
-                    else next.delete(row.id);
-                    onSelectionChange(next);
-                  }}
-                />
-              </TableCell>
-              {columns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  className={
-                    column.pin
-                      ? "overflow-hidden bg-background text-ellipsis"
-                      : "overflow-hidden text-ellipsis"
-                  }
-                  style={pinnedStyle(column, offsets)}
-                >
-                  {cellContent(row, column.id, labels)}
-                </TableCell>
-              ))}
-            </TableRow>
+              <input
+                type="checkbox"
+                aria-label={`${labels.selectIncident}: ${row.key}`}
+                checked={selectedIds.has(row.id)}
+                onChange={(event) => {
+                  const next = new Set(selectedIds);
+                  if (event.target.checked) next.add(row.id);
+                  else next.delete(row.id);
+                  onSelectionChange(next);
+                }}
+              />
+              <button
+                type="button"
+                onClick={(event) =>
+                  onSelectIncident(row.id, event.currentTarget)
+                }
+              >
+                <span className="flex items-center justify-between gap-2 text-xs">
+                  <span className="font-mono text-muted-foreground">
+                    {row.key}
+                  </span>
+                  <span>
+                    {labels.severityById[row.severity]} ·{" "}
+                    {labels.statusById[row.status]}
+                  </span>
+                </span>
+                <strong className="line-clamp-2 text-sm font-medium">
+                  {row.title}
+                </strong>
+                <span className="block truncate text-xs text-muted-foreground">
+                  {row.service.name} · {row.commander?.name ?? "—"}
+                </span>
+              </button>
+            </li>
           ))}
-          {bottomSpacer > 0 ? (
-            <tr style={{ height: bottomSpacer }}>
-              <td colSpan={columns.length + 1} />
-            </tr>
-          ) : null}
-        </TableBody>
-      </table>
+          <li aria-hidden="true" style={{ height: bottomSpacer }} />
+        </ul>
+      ) : (
+        <table
+          className="border-separate border-spacing-0 text-sm"
+          style={{ width: tableWidth, minWidth: "100%" }}
+          aria-rowcount={items.length + 1}
+        >
+          <TableHeader className="sticky top-0 z-20 bg-background shadow-sm">
+            <TableRow>
+              <TableHead
+                className="sticky left-0 z-30 w-11 min-w-11 bg-background"
+                aria-label={labels.selectIncident}
+              />
+              {columns.map((column) => {
+                const sortField = sortableColumns[column.id];
+                const activeSort = sort.find(
+                  (item) => item.field === sortField,
+                );
+                return (
+                  <TableHead
+                    key={column.id}
+                    className={column.pin ? "bg-background" : undefined}
+                    style={pinnedStyle(column, offsets)}
+                    aria-sort={
+                      activeSort?.direction === "asc"
+                        ? "ascending"
+                        : activeSort?.direction === "desc"
+                          ? "descending"
+                          : undefined
+                    }
+                  >
+                    {sortField ? (
+                      <button
+                        type="button"
+                        className="flex w-full items-center gap-1 text-left"
+                        aria-label={`${labels.sortColumn}: ${labels.columnsById[column.id]}`}
+                        onClick={(event) =>
+                          onSortChange(
+                            nextSort(sort, sortField, event.shiftKey),
+                          )
+                        }
+                      >
+                        {labels.columnsById[column.id]}
+                        {activeSort?.direction === "asc" ? (
+                          <ArrowUp className="size-3.5" />
+                        ) : activeSort?.direction === "desc" ? (
+                          <ArrowDown className="size-3.5" />
+                        ) : null}
+                      </button>
+                    ) : (
+                      labels.columnsById[column.id]
+                    )}
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {topSpacer > 0 ? (
+              <tr style={{ height: topSpacer }}>
+                <td colSpan={columns.length + 1} />
+              </tr>
+            ) : null}
+            {visibleItems.map((row) => (
+              <TableRow
+                key={row.id}
+                data-testid="workbench-row"
+                data-updated={changedIds.has(row.id) || undefined}
+                data-severity={row.severity}
+                data-state={
+                  row.id === selectedIncidentId ? "selected" : undefined
+                }
+                tabIndex={0}
+                style={{ height: rowHeight }}
+                onClick={(event) => openRow(row, event)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    openRow(row, event);
+                  }
+                }}
+              >
+                <TableCell className="sticky left-0 z-10 w-11 min-w-11 bg-background">
+                  <input
+                    type="checkbox"
+                    aria-label={`${labels.selectIncident}: ${row.key}`}
+                    checked={selectedIds.has(row.id)}
+                    onClick={(event) => event.stopPropagation()}
+                    onChange={(event) => {
+                      const next = new Set(selectedIds);
+                      if (event.target.checked) next.add(row.id);
+                      else next.delete(row.id);
+                      onSelectionChange(next);
+                    }}
+                  />
+                </TableCell>
+                {columns.map((column) => (
+                  <TableCell
+                    key={column.id}
+                    className={
+                      column.pin
+                        ? "overflow-hidden bg-background text-ellipsis"
+                        : "overflow-hidden text-ellipsis"
+                    }
+                    style={pinnedStyle(column, offsets)}
+                  >
+                    {cellContent(row, column.id, labels)}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+            {bottomSpacer > 0 ? (
+              <tr style={{ height: bottomSpacer }}>
+                <td colSpan={columns.length + 1} />
+              </tr>
+            ) : null}
+          </TableBody>
+        </table>
+      )}
       {hasMore ? (
         <div className="sticky bottom-0 flex justify-center border-t bg-background/95 p-2">
           <Button

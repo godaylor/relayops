@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { CreateIncidentDialog } from "@/components/relayops/create-incident-dialog";
 import {
   ResponseBoard,
   type ResponseBoardTransitionCommand,
@@ -102,6 +103,7 @@ function ResponseBoardRoute() {
 
   return (
     <ResponseBoard
+      emptyAction={<CreateIncidentDialog workspaceId={workspaceId} />}
       incidents={items}
       labels={labels}
       onTransition={transition}

@@ -3,8 +3,8 @@
 		"eyebrow": "Self-hosted incident operations",
 		"title": "One incident.\nOne shared picture.",
 		"intro": "Keep services, incoming signals and response decisions together. A durable timeline gives the next responder the context to continue.",
-		"open": "Open local RelayOps",
-		"local": "Static portfolio demo is published on GitHub Pages. The live RelayOps runtime is not publicly hosted.",
+		"open": "Open local Сборитм",
+		"local": "Static portfolio demo is published on GitHub Pages. The live Сборитм runtime is not publicly hosted.",
 		"flow": "From observation to resolution",
 		"service": "Service",
 		"signal": "Signal",
@@ -25,13 +25,13 @@
 		"analyticsText": "MTTA, MTTR, explicit samples and links back to the incidents.",
 		"architecture": "PostgreSQL is the record. Realtime keeps the team current.",
 		"architectureText": "A single instance runs without Redis. Existing Kaneo data remains in an explicit read-only archive; incidents are a separate domain.",
-		"provenance": "Derived from the MIT-licensed Kaneo project. Original copyright: Andrej Acevski. RelayOps is an independent fork and is not endorsed by Kaneo.",
+		"provenance": "Derived from the MIT-licensed Kaneo project. Original copyright: Andrej Acevski. Сборитм is an independent fork and is not endorsed by Kaneo.",
 		"licenses": "Licenses and notices",
 		"upstream": "Upstream Kaneo",
 		"language": "Language"
 	},
 	"common": {
-		"appName": "RelayOps",
+		"appName": "Сборитм",
 		"actions": {
 			"cancel": "Cancel",
 			"close": "Close",
@@ -250,7 +250,7 @@
 			"toggleMessage": "Already have an account?",
 			"toggleLink": "Sign in",
 			"instanceStatusError": "Couldn't reach the server. Please retry in a moment.",
-			"instanceAdminTitle": "Set up your RelayOps instance",
+			"instanceAdminTitle": "Set up your Сборитм instance",
 			"instanceAdminSubtitle": "This account becomes the instance administrator with full access."
 		},
 		"verifyOtp": {
@@ -308,7 +308,7 @@
 			"workspaceLabel": "Workspace: {{workspaceName}}",
 			"joinWorkspace": "Join {{workspaceName}}",
 			"inviteBodySignedIn": "<inviter>{{inviterName}}</inviter> has invited you to join their workspace.",
-			"inviteBodySignedOut": "<inviter>{{inviterName}}</inviter> has invited you to join their workspace on RelayOps.",
+			"inviteBodySignedOut": "<inviter>{{inviterName}}</inviter> has invited you to join their workspace on Сборитм.",
 			"createAccountOrSignIn": "Create an account to accept this invitation, or sign in if you already have one.",
 			"createAccount": "Create Account",
 			"accepting": "Accepting...",
@@ -324,7 +324,7 @@
 			}
 		},
 		"onboarding": {
-			"pageTitle": "Welcome to RelayOps",
+			"pageTitle": "Welcome to Сборитм",
 			"workspacePageTitle": "Create Workspace",
 			"createWorkspaceTitle": "Create workspace",
 			"createWorkspaceSubtitle": "Set up your workspace to coordinate incident response",
@@ -416,7 +416,7 @@
 		"notificationsPage": {
 			"pageTitle": "Notifications",
 			"title": "Notifications",
-			"subtitle": "Choose how RelayOps delivers your account notifications and which channels to use.",
+			"subtitle": "Choose how Сборитм delivers your account notifications and which channels to use.",
 			"statusConnected": "Connected",
 			"statusPaused": "Paused",
 			"emailTitle": "Email",
@@ -452,7 +452,7 @@
 			"webhookUrlPlaceholder": "https://example.com/webhooks/relayops",
 			"webhookSecretPlaceholder": "Optional shared secret",
 			"webhookSecretHintConfigured": "A signing secret is already configured ({{masked}}). Enter a new one to replace it.",
-			"webhookSecretHintOptional": "Optional. RelayOps signs the request body when a secret is set.",
+			"webhookSecretHintOptional": "Optional. Сборитм signs the request body when a secret is set.",
 			"connectWebhook": "Connect webhook",
 			"workspaceRulesTitle": "Workspace delivery rules",
 			"workspaceRulesDescription": "Reuse your global channels, then decide which workspaces and projects are allowed to send account notifications.",
@@ -517,7 +517,7 @@
 		},
 		"preferencesPage": {
 			"title": "Preferences",
-			"subtitle": "Customize your RelayOps experience.",
+			"subtitle": "Customize your Сборитм experience.",
 			"appearanceTitle": "Appearance",
 			"appearanceSubtitle": "Visual settings and layout preferences.",
 			"theme": "Theme",
@@ -561,7 +561,7 @@
 			"title": "Developer Settings",
 			"subtitle": "Manage your API keys and developer resources.",
 			"apiKeysCardTitle": "API Keys",
-			"apiKeysCardDescription": "Create and manage API keys for programmatic access to RelayOps.",
+			"apiKeysCardDescription": "Create and manage API keys for programmatic access to Сборитм.",
 			"createApiKey": "Create API Key",
 			"unnamedKey": "Unnamed Key"
 		},
@@ -600,7 +600,7 @@
 			},
 			"createDialog": {
 				"title": "Create API Key",
-				"description": "Create a new API key to access the RelayOps API programmatically.",
+				"description": "Create a new API key to access the Сборитм API programmatically.",
 				"nameLabel": "Name",
 				"namePlaceholder": "My API Key",
 				"nameDescription": "A descriptive name for this API key",
@@ -954,7 +954,7 @@
 				"removeError": "Failed to remove GitHub integration",
 				"issuesImported": "Issues imported successfully",
 				"importError": "Failed to import issues",
-				"commentOnEnabled": "RelayOps will comment with a task link on new issues",
+				"commentOnEnabled": "Сборитм will comment with a task link on new issues",
 				"commentOnDisabled": "Task link comments on new issues are turned off",
 				"settingsUpdateError": "Failed to update GitHub integration"
 			},
@@ -965,8 +965,8 @@
 			"badgeNotConnected": "Not Connected",
 			"repository": "Repository",
 			"repositoryHint": "Connected GitHub repository",
-			"commentTaskLinkTitle": "Comment RelayOps link on new issues",
-			"commentTaskLinkHint": "When enabled, RelayOps posts a comment on each new GitHub issue with a link to the task.",
+			"commentTaskLinkTitle": "Comment Сборитм link on new issues",
+			"commentTaskLinkHint": "When enabled, Сборитм posts a comment on each new GitHub issue with a link to the task.",
 			"appStatusTitle": "GitHub App Status",
 			"appStatusHint": "Installation and permissions status",
 			"statusProperlyConfigured": "Properly configured",
@@ -1019,7 +1019,7 @@
 				"removeError": "Failed to remove Gitea integration",
 				"issuesImported": "Issues imported successfully",
 				"importError": "Failed to import issues",
-				"commentOnEnabled": "RelayOps will comment with a task link on new issues",
+				"commentOnEnabled": "Сборитм will comment with a task link on new issues",
 				"commentOnDisabled": "Task link comments on new issues are turned off",
 				"settingsUpdateError": "Failed to update Gitea integration",
 				"secretCopied": "Copied",
@@ -1035,8 +1035,8 @@
 			"badgeNotConnected": "Not connected",
 			"repository": "Repository",
 			"repositoryHint": "Linked Gitea repository",
-			"commentTaskLinkTitle": "Comment RelayOps link on new issues",
-			"commentTaskLinkHint": "When enabled, RelayOps posts a comment on each new issue with a link to the task.",
+			"commentTaskLinkTitle": "Comment Сборитм link on new issues",
+			"commentTaskLinkHint": "When enabled, Сборитм posts a comment on each new issue with a link to the task.",
 			"webhookTitle": "Webhook",
 			"webhookHint": "In your Gitea repository, add a webhook with this URL and secret. Enable push, pull request, issues, issue comments, and create (for labels).",
 			"webhookSecretLabel": "Secret (must match the webhook secret in Gitea)",
@@ -1160,15 +1160,15 @@
 				"removeError": "Failed to remove generic webhook integration"
 			},
 			"connectionTitle": "Outgoing webhook connection",
-			"connectionHint": "Send task events to your own endpoint as JSON. A signed X-RelayOps-Signature header is included when a secret is configured.",
+			"connectionHint": "Send task events to your own endpoint as JSON. A signed X-Сборитм-Signature header is included when a secret is configured.",
 			"connected": "Connected",
 			"paused": "Paused",
 			"webhookLabel": "Endpoint URL",
 			"webhookPlaceholder": "https://example.com/webhooks/relayops",
-			"webhookHint": "RelayOps sends POST requests with a JSON payload for each enabled event.",
+			"webhookHint": "Сборитм sends POST requests with a JSON payload for each enabled event.",
 			"secretLabel": "Signing secret",
 			"secretPlaceholder": "Optional shared secret",
-			"secretHint": "Optional. If provided, RelayOps signs the request body and sends the hex digest in the X-RelayOps-Signature header.",
+			"secretHint": "Optional. If provided, Сборитм signs the request body and sends the hex digest in the X-Сборитм-Signature header.",
 			"secretHintConfigured": "A signing secret is already configured ({{secret}}). Enter a new one to replace it.",
 			"eventsTitle": "Event notifications",
 			"eventsHint": "Choose which project changes should trigger outgoing webhooks.",
@@ -1222,7 +1222,7 @@
 			"threadIdHint": "Optional. Use this for forum topics inside Telegram groups.",
 			"chatLabelLabel": "Chat label",
 			"chatLabelPlaceholder": "Engineering Updates",
-			"chatLabelHint": "Optional label for your reference inside RelayOps.",
+			"chatLabelHint": "Optional label for your reference inside Сборитм.",
 			"eventsTitle": "Event notifications",
 			"eventsHint": "Choose which project changes should post to Telegram.",
 			"events": {
@@ -2012,14 +2012,14 @@
 	},
 	"invitations": {
 		"email": {
-			"subject": "{{inviterName}} invited you to join {{workspaceName}} on RelayOps",
-			"preview": "You're invited to {{workspaceName}} on RelayOps",
+			"subject": "{{inviterName}} invited you to join {{workspaceName}} on Сборитм",
+			"preview": "You're invited to {{workspaceName}} on Сборитм",
 			"title": "Join {{workspaceName}}",
-			"subtitle": "{{inviterName}} ({{inviterEmail}}) invited you to collaborate in RelayOps.",
+			"subtitle": "{{inviterName}} ({{inviterEmail}}) invited you to collaborate in Сборитм.",
 			"cta": "Accept invitation",
 			"sameEmail": "You can accept with the same email that received this message.",
 			"ignore": "If this wasn't expected, you can safely ignore this email.",
-			"footer": "RelayOps workspace invitation"
+			"footer": "Сборитм workspace invitation"
 		},
 		"pageTitle": "Invitations",
 		"pendingInvitations": "Pending Invitations",
@@ -2155,13 +2155,13 @@
 	},
 	"billing": {
 		"title": "Billing",
-		"disabled": "Billing isn't enabled on this instance. Self-hosted RelayOps includes every feature, free forever.",
-		"description": "Manage the RelayOps Cloud subscription for this workspace.",
+		"disabled": "Billing isn't enabled on this instance. Self-hosted Сборитм includes every feature, free forever.",
+		"description": "Manage the Сборитм Cloud subscription for this workspace.",
 		"currentPlan": "Current plan",
 		"currentPlanSubtitle": "Your workspace's active plan and billing status.",
 		"foundingFree": "Founding Free",
 		"free": "Free",
-		"foundingDescription": "This workspace has free access to RelayOps Cloud as an early supporter. Thank you for being here from the start.",
+		"foundingDescription": "This workspace has free access to Сборитм Cloud as an early supporter. Thank you for being here from the start.",
 		"accessEnds": "Access ends",
 		"renews": "Renews",
 		"manageDescription": "Update payment method, view invoices, or cancel anytime.",
@@ -2241,7 +2241,7 @@
 			"loading": "Loading request…",
 			"checking": "Checking the authorization request.",
 			"signInSubtitle": "Sign in before approving this MCP client.",
-			"reviewSubtitle": "Review this request before granting access to your RelayOps account.",
+			"reviewSubtitle": "Review this request before granting access to your Сборитм account.",
 			"warning": "This client will be able to act as you and access your workspaces. Only continue if you initiated this connection.",
 			"clientName": "Client name (self-reported)",
 			"defaultClient": "MCP client",
@@ -2257,15 +2257,73 @@
 			"connected": "Device connected",
 			"denyError": "Could not deny",
 			"cancelled": "Request cancelled",
-			"subtitle": "A device is requesting access to your RelayOps account."
+			"subtitle": "A device is requesting access to your Сборитм account."
 		}
 	},
 	"relayops": {
-		"pageTitle": "RelayOps — service issues",
+		"brand": {
+			"name": "Сборитм",
+			"category": "Incident response, in sync",
+			"promise": "From the first signal to a shared outcome",
+			"heroTitle": "Signal received.\nTeam, together.",
+			"heroDescription": "Understand the impact, bring the team together and keep every decision in one shared incident room.",
+			"tryProduct": "See how a response comes together",
+			"entryEyebrow": "Your team’s response space",
+			"accessNote": "Try a private demo without signing up. Your browser gets its own workspace with saved training data. Team workspaces stay private.",
+			"builtForTeams": "Built for teams that keep services running.",
+			"visualDemo": "How it works · illustrative example",
+			"sceneSignal": "A signal becomes an incident",
+			"sceneSignalDetail": "Payment gateway · elevated response time",
+			"sceneOwner": "Someone takes the lead",
+			"sceneOwnerDetail": "A coordinator brings the team together",
+			"sceneAction": "The team moves forward",
+			"sceneActionDetail": "Findings and actions appear in the shared history",
+			"sceneResolved": "Service restored. Context preserved.",
+			"sceneResolvedDetail": "The outcome is recorded for the next response",
+			"sharedRhythm": "One signal. One shared response.",
+			"navigationCaption": "Response workspace",
+			"workspaceBoundary": "Private team workspace",
+			"guestIdentity": "Demo participant",
+			"demoMode": "Private demonstration",
+			"workspaceLabel": "Team workspace",
+			"boardEyebrow": "The response, in motion",
+			"boardSubtitle": "From first signal to recovery. Everyone knows the next step.",
+			"activeLabel": "In response",
+			"resolvedLabel": "Resolved",
+			"unassignedLabel": "Need a coordinator",
+			"overviewEyebrow": "The shared picture",
+			"overviewTitle": "See the signal.\nAlign the response.",
+			"overviewDescription": "Active incidents, affected services and the team’s latest decisions — together.",
+			"allQuiet": "A clear picture. A ready team.",
+			"demoNotice": "Training data · saved in your private workspace",
+			"noBoardTitle": "The next response starts here",
+			"noBoardDescription": "Create an incident or open Overview to prepare your first service. The board will show how the response moves forward."
+		},
+		"access": {
+			"explanation": "Access to this link depends on your account and role. Each browser signs in separately. Open your own workspace or sign in with a member account.",
+			"ownWorkspace": "Open my workspace",
+			"signIn": "Sign in with another account",
+			"signingOut": "Opening sign in…",
+			"signOutError": "Could not sign out. Try again."
+		},
+		"guest": {
+			"preparing": "Preparing your private demo…",
+			"workspaceName": "Demo response shift",
+			"workspaceDescription": "Private training workspace. All demo incidents are explicitly marked.",
+			"serviceName": "Payment gateway · demo",
+			"serviceDescription": "Training service for exploring coordinated incident response."
+		},
+		"redesign": {
+			"table": "All columns and sorting",
+			"cards": "Compact list",
+			"filters": "Filters and table options",
+			"connectionHelp": "If the app takes a while to load"
+		},
+		"pageTitle": "Сборитм — service issues",
 		"tracerLabel": "Production vertical tracer",
-		"entry": "Open RelayOps",
+		"entry": "Open Сборитм",
 		"back": "Back to workspace",
-		"createPanel": "Create RelayOps records",
+		"createPanel": "Create Сборитм records",
 		"creating": "Creating...",
 		"service": {
 			"title": "1 · Service",
@@ -2343,7 +2401,7 @@
 		"skipToContent": "Skip to main content",
 		"shell": {
 			"subtitle": "Service issue response",
-			"provenance": "RelayOps is derived from the MIT-licensed Kaneo project and is not officially endorsed by Kaneo."
+			"provenance": "Сборитм is derived from the MIT-licensed Kaneo project and is not officially endorsed by Kaneo."
 		},
 		"nav": {
 			"primary": "Primary navigation",
@@ -2366,7 +2424,7 @@
 			"retry": "Reconnect"
 		},
 		"clockRail": {
-			"title": "Live incident clock rail",
+			"title": "Active now",
 			"loading": "Loading active incidents…",
 			"error": "Active incidents are temporarily unavailable.",
 			"retry": "Retry clock rail",
@@ -2376,22 +2434,22 @@
 			"openIncident": "Open {{key}}: {{title}}, {{severity}}, {{status}}, elapsed {{elapsed}}"
 		},
 		"activation": {
-			"pageTitle": "Activate RelayOps",
+			"pageTitle": "Activate Сборитм",
 			"eyebrow": "EXPLICIT PRODUCT ROLLOUT",
-			"title": "Move this workspace to RelayOps",
-			"description": "RelayOps becomes the primary experience. Existing RelayOps projects and tasks remain intact in a read-only archive with JSON export.",
+			"title": "Move this workspace to Сборитм",
+			"description": "Сборитм becomes the primary experience. Existing Сборитм projects and tasks remain intact in a read-only archive with JSON export.",
 			"legacyNotice": "{{projects}} projects and {{tasks}} tasks will be preserved. No records are converted or deleted.",
-			"submit": "Activate RelayOps",
+			"submit": "Activate Сборитм",
 			"activating": "Activating...",
 			"keepLegacy": "Keep legacy workspace",
-			"adminRequired": "A workspace administrator must activate RelayOps.",
-			"error": "RelayOps could not be activated. Try again."
+			"adminRequired": "A workspace administrator must activate Сборитм.",
+			"error": "Сборитм could not be activated. Try again."
 		},
 		"states": {
-			"loading": "Loading RelayOps",
+			"loading": "Loading Сборитм",
 			"deniedTitle": "Access denied",
 			"deniedDescription": "You do not have permission to view this workspace resource.",
-			"retryableTitle": "RelayOps is temporarily unavailable",
+			"retryableTitle": "Сборитм is temporarily unavailable",
 			"retryableDescription": "The request can be retried without losing any work.",
 			"unrecoverableTitle": "This resource cannot be opened",
 			"unrecoverableDescription": "The server returned status {{status}}. Check the link or contact a workspace administrator.",
@@ -2400,13 +2458,13 @@
 		"onboarding": {
 			"eyebrow": "GUIDED SETUP",
 			"title": "Add your first service",
-			"createWorkspace": "Create RelayOps workspace",
+			"createWorkspace": "Create Сборитм workspace",
 			"stepWorkspace": "Workspace",
 			"stepService": "First service",
 			"stepIncident": "Demo incident",
 			"serviceTitle": "Define the system your team operates",
 			"serviceDescription": "For example, your store checkout. Use a short identifier such as checkout-api. This records a service; it does not connect monitoring automatically.",
-			"serviceDenied": "You can view RelayOps, but you do not have permission to create a Service.",
+			"serviceDenied": "You can view Сборитм, but you do not have permission to create a Service.",
 			"createService": "Create first service",
 			"serviceReady": "{{name}} is ready",
 			"demoDescription": "Optionally create a marked training incident. It is saved on the server and can be removed separately from real work.",
@@ -2449,7 +2507,7 @@
 			"all": "All services",
 			"apply": "Apply",
 			"emptyTitle": "No services yet",
-			"emptyDescription": "Create the first Service to start operating in RelayOps.",
+			"emptyDescription": "Create the first Service to start operating in Сборитм.",
 			"filteredEmptyTitle": "No services match these filters",
 			"filteredEmptyDescription": "Change the search or archive filter to see more services.",
 			"clearFilters": "Clear filters",
@@ -2477,7 +2535,7 @@
 			"description": "{{count}} marked demo Incident is available for training.",
 			"remove": "Remove demo data",
 			"confirmTitle": "Remove all marked demo data?",
-			"confirmDescription": "Only records carrying the RelayOps demo provenance marker are deleted. User-created data is preserved.",
+			"confirmDescription": "Only records carrying the Сборитм demo provenance marker are deleted. User-created data is preserved.",
 			"cancel": "Keep demo data",
 			"confirm": "Remove marked data"
 		},
@@ -2508,7 +2566,9 @@
 			"responders": "Responders",
 			"affectedServices": "Affected services",
 			"none": "None",
-			"resolutionSummary": "Resolution summary"
+			"resolutionSummary": "Resolution summary",
+			"technicalDetails": "Technical details",
+			"noTimeline": "Updates will appear here as the team responds."
 		},
 		"lifecycle": {
 			"detected": "Detected",
@@ -2588,13 +2648,13 @@
 			"apiAuthorityDescription": "Only members with the required permissions can view or change team records."
 		},
 		"legacy": {
-			"title": "Legacy RelayOps archive",
+			"title": "Legacy Сборитм archive",
 			"readOnly": "Read-only",
-			"description": "Existing projects and tasks are preserved unchanged. RelayOps does not convert, dual-write or delete them.",
+			"description": "Existing projects and tasks are preserved unchanged. Сборитм does not convert, dual-write or delete them.",
 			"export": "Export JSON",
 			"exportError": "The legacy export could not be prepared.",
 			"emptyTitle": "No legacy records",
-			"emptyDescription": "This workspace did not contain RelayOps projects or tasks.",
+			"emptyDescription": "This workspace did not contain Сборитм projects or tasks.",
 			"taskCount_one": "{{count}} task",
 			"taskCount_other": "{{count}} tasks"
 		},
@@ -2717,7 +2777,10 @@
 			"openWorkbench": "Open Workbench",
 			"generatedAt": "Generated {{value}}",
 			"explanation": "How to read these numbers",
-			"explanationBody": "Response time runs from reporting to acknowledgement. Resolution time runs from reporting to a saved solution. Recovery time ends when monitoring starts. The median is the middle result; 90% of measured results are at or below the p90 value. Missing timestamps are excluded, not treated as zero."
+			"explanationBody": "Response time runs from reporting to acknowledgement. Resolution time runs from reporting to a saved solution. Recovery time ends when monitoring starts. The median is the middle result; 90% of measured results are at or below the p90 value. Missing timestamps are excluded, not treated as zero.",
+			"includeDemo": "Include training incidents",
+			"demoExcluded": "DEMO incidents are excluded from these metrics. Include them to explore the training results.",
+			"demoIncluded": "Training incidents marked DEMO are included in these metrics."
 		},
 		"status": {
 			"detected": "Detected",
@@ -2751,7 +2814,8 @@
 			"discard": "Discard draft",
 			"failedTitle": "Change not confirmed",
 			"failed": "Could not save. Check your connection and retry; your text is still here.",
-			"saved": "Saved"
+			"saved": "Saved",
+			"updateHint": "Keep the team aligned: findings, actions, next step."
 		},
 		"intro": {
 			"title": "Teamwork on website and IT service outages",

@@ -12,42 +12,42 @@ export type MagicLinkEmailProps = {
 
 const messages = {
   en: {
-    preview: "Sign in to RelayOps",
+    preview: "Sign in to Сборитм",
     title: "Your secure sign-in link",
-    subtitle: "Use this link to continue to your RelayOps workspace.",
-    cta: "Sign in to RelayOps",
+    subtitle: "Use this link to continue to your Сборитм workspace.",
+    cta: "Sign in to Сборитм",
     expiry: "This link expires in 5 minutes for your security.",
     ignore: "If you didn't request this, you can ignore this email.",
-    footer: "RelayOps security email",
+    footer: "Сборитм security email",
   },
   de: {
-    preview: "Bei RelayOps anmelden",
+    preview: "Bei Сборитм anmelden",
     title: "Dein sicherer Anmeldelink",
     subtitle:
-      "Verwende diesen Link, um mit deinem RelayOps-Workspace fortzufahren.",
-    cta: "Bei RelayOps anmelden",
+      "Verwende diesen Link, um mit deinem Сборитм-Workspace fortzufahren.",
+    cta: "Bei Сборитм anmelden",
     expiry: "Dieser Link laeuft aus Sicherheitsgruenden in 5 Minuten ab.",
     ignore:
       "Wenn du das nicht angefordert hast, kannst du diese E-Mail ignorieren.",
-    footer: "RelayOps Sicherheits-E-Mail",
+    footer: "Сборитм Sicherheits-E-Mail",
   },
   vi: {
-    preview: "Đăng nhập vào RelayOps",
+    preview: "Đăng nhập vào Сборитм",
     title: "Liên kết đăng nhập an toàn của bạn",
-    subtitle: "Dùng liên kết này để tiếp tục vào không gian làm việc RelayOps.",
-    cta: "Đăng nhập vào RelayOps",
+    subtitle: "Dùng liên kết này để tiếp tục vào không gian làm việc Сборитм.",
+    cta: "Đăng nhập vào Сборитм",
     expiry: "Vì lý do bảo mật, liên kết này sẽ hết hạn sau 5 phút.",
     ignore: "Nếu bạn không yêu cầu điều này, bạn có thể bỏ qua email này.",
-    footer: "Email bảo mật RelayOps",
+    footer: "Email bảo mật Сборитм",
   },
   ja: {
-    preview: "RelayOps にサインイン",
+    preview: "Сборитм にサインイン",
     title: "安全なサインインリンク",
-    subtitle: "このリンクから RelayOps ワークスペースにアクセスできます。",
-    cta: "RelayOps にサインイン",
+    subtitle: "このリンクから Сборитм ワークスペースにアクセスできます。",
+    cta: "Сборитм にサインイン",
     expiry: "セキュリティのため、このリンクは5分で有効期限が切れます。",
     ignore: "心当たりがない場合は、このメールを無視してかまいません。",
-    footer: "RelayOps セキュリティメール",
+    footer: "Сборитм セキュリティメール",
   },
 } as const;
 

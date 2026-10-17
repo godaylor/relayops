@@ -1,0 +1,92 @@
+[
+	{
+		"route": "",
+		"violations": [],
+		"widths": [
+			{
+				"width": 320,
+				"overflow": true
+			},
+			{
+				"width": 390,
+				"overflow": false
+			},
+			{
+				"width": 768,
+				"overflow": false
+			}
+		]
+	},
+	{
+		"route": "/incidents",
+		"violations": [],
+		"widths": [
+			{
+				"width": 320,
+				"overflow": true
+			},
+			{
+				"width": 390,
+				"overflow": false
+			},
+			{
+				"width": 768,
+				"overflow": false
+			}
+		]
+	},
+	{
+		"route": "/board",
+		"violations": [],
+		"widths": [
+			{
+				"width": 320,
+				"overflow": true
+			},
+			{
+				"width": 390,
+				"overflow": false
+			},
+			{
+				"width": 768,
+				"overflow": false
+			}
+		]
+	},
+	{
+		"route": "/services",
+		"violations": [],
+		"widths": [
+			{
+				"width": 320,
+				"overflow": true
+			},
+			{
+				"width": 390,
+				"overflow": false
+			},
+			{
+				"width": 768,
+				"overflow": false
+			}
+		]
+	},
+	{
+		"route": "/analytics",
+		"violations": [],
+		"widths": [
+			{
+				"width": 320,
+				"overflow": true
+			},
+			{
+				"width": 390,
+				"overflow": false
+			},
+			{
+				"width": 768,
+				"overflow": false
+			}
+		]
+	}
+]

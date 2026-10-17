@@ -1,0 +1,26 @@
+{
+	"mode": "Built-in image_gen.imagegen; no CLI/API fallback",
+	"selected": "concept-c.png",
+	"prompts": [
+		{
+			"file": "concept-a.png",
+			"prompt": "Use case: ui-mockup. Create a high-fidelity desktop web app screenshot for RelayOps incident response. Concept A: daylight dispatch console, pale blue-gray canvas, white panels, deep navy narrow left navigation, cobalt actions, restrained orange incident severity. Main Incident Workbench with tight useful table, status tabs, incident IDs, services, owner avatars, duration. Header shows workspace and connected status. One selected incident has a right inspector with lifecycle and timeline. Realistic legible English UI, sample data explicitly labeled Demo workspace. Flat front view, no device frame. Deliberate professional visual hierarchy, plenty of space for operational data, no decorative charts. 1536x1024 landscape."
+		},
+		{
+			"file": "concept-b.png",
+			"prompt": "Use case ui-mockup. High fidelity RelayOps desktop incident operations app Concept B: night-shift operational center. Slate plum charcoal background, soft lavender primary action, amber severity, restrained crisp readable typography. Horizontal top navigation Operations, Incidents, Response board, Services, Analytics. Main area a large active incident focus with owner and next action, below a dense triage list; right narrow chronological team activity. Thin status ribbon, no glow, no futuristic effects, no decorative graph, realistic production UI. Explicit Demo workspace label. Legible sample incidents and lifecycle Open, Acknowledged, Investigating, Mitigated, Resolved. Flat full screen landscape screenshot."
+		},
+		{
+			"file": "concept-c.png",
+			"prompt": "Use case ui-mockup. RelayOps Concept C full desktop production screenshot. Calm compact collaborative incident workspace inspired by transport wayfinding: white canvas, pale steel sidebar 220px, petrol teal #126b70 primary, ink #182c38 text, orange reserved for urgency. Large precise sans typography, monospaced timestamps. Left nav Operations, Incidents selected, Response board, Services, Analytics. Small account bottom. Top workspace breadcrumb and connection; title Incidents, subtitle Coordinate the response. Search and filters, dense beautiful white incident table with colored thin severity markers, owner, status and updated. Right hand narrow incident inspector with owner and next action. Signature thin connected lifecycle track with labeled steps. No big metric cards. Explicit demo workspace. Human approachable quiet UI, small 8px radii, exceptional spacing. Landscape."
+		},
+		{
+			"file": "screen-family.png",
+			"prompt": "Use case ui-mockup. Consistent RelayOps design system presentation, six high fidelity screen mockups arranged 3 columns x 2 rows on slate background. Selected direction calm white workspace pale steel left sidebar petrol teal #126b70, ink #182c38, orange urgency. Screens: 1 welcome/auth with prominent Sign in/Create account, concise headline Resolve incidents. Together. and explicitly labeled training incident preview; 2 Operations overview active incidents and affected services; 3 Incident room with detected/triaging/mitigating/monitoring/resolved lifecycle, assigned response coordinator, progress update form, immutable timeline and resolution summary; 4 Response board with status columns; 5 Services catalog and Analytics with honest empty-data state; 6 two mobile screens incident list and create incident form. No fictional integrations, no on-call schedules. Legible large primary headings, clear consistent buttons, careful spacing. This is a design sheet, each panel visibly distinct, landscape high resolution."
+		},
+		{
+			"file": "states-mobile.png",
+			"prompt": "Use case: ui-mockup. RelayOps final companion design board: four polished UI states in a 2x2 grid, coherent white canvas #f5f8fa, pale steel navigation #eaf0f3, petrol teal #126b70 actions, dark ink #182c38, Geist-like crisp sans with monospace incident IDs. Top left first workspace onboarding with workspace name form and Create workspace, then first service step. Top right Incident Workbench empty filtered search, heading No incidents match these filters, clear filters button. Bottom left failed load state Could not load this workspace, Try again button, compact skeleton preview labeled Loading. Bottom right two mobile screens 390px: incident cards with key/title/severity/status/service/owner and a resolved incident room with resolution summary and chronological history. Explicit Demo workspace labels. No invented metrics, no fictional integrations, no device decoration. Native production-web layout, comfortable readable text, restrained borders, 8px radius, controls accessible. State design sheet, not a website screenshot."
+		}
+	]
+}

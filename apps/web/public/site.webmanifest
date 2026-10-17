@@ -1,6 +1,6 @@
 {
-	"name": "RelayOps",
-	"short_name": "RelayOps",
+	"name": "Сборитм",
+	"short_name": "Сборитм",
 	"description": "Realtime incident operations",
 	"lang": "ru-RU",
 	"icons": [
@@ -17,7 +17,7 @@
 			"purpose": "maskable"
 		}
 	],
-	"theme_color": "#141414",
-	"background_color": "#141414",
+	"theme_color": "#111229",
+	"background_color": "#111229",
 	"display": "standalone"
 }

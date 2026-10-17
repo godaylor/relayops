@@ -71,4 +71,6 @@ jobs:
       - name: Resolve the frozen dependency graph without lifecycle scripts
         run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Reject high and critical dependency advisories
-        run: pnpm audit --audit-level high
+        # The unpublished braces fix must pass regression probes before its
+        # exact advisory/version is treated as mitigated; all other findings fail.
+        run: pnpm security:audit

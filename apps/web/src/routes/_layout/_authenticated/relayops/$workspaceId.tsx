@@ -1,10 +1,18 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  Outlet,
+  useLocation,
+} from "@tanstack/react-router";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   Activity,
-  Archive,
   BarChart3,
+  ChevronDown,
+  ChevronsUpDown,
   Columns3,
   ListFilter,
+  Menu as MenuIcon,
   Radio,
   Server,
   Settings2,
@@ -12,7 +20,9 @@ import {
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import PageTitle from "@/components/page-title";
+import useAuth from "@/components/providers/auth-provider/hooks/use-auth";
 import { AccountContext } from "@/components/relayops/account-context";
+import { BrandWordmark } from "@/components/relayops/brand";
 import { CreateIncidentDialog } from "@/components/relayops/create-incident-dialog";
 import { RelayOpsLanguageSwitcher } from "@/components/relayops/language-switcher";
 import { LiveIncidentClockRail } from "@/components/relayops/live-incident-clock-rail";
@@ -21,20 +31,26 @@ import {
   RelayOpsSkeleton,
 } from "@/components/relayops/route-state";
 import { UsageGuide } from "@/components/relayops/usage-guide";
-import { Badge } from "@/components/ui/badge";
+import { ThemeToggleDropdown } from "@/components/theme-toggle-dropdown";
 import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetPopup,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   useActivateRelayOpsWorkspace,
   useRelayOpsOverview,
   useRelayOpsWorkspaceState,
 } from "@/hooks/queries/relayops/use-relayops";
+import useGetFullWorkspace from "@/hooks/queries/workspace/use-get-full-workspace";
 import {
   retryRelayOpsRealtime,
   useRelayOpsRealtimeState,
 } from "@/hooks/relayops/realtime-store";
 import { useRelayOpsCapability } from "@/hooks/relayops/use-relayops-capability";
 import { useUserWebSocket } from "@/hooks/use-user-websocket";
-import { formatRelayOpsDateTime } from "@/lib/relayops-format";
 
 export const Route = createFileRoute(
   "/_layout/_authenticated/relayops/$workspaceId",
@@ -44,8 +60,13 @@ export const Route = createFileRoute(
 
 function RelayOpsShell() {
   const { t } = useTranslation();
+  const pathname = useLocation({ select: (location) => location.pathname });
+  const reduceMotion = useReducedMotion();
+  const { user } = useAuth();
+  const [navigationOpen, setNavigationOpen] = useState(false);
   const { workspaceId } = Route.useParams();
   const workspace = useRelayOpsWorkspaceState(workspaceId);
+  const fullWorkspace = useGetFullWorkspace({ workspaceId });
   const overview = useRelayOpsOverview(workspaceId);
   const activate = useActivateRelayOpsWorkspace(workspaceId);
   const connection = useUserWebSocket({ relayOpsWorkspaceId: workspaceId });
@@ -89,7 +110,7 @@ function RelayOpsShell() {
 
   if (workspace.isLoading) {
     return (
-      <main className="min-h-screen bg-[#f4f6f5] p-6 dark:bg-[#0b1210]">
+      <main className="sbor-auth min-h-screen w-full bg-[#f5f4fb] p-6 dark:bg-[#101124]">
         <RelayOpsSkeleton rows={7} />
       </main>
     );
@@ -97,7 +118,7 @@ function RelayOpsShell() {
 
   if (workspace.error || !workspace.data) {
     return (
-      <main className="min-h-screen bg-[#f4f6f5] p-6 dark:bg-[#0b1210]">
+      <main className="sbor-auth min-h-screen w-full bg-[#f5f4fb] p-6 dark:bg-[#101124]">
         <RelayOpsErrorState
           error={workspace.error}
           onRetry={() => workspace.refetch()}
@@ -108,13 +129,13 @@ function RelayOpsShell() {
 
   if (workspace.data.productMode === "legacy") {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#f4f6f5] p-5 text-[#17211f] dark:bg-[#0b1210] dark:text-[#f4f6f5]">
+      <main className="grid min-h-screen place-items-center bg-[#f5f4fb] p-5 text-[#1b1d36] dark:bg-[#101124] dark:text-[#f5f4fb]">
         <PageTitle title={t("relayops:activation.pageTitle")} />
-        <section className="w-full max-w-2xl rounded-xl border border-[#17211f]/10 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#101a18] sm:p-9">
-          <span className="grid size-11 place-items-center rounded-lg bg-[#245ebe] text-white">
+        <section className="w-full max-w-2xl rounded-xl border border-[#1b1d36]/10 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#1a1c35] sm:p-9">
+          <span className="grid size-11 place-items-center rounded-lg bg-[#6757ec] text-white">
             <Radio className="size-6" />
           </span>
-          <p className="mt-6 font-mono text-[#245ebe] text-xs tracking-[0.18em] dark:text-[#8fb6ff]">
+          <p className="mt-6 font-mono text-[#6757ec] text-xs tracking-[0.18em] dark:text-[#b3a5ff]">
             {t("relayops:activation.eyebrow")}
           </p>
           <h1 className="mt-2 font-semibold text-3xl tracking-tight">
@@ -213,147 +234,206 @@ function RelayOpsShell() {
     },
   ].filter((item) => item.allowed);
 
+  const guest = Boolean(user && "isAnonymous" in user && user.isAnonymous);
+  const displayName = guest
+    ? t("relayops:brand.guestIdentity")
+    : (user?.name ?? t("relayops:account.workspace", { name: "…" }));
+  const initials = guest
+    ? "ГС"
+    : (user?.name ?? "")
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((word) => word[0])
+        .join("")
+        .toUpperCase();
+  const renderNavigation = (mobile = false) => (
+    <nav className="sbor-navigation" aria-label={t("relayops:nav.primary")}>
+      {nav.map(({ label, to, icon: Icon }) => {
+        const target = to.replace("$workspaceId", workspaceId);
+        const active =
+          to === "/relayops/$workspaceId"
+            ? pathname === target || pathname === `${target}/`
+            : pathname.startsWith(target);
+        return (
+          <Link
+            key={to}
+            to={to}
+            params={{ workspaceId }}
+            onClick={() => setNavigationOpen(false)}
+            data-guide={
+              to.endsWith("/services")
+                ? "services"
+                : to.endsWith("/board")
+                  ? "board"
+                  : to.endsWith("/analytics")
+                    ? "analytics"
+                    : to.endsWith("/incidents")
+                      ? "history"
+                      : undefined
+            }
+            activeOptions={{ exact: to === "/relayops/$workspaceId" }}
+            className={active ? "is-active" : ""}
+          >
+            {active ? (
+              <motion.span
+                className="sbor-nav-indicator"
+                layoutId={mobile ? "mobile-navigation" : "desktop-navigation"}
+                transition={{
+                  duration: reduceMotion ? 0 : 0.22,
+                  ease: [0.23, 1, 0.32, 1],
+                }}
+              />
+            ) : null}
+            <Icon size={19} />
+            <span>{label}</span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
   return (
-    <div
-      data-relayops-shell
-      className="h-full w-full min-w-0 max-w-full overflow-y-auto bg-[#f4f6f5] text-[#17211f] [overflow-wrap:anywhere] dark:bg-[#0b1210] dark:text-[#f4f6f5]"
-    >
-      <PageTitle title={t("relayops:pageTitle")} />
-      <a
-        href="#relayops-main"
-        className="fixed top-2 left-2 z-[100] -translate-y-16 rounded-md bg-[#17211f] px-4 py-2 text-white focus:translate-y-0"
-      >
+    <div data-relayops-shell className="sbor-app">
+      <PageTitle title={t("relayops:pageTitle")} hideAppName />
+      <a href="#relayops-main" className="sbor-skip">
         {t("relayops:skipToContent")}
       </a>
-      <header className="relative z-40 border-[#17211f]/10 border-b bg-white/95 backdrop-blur dark:border-white/10 dark:bg-[#101a18]/95">
-        <div className="mx-auto flex min-w-0 max-w-[92rem] flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <Link
-            to="/relayops/$workspaceId"
-            params={{ workspaceId }}
-            className="flex min-h-11 min-w-0 max-w-full items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#245ebe]"
-          >
-            <span className="grid size-9 shrink-0 place-items-center rounded-md bg-[#245ebe] text-white">
-              <Radio className="size-5" />
+      <aside className="sbor-sidebar">
+        <Link
+          to="/relayops/$workspaceId"
+          params={{ workspaceId }}
+          className="sbor-brand-link"
+        >
+          <BrandWordmark />
+        </Link>
+        <p className="sbor-sidebar-caption">
+          {t("relayops:brand.navigationCaption")}
+        </p>
+        {renderNavigation()}
+        <div className="sbor-sidebar-bottom">
+          <div className="sbor-guide">
+            <UsageGuide />
+          </div>
+          <div className="sbor-sidebar-note">
+            <span className="signal-dot" />
+            {t("relayops:brand.workspaceBoundary")}
+          </div>
+        </div>
+      </aside>
+      <div className="sbor-app-column">
+        <header className="sbor-topbar">
+          <Sheet open={navigationOpen} onOpenChange={setNavigationOpen}>
+            <SheetTrigger
+              render={
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="sbor-mobile-menu"
+                  aria-label={t("relayops:nav.primary")}
+                />
+              }
+            >
+              <MenuIcon />
+            </SheetTrigger>
+            <SheetPopup
+              side="left"
+              className="sbor-mobile-sidebar relay-dialog"
+            >
+              <SheetTitle className="sr-only">
+                {t("relayops:nav.primary")}
+              </SheetTitle>
+              <BrandWordmark />
+              {navigationOpen ? renderNavigation(true) : null}
+              <UsageGuide />
+            </SheetPopup>
+          </Sheet>
+          <Link to="/dashboard" className="sbor-workspace-selector">
+            <span className="sbor-workspace-icon">
+              {(fullWorkspace.data?.name ?? "С").slice(0, 1).toUpperCase()}
             </span>
             <span>
-              <span
-                className="block font-semibold text-sm tracking-[0.16em]"
-                translate="no"
-              >
-                RELAYOPS
-              </span>
-              <span className="block text-muted-foreground text-xs">
-                {t("relayops:shell.subtitle")}
-              </span>
+              <strong>{fullWorkspace.data?.name ?? "…"}</strong>
+              <small>
+                {guest
+                  ? t("relayops:brand.demoMode")
+                  : t("relayops:brand.workspaceLabel")}
+              </small>
             </span>
+            <ChevronsUpDown size={14} />
           </Link>
-          <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2 text-xs sm:justify-end">
-            <RelayOpsLanguageSwitcher />
-            <div data-guide="create">
-              <CreateIncidentDialog workspaceId={workspaceId} />
-            </div>
-            <Badge
-              variant="outline"
-              className="min-h-8 gap-2 bg-white dark:bg-[#101a18]"
+          <div className="sbor-topbar-actions">
+            <span
+              className="sbor-connection"
+              data-state={connection}
               aria-live="polite"
             >
-              <span
-                className={`size-2 rounded-full ${
-                  connection === "connected" ? "bg-emerald-600" : "bg-[#b9651b]"
-                }`}
-              />
+              <span className="signal-dot" />
               {t(`relayops:connection.${connection}`)}
               {reconnectSeconds !== null && connection === "reconnecting"
                 ? t("relayops:connection.reconnectIn", {
                     seconds: reconnectSeconds,
                   })
                 : null}
-            </Badge>
-            {realtime.lastSyncAt ? (
-              <span className="hidden text-muted-foreground md:inline">
-                {t("relayops:connection.lastSync", {
-                  time: formatRelayOpsDateTime(realtime.lastSyncAt, {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }),
-                })}
-              </span>
-            ) : null}
+            </span>
             {connection === "offline" || connection === "stale" ? (
               <Button
                 size="sm"
-                variant="outline"
+                variant="ghost"
                 onClick={() => retryRelayOpsRealtime(workspaceId)}
               >
                 {t("relayops:connection.retry")}
               </Button>
             ) : null}
+            <div data-guide="create">
+              <CreateIncidentDialog workspaceId={workspaceId} />
+            </div>
+            <details className="sbor-account-menu">
+              <summary aria-label={t("relayops:nav.manage")}>
+                <span className="sbor-avatar">{initials}</span>
+                <ChevronDown size={13} />
+              </summary>
+              <div className="sbor-account-popup">
+                <strong>{displayName}</strong>
+                <div className="sbor-preferences">
+                  <ThemeToggleDropdown />
+                  <RelayOpsLanguageSwitcher />
+                </div>
+                <AccountContext workspaceId={workspaceId} />
+              </div>
+            </details>
           </div>
-        </div>
-        <nav
-          className="mx-auto flex max-w-[92rem] gap-1 overflow-x-auto px-3 pb-2 sm:px-5"
-          aria-label={t("relayops:nav.primary")}
+        </header>
+        {overview.data?.activeIncidents.length || overview.error ? (
+          <div className="sbor-live-ribbon">
+            <LiveIncidentClockRail
+              workspaceId={workspaceId}
+              incidents={overview.data?.activeIncidents ?? []}
+              loading={overview.isLoading}
+              error={Boolean(overview.error)}
+              onRetry={() => void overview.refetch()}
+            />
+          </div>
+        ) : null}
+        <motion.main
+          id="relayops-main"
+          tabIndex={-1}
+          className="sbor-main"
+          key={pathname}
+          initial={{
+            opacity: 0,
+            transform: reduceMotion ? "none" : "translateY(10px)",
+          }}
+          animate={{ opacity: 1, transform: "none" }}
+          transition={{
+            duration: reduceMotion ? 0.12 : 0.26,
+            ease: [0.23, 1, 0.32, 1],
+          }}
         >
-          {nav.map(({ label, to, icon: Icon }) => (
-            <Link
-              key={label}
-              data-guide={
-                to.endsWith("/services")
-                  ? "services"
-                  : to.endsWith("/board")
-                    ? "board"
-                    : to.endsWith("/analytics")
-                      ? "analytics"
-                      : to.endsWith("/incidents")
-                        ? "history"
-                        : undefined
-              }
-              to={to}
-              params={{ workspaceId }}
-              activeOptions={{
-                exact: to === "/relayops/$workspaceId",
-              }}
-              activeProps={{
-                className:
-                  "bg-[#e2e9e6] text-[#17211f] dark:bg-white/12 dark:text-white",
-              }}
-              className="flex min-h-11 shrink-0 items-center gap-2 rounded-md px-3 text-muted-foreground text-sm hover:bg-[#e2e9e6]/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#245ebe]"
-            >
-              <Icon className="size-4" />
-              {label}
-            </Link>
-          ))}
-          {canOpenLegacy.allowed ? (
-            <Link
-              to="/relayops/$workspaceId/legacy"
-              params={{ workspaceId }}
-              className="ml-auto hidden min-h-11 shrink-0 items-center gap-2 rounded-md px-3 text-muted-foreground text-xs hover:text-foreground lg:flex"
-            >
-              <Archive className="size-4" />
-              {t("relayops:nav.legacyArchive")}
-            </Link>
-          ) : null}
-        </nav>
-      </header>
-      <AccountContext workspaceId={workspaceId} />
-      <UsageGuide />
-      <LiveIncidentClockRail
-        workspaceId={workspaceId}
-        incidents={overview.data?.activeIncidents ?? []}
-        loading={overview.isLoading}
-        error={Boolean(overview.error)}
-        onRetry={() => void overview.refetch()}
-      />
-      <main
-        id="relayops-main"
-        tabIndex={-1}
-        className="mx-auto min-w-0 max-w-[92rem] px-4 py-6 sm:px-6 sm:py-8"
-      >
-        <Outlet />
-      </main>
-      <footer className="mx-auto max-w-[92rem] px-4 py-6 text-muted-foreground text-xs sm:px-6">
-        {t("relayops:shell.provenance")}
-      </footer>
+          <Outlet />
+        </motion.main>
+        <footer className="sbor-footer">
+          {t("relayops:shell.provenance")}
+        </footer>
+      </div>
     </div>
   );
 }

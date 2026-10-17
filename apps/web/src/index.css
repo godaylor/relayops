@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
+@import "@fontsource-variable/onest";
+@import "./relayops-design.css";
+@import "./components/relayops/incident-room.css";
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -106,10 +109,10 @@ input:-webkit-autofill:active {
 }
 
 :root {
-  --relay-control-ink: #17211f;
-  --relay-instrument: #f4f6f5;
-  --relay-panel-alloy: #e2e9e6;
-  --relay-cobalt: #245ebe;
+  --relay-control-ink: #182c38;
+  --relay-instrument: #f5f8fa;
+  --relay-panel-alloy: #e6eef2;
+  --relay-cobalt: #126b70;
   --relay-caution: #b9651b;
   --relay-incident: #b73a34;
   --relay-motion-fast: 140ms;
@@ -236,15 +239,13 @@ input:-webkit-autofill:active {
 }
 
 [data-relayops-shell] {
-  background: var(--relay-instrument);
-  color: var(--relay-control-ink);
-  --muted-foreground: #59635f;
+  background: var(--sb-bg, var(--relay-instrument));
+  color: var(--sb-ink, var(--relay-control-ink));
 }
 
 .dark [data-relayops-shell] {
-  background: #0b1210;
-  color: var(--relay-instrument);
-  --muted-foreground: #aeb8b4;
+  background: var(--sb-bg, #101124);
+  color: var(--sb-ink, #f0effb);
 }
 
 [data-relayops-shell] :where(a, button, input, select, textarea, summary) {

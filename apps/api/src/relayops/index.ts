@@ -282,6 +282,7 @@ const demoRoute = createRoute({
   },
   responses: {
     201: jsonResponse("Demo incident", incidentDetailSchema),
+    400: errorResponse("Invalid service identifier or unsupported demo locale"),
     403: errorResponse("Missing incident:create permission"),
     404: errorResponse("Service not found"),
   },
@@ -676,6 +677,7 @@ const relayops = apiRouter<BaseVariables & { workspaceId: string }>()
         c.get("workspaceId"),
         c.get("userId"),
         c.req.valid("json").serviceId,
+        c.req.valid("json").locale,
       ),
       201,
     ),

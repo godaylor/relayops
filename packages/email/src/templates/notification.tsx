@@ -15,29 +15,29 @@ export type NotificationEmailProps = {
 
 const messages = {
   en: {
-    preview: "You have a new RelayOps notification",
+    preview: "You have a new Сборитм notification",
     subtitle: "A notification matched your delivery preferences.",
-    footer: "RelayOps notification",
-    actionLabel: "Open in RelayOps",
+    footer: "Сборитм notification",
+    actionLabel: "Open in Сборитм",
   },
   de: {
-    preview: "Du hast eine neue RelayOps-Benachrichtigung",
+    preview: "Du hast eine neue Сборитм-Benachrichtigung",
     subtitle:
       "Eine Benachrichtigung entspricht deinen Zustellungs-Einstellungen.",
-    footer: "RelayOps-Benachrichtigung",
-    actionLabel: "In RelayOps oeffnen",
+    footer: "Сборитм-Benachrichtigung",
+    actionLabel: "In Сборитм oeffnen",
   },
   vi: {
-    preview: "Bạn có thông báo mới từ RelayOps",
+    preview: "Bạn có thông báo mới từ Сборитм",
     subtitle: "Một thông báo khớp với tùy chọn nhận thông báo của bạn.",
-    footer: "Thông báo RelayOps",
-    actionLabel: "Mở trong RelayOps",
+    footer: "Thông báo Сборитм",
+    actionLabel: "Mở trong Сборитм",
   },
   ja: {
-    preview: "RelayOps の新しい通知",
+    preview: "Сборитм の新しい通知",
     subtitle: "配信設定に一致する通知がありました。",
-    footer: "RelayOps 通知",
-    actionLabel: "RelayOps で開く",
+    footer: "Сборитм 通知",
+    actionLabel: "Сборитм で開く",
   },
 } as const;
 
