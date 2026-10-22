@@ -1,7 +1,10 @@
 import { isLegacyRequest } from "@modelcontextprotocol/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import mcpRoutes from "../../apps/api/src/mcp";
-import { createModernMcpHandler } from "../../apps/api/src/mcp/modern";
+import {
+  createModernMcpHandler,
+  MCP_HTTP_LIMITS,
+} from "../../apps/api/src/mcp/modern";
 
 const authMocks = vi.hoisted(() => ({
   getSession: vi.fn(async () => ({ user: { id: "test-user" } })),
@@ -55,6 +58,7 @@ type RpcBody = {
   result: {
     tools: unknown[];
     content: Array<{ text: string }>;
+    isError?: boolean;
   };
   error?: unknown;
 };
@@ -114,6 +118,127 @@ afterEach(() => {
 });
 
 describe("MCP 2026-07-28 stateless HTTP", () => {
+  it("rejects excessive modern tool input before calling the API", async () => {
+    const apiFetch = vi.fn();
+    vi.stubGlobal("fetch", apiFetch);
+    const handler = createModernMcpHandler("test-token", "http://api.test");
+    const response = await handler.fetch(
+      modernRequest("tools/call", 1, {
+        name: "whoami",
+        arguments: {
+          padding: Array(MCP_HTTP_LIMITS.maxToolInputElements + 1).fill(0),
+        },
+      }),
+    );
+    const body = await rpcBody(response);
+    expect(response.status).toBe(200);
+    expect(body.result.isError).toBe(true);
+    expect(body.result.content[0].text).toContain("maximum of 10000 elements");
+    expect(apiFetch).not.toHaveBeenCalled();
+  });
+
+  it("bounds modern request bytes before JSON/tool validation", async () => {
+    const apiFetch = vi.fn();
+    vi.stubGlobal("fetch", apiFetch);
+    const handler = createModernMcpHandler("test-token", "http://api.test");
+    const response = await handler.fetch(
+      modernRequest("tools/call", 1, {
+        name: "whoami",
+        arguments: { padding: "x".repeat(MCP_HTTP_LIMITS.maxRequestBodySize) },
+      }),
+    );
+    expect(response.status).toBe(413);
+    expect(apiFetch).not.toHaveBeenCalled();
+  });
+
+  it("bounds protocol classification before legacy initialization", async () => {
+    const response = await mcpRoutes.request("/mcp", {
+      method: "POST",
+      headers: {
+        accept: "application/json, text/event-stream",
+        authorization: "Bearer test-token",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "initialize",
+        params: {
+          protocolVersion: "2025-06-18",
+          capabilities: {},
+          clientInfo: { name: "large-request", version: "1" },
+          padding: "x".repeat(MCP_HTTP_LIMITS.maxRequestBodySize),
+        },
+      }),
+    });
+    expect(response.status).toBe(413);
+    expect(response.headers.has("mcp-session-id")).toBe(false);
+  });
+
+  it("applies byte and element budgets to an existing legacy session", async () => {
+    const initialize = await initializeLegacySession();
+    const sessionId = initialize.headers.get("mcp-session-id");
+    expect(sessionId).toBeTruthy();
+    const headers = {
+      accept: "application/json, text/event-stream",
+      authorization: "Bearer test-token",
+      "content-type": "application/json",
+      "mcp-session-id": sessionId ?? "",
+    };
+    const apiFetch = vi.fn();
+    vi.stubGlobal("fetch", apiFetch);
+    try {
+      await mcpRoutes.request("/mcp", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          method: "notifications/initialized",
+        }),
+      });
+      const elements = await mcpRoutes.request("/mcp", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 2,
+          method: "tools/call",
+          params: {
+            name: "whoami",
+            arguments: {
+              padding: Array(MCP_HTTP_LIMITS.maxToolInputElements + 1).fill(0),
+            },
+          },
+        }),
+      });
+      const body = await rpcBody(elements);
+      expect(elements.status).toBe(200);
+      expect(body.result.isError).toBe(true);
+      expect(body.result.content[0].text).toContain(
+        "maximum of 10000 elements",
+      );
+      const bytes = await mcpRoutes.request("/mcp", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 3,
+          method: "tools/call",
+          params: {
+            name: "whoami",
+            arguments: {
+              padding: "x".repeat(MCP_HTTP_LIMITS.maxRequestBodySize),
+            },
+          },
+        }),
+      });
+      expect(bytes.status).toBe(413);
+      expect(apiFetch).not.toHaveBeenCalled();
+    } finally {
+      await closeLegacySession(sessionId ?? "");
+    }
+  });
+
   it("serves tools/list on independent HTTP requests without session IDs", async () => {
     const handler = createModernMcpHandler("test-token", "http://api.test");
 

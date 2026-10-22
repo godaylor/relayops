@@ -14,7 +14,7 @@ import {
   getMcpAuthorizationRequest,
   registerMcpClient,
 } from "./controllers/oauth-consent";
-import { createModernMcpHandler } from "./modern";
+import { createModernMcpHandler, MCP_HTTP_LIMITS } from "./modern";
 import { exchangeCode } from "./oauth";
 import {
   authorizationDecisionResponseSchema,
@@ -102,10 +102,13 @@ function allowPublicMcpRequest(key: string, now = Date.now()) {
 setInterval(() => cleanupMcpSessions(), 60_000).unref();
 
 function createMcpServerForUser(token: string): LegacyMcpServer {
-  const server = new LegacyMcpServer({
-    name: "kaneo-mcp",
-    version: "1.0.0",
-  });
+  const server = new LegacyMcpServer(
+    {
+      name: "kaneo-mcp",
+      version: "1.0.0",
+    },
+    { maxToolInputElements: MCP_HTTP_LIMITS.maxToolInputElements },
+  );
   registerMcpTools(toMcpToolRegistrar(server), internalApiUrl, token);
   return server;
 }
@@ -299,7 +302,11 @@ mcp.all("/mcp", async (c) => {
     return c.json({ error: "Unsupported Media Type" }, 415);
   }
 
-  if (!(await isLegacyRequest(c.req.raw.clone()))) {
+  if (
+    !(await isLegacyRequest(c.req.raw.clone(), undefined, {
+      maxRequestBodySize: MCP_HTTP_LIMITS.maxRequestBodySize,
+    }))
+  ) {
     const modern = createModernMcpHandler(authResult.token, internalApiUrl);
     return modern.fetch(c.req.raw);
   }
@@ -325,6 +332,7 @@ mcp.all("/mcp", async (c) => {
   try {
     const transport = new WebStandardStreamableHTTPServerTransport({
       sessionIdGenerator: () => randomUUID(),
+      maxRequestBodySize: MCP_HTTP_LIMITS.maxRequestBodySize,
     });
 
     transport.onclose = () => {
