@@ -135,6 +135,25 @@ test("an unrelated stylesheet failure cannot cover an already mounted app", asyn
   await expect(page.getByTestId("guest-demo-entry")).toBeVisible();
 });
 
+test("unrelated resources failing before mount do not trigger startup recovery", async ({
+  page,
+}) => {
+  await page.route("**/unavailable-*", (route) =>
+    route.abort("blockedbyclient"),
+  );
+  await page.route("**/auth/sign-in", async (route) => {
+    const response = await route.fetch();
+    const html = (await response.text()).replace(
+      "</script>",
+      '</script><link rel="stylesheet" href="/unavailable-extension.css"><script type="module" src="/unavailable-widget.js"></script>',
+    );
+    await route.fulfill({ response, body: html });
+  });
+  await page.goto("/auth/sign-in");
+  await expect(page.getByTestId("guest-demo-entry")).toBeVisible();
+  await expect(page.locator("#startup-recovery")).toHaveCount(0);
+});
+
 test("blocked operational preloads do not replace the overview", async ({
   page,
 }) => {

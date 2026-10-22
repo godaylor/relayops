@@ -70,7 +70,17 @@ export function installStartupRecovery(copy: {
         (target instanceof HTMLScriptElement && target.type === "module") ||
         (target instanceof HTMLLinkElement && target.rel === "stylesheet")
       ) {
-        showRecovery();
+        const resource = new URL(
+          target instanceof HTMLScriptElement ? target.src : target.href,
+          document.baseURI,
+        );
+        // A failed injected widget/style is not a failed application bootstrap.
+        if (
+          resource.origin === window.location.origin &&
+          resource.pathname.startsWith("/assets/")
+        ) {
+          showRecovery();
+        }
       }
     },
     true,
