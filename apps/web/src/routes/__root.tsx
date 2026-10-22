@@ -1,5 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { ToastProvider } from "@/components/ui/toast";
 import type { User } from "@/types/user";
 
@@ -11,6 +12,10 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootComponent() {
+  useEffect(() => {
+    window.dispatchEvent(new Event("relayops:ready"));
+  }, []);
+
   return (
     <ToastProvider position="bottom-right">
       <div className="flex h-svh w-full flex-row overflow-x-hidden overflow-y-hidden bg-background scrollbar-thin scrollbar-thumb-border scrollbar-track-muted">
