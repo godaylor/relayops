@@ -2297,7 +2297,9 @@
 			"allQuiet": "A clear picture. A ready team.",
 			"demoNotice": "Training data · saved in your private workspace",
 			"noBoardTitle": "The next response starts here",
-			"noBoardDescription": "Create an incident or open Overview to prepare your first service. The board will show how the response moves forward."
+			"noBoardDescription": "Create an incident or open Overview to prepare your first service. The board will show how the response moves forward.",
+			"pauseAnimation": "Pause animation",
+			"resumeAnimation": "Resume animation"
 		},
 		"access": {
 			"explanation": "Access to this link depends on your account and role. Each browser signs in separately. Open your own workspace or sign in with a member account.",
@@ -2490,7 +2492,12 @@
 			"noActiveDescription": "There is no detected incident requiring attention.",
 			"latestTitle": "Latest updates",
 			"latestDescription": "Saved updates, newest first.",
-			"noUpdates": "No incident updates have been recorded yet."
+			"noUpdates": "No incident updates have been recorded yet.",
+			"focusTitle": "The next step for your team",
+			"focusUnassigned": "Incidents without a response lead: {{count}}.",
+			"focusActive": "Active incidents: {{count}}. Open a room to continue the response.",
+			"reviewIncident": "Open incident",
+			"openAll": "View all"
 		},
 		"catalog": {
 			"eyebrow": "SERVICE CATALOG",
@@ -2645,7 +2652,11 @@
 			"team": "Members and roles",
 			"teamDescription": "Manage workspace membership and authorization.",
 			"apiAuthority": "Access depends on your role",
-			"apiAuthorityDescription": "Only members with the required permissions can view or change team records."
+			"apiAuthorityDescription": "Only members with the required permissions can view or change team records.",
+			"membersTitle": "Workspace team",
+			"membersDescription": "People who can work in this workspace. Their role determines which actions are available.",
+			"openMembers": "Manage members",
+			"technicalTitle": "Access rules and archived data"
 		},
 		"legacy": {
 			"title": "Legacy Сборитм archive",
@@ -2764,7 +2775,7 @@
 			"p90": "90% completed within {{value}}",
 			"staleDetail": "{{stale}} of {{active}} active incidents",
 			"volumeTrend": "Detected incident volume",
-			"drilldownHint": "Choose any day to open the Incident Workbench with the identical filters.",
+			"drilldownHint": "Open the selected day in the incident list. Status, severity and service filters carry over; dates use UTC and demo incidents may be included.",
 			"openBucket": "Open {{date}} with {{count}} incidents in Workbench",
 			"empty": "No incidents match this period and filter set.",
 			"hotspotEyebrow": "PRIMARY SERVICE RANKING",

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { AnimatedMetric } from "@/components/relayops/animated-metric";
 import { CreateIncidentDialog } from "@/components/relayops/create-incident-dialog";
 import {
   RelayOpsErrorState,
@@ -75,7 +76,9 @@ function Metric({
       >
         <Icon className="size-5" />
       </div>
-      <p className="mt-5 font-semibold text-3xl tabular-nums">{value}</p>
+      <p className="mt-5 font-semibold text-3xl tabular-nums">
+        <AnimatedMetric value={value} />
+      </p>
       <p className="mt-1 text-muted-foreground text-sm">{label}</p>
     </article>
   );
@@ -128,7 +131,18 @@ function OperationsOverview() {
   const isFirstService = services.data.length === 0;
   if (isFirstService || createdService) {
     return (
-      <section className="mx-auto max-w-4xl">
+      <section className="sbor-onboarding mx-auto max-w-4xl">
+        <img
+          className="sbor-response-art"
+          src="/brand/response-network-640.webp"
+          srcSet="/brand/response-network-320.webp 320w, /brand/response-network-640.webp 640w"
+          sizes="(max-width: 700px) 160px, 240px"
+          width={640}
+          height={400}
+          alt=""
+          aria-hidden="true"
+          decoding="async"
+        />
         <div className="mb-6 flex items-center gap-3">
           <span className="grid size-10 place-items-center rounded-md bg-[#6757ec] text-white">
             <Radio className="size-5" />
@@ -259,6 +273,25 @@ function OperationsOverview() {
     );
   }
 
+  const priorityIncident =
+    overview.data.activeIncidents.find((incident) => !incident.commanderId) ??
+    overview.data.activeIncidents[0];
+  const serviceById = new Map(
+    services.data.map((service) => [service.id, service]),
+  );
+  const eventKeys = {
+    "incident.created": "relayops:timeline.created",
+    "incident.status_changed": "relayops:timeline.statusChanged",
+    "incident.severity_changed": "relayops:timeline.severityChanged",
+    "incident.assignment_changed": "relayops:timeline.assignmentChanged",
+    "incident.update_published": "relayops:timeline.updatePublished",
+    "incident.timestamps_corrected": "relayops:timeline.timestampsCorrected",
+    "incident.resolved": "relayops:timeline.resolved",
+    "incident.dismissed": "relayops:timeline.dismissed",
+    "incident.reopened": "relayops:timeline.reopened",
+    "incident.signal_attached": "relayops:signals.attached",
+  } as const;
+
   return (
     <div className="sbor-overview space-y-7">
       <div className="sbor-overview-hero">
@@ -275,6 +308,43 @@ function OperationsOverview() {
         </div>
         <SignalScene compact />
       </div>
+
+      <section
+        className="sbor-focus-strip"
+        data-attention={Boolean(priorityIncident)}
+      >
+        <span className="sbor-focus-icon" aria-hidden="true">
+          {priorityIncident ? <ShieldAlert /> : <CheckCircle2 />}
+        </span>
+        <div>
+          <h2>{t("relayops:overview.focusTitle")}</h2>
+          <p>
+            {overview.data.commanderlessCount > 0
+              ? t("relayops:overview.focusUnassigned", {
+                  count: overview.data.commanderlessCount,
+                })
+              : priorityIncident
+                ? t("relayops:overview.focusActive", {
+                    count: overview.data.activeIncidents.length,
+                  })
+                : t("relayops:overview.noActiveDescription")}
+          </p>
+        </div>
+        <Link
+          className="sbor-focus-action"
+          to={
+            priorityIncident
+              ? "/relayops/$workspaceId/incidents/$incidentId"
+              : "/relayops/$workspaceId/services"
+          }
+          params={{ workspaceId, incidentId: priorityIncident?.id ?? "" }}
+        >
+          {priorityIncident
+            ? t("relayops:overview.reviewIncident")
+            : t("relayops:overview.openCatalog")}
+          <ArrowRight aria-hidden="true" size={16} />
+        </Link>
+      </section>
 
       <section
         className="sbor-metrics"
@@ -311,9 +381,18 @@ function OperationsOverview() {
       >
         <section className="sbor-overview-panel">
           <div className="border-b px-5 py-4">
-            <h2 className="font-semibold">
-              {t("relayops:overview.activeTitle")}
-            </h2>
+            <div className="sbor-panel-heading">
+              <h2 className="font-semibold">
+                {t("relayops:overview.activeTitle")}
+              </h2>
+              <Link
+                to="/relayops/$workspaceId/incidents"
+                params={{ workspaceId }}
+              >
+                {t("relayops:overview.openAll")}{" "}
+                <ArrowRight size={14} aria-hidden="true" />
+              </Link>
+            </div>
             <p className="mt-1 text-muted-foreground text-sm">
               {t("relayops:overview.activeDescription")}
             </p>
@@ -337,6 +416,8 @@ function OperationsOverview() {
                   key={incident.id}
                   to="/relayops/$workspaceId/incidents/$incidentId"
                   params={{ workspaceId, incidentId: incident.id }}
+                  data-severity={incident.severity}
+                  data-status={incident.status}
                   className="flex min-h-16 items-center justify-between gap-3 px-5 py-3 hover:bg-[#eeedf8]/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#6757ec]"
                 >
                   <span>
@@ -345,6 +426,13 @@ function OperationsOverview() {
                     </span>
                     <span className="mt-1 block font-medium">
                       {incident.title}
+                    </span>
+                    <span className="sbor-overview-incident-meta">
+                      <span>{serviceById.get(incident.serviceId)?.name}</span>
+                      <span>{t(`relayops:status.${incident.status}`)}</span>
+                      {!incident.commanderId ? (
+                        <span>{t("relayops:assignment.clear")}</span>
+                      ) : null}
                     </span>
                   </span>
                   <span className="flex items-center gap-2">
@@ -373,15 +461,30 @@ function OperationsOverview() {
               {t("relayops:overview.noUpdates")}
             </p>
           ) : (
-            <div className="relative p-5 pl-8">
+            <div className="sbor-overview-updates relative p-5 pl-8">
               <span className="absolute top-5 bottom-5 left-[1.05rem] w-px bg-[#6757ec]/25" />
               {overview.data.latestUpdates.map((update) => (
-                <article key={update.id} className="relative mb-5 last:mb-0">
+                <article
+                  key={update.id}
+                  className="sbor-update-entry relative mb-5 last:mb-0"
+                >
                   <span className="absolute top-1.5 -left-[1.18rem] size-2.5 rounded-full bg-[#6757ec]" />
-                  <p className="font-medium text-sm">{update.incidentTitle}</p>
+                  <span className="sbor-update-type">
+                    {t(eventKeys[update.type])}
+                  </span>
+                  <Link
+                    to="/relayops/$workspaceId/incidents/$incidentId"
+                    params={{ workspaceId, incidentId: update.incidentId }}
+                  >
+                    <p className="font-medium text-sm">
+                      {update.incidentTitle}
+                    </p>
+                  </Link>
                   <p className="mt-1 text-muted-foreground text-xs">
                     {update.serviceName} ·{" "}
-                    {formatRelayOpsDateTime(update.occurredAt)}
+                    <time dateTime={update.occurredAt}>
+                      {formatRelayOpsDateTime(update.occurredAt)}
+                    </time>
                   </p>
                 </article>
               ))}

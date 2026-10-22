@@ -1,0 +1,688 @@
+{
+	"date": "2026-10-22T21:54:20.912Z",
+	"baseURL": "http://127.0.0.1:32045",
+	"status": "passed",
+	"browser": "155.0.8059.85",
+	"captures": [
+		{
+			"name": "after-overview-desktop-light.png",
+			"route": "overview",
+			"theme": "light",
+			"device": "desktop",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				},
+				{
+					"path": "/brand/sboritm-mark-512.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-incidents-desktop-light.png",
+			"route": "incidents",
+			"theme": "light",
+			"device": "desktop",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-services-desktop-light.png",
+			"route": "services",
+			"theme": "light",
+			"device": "desktop",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-board-desktop-light.png",
+			"route": "board",
+			"theme": "light",
+			"device": "desktop",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				},
+				{
+					"path": "/brand/sboritm-mark-512.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-analytics-desktop-light.png",
+			"route": "analytics",
+			"theme": "light",
+			"device": "desktop",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-team-desktop-light.png",
+			"route": "team",
+			"theme": "light",
+			"device": "desktop",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-room-desktop-light.png",
+			"route": "room",
+			"theme": "light",
+			"device": "desktop",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-service-desktop-light.png",
+			"route": "service",
+			"theme": "light",
+			"device": "desktop",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-overview-mobile-light.png",
+			"route": "overview",
+			"theme": "light",
+			"device": "mobile",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				},
+				{
+					"path": "/brand/sboritm-mark-512.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-incidents-mobile-light.png",
+			"route": "incidents",
+			"theme": "light",
+			"device": "mobile",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-services-mobile-light.png",
+			"route": "services",
+			"theme": "light",
+			"device": "mobile",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-board-mobile-light.png",
+			"route": "board",
+			"theme": "light",
+			"device": "mobile",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				},
+				{
+					"path": "/brand/sboritm-mark-512.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-analytics-mobile-light.png",
+			"route": "analytics",
+			"theme": "light",
+			"device": "mobile",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-team-mobile-light.png",
+			"route": "team",
+			"theme": "light",
+			"device": "mobile",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-room-mobile-light.png",
+			"route": "room",
+			"theme": "light",
+			"device": "mobile",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-room-history-mobile-light.png",
+			"route": "room",
+			"theme": "light",
+			"device": "mobile",
+			"history": true,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 998,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-service-mobile-light.png",
+			"route": "service",
+			"theme": "light",
+			"device": "mobile",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-overview-desktop-dark.png",
+			"route": "overview",
+			"theme": "dark",
+			"device": "desktop",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				},
+				{
+					"path": "/brand/sboritm-mark-512.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-incidents-desktop-dark.png",
+			"route": "incidents",
+			"theme": "dark",
+			"device": "desktop",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-services-desktop-dark.png",
+			"route": "services",
+			"theme": "dark",
+			"device": "desktop",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-board-desktop-dark.png",
+			"route": "board",
+			"theme": "dark",
+			"device": "desktop",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				},
+				{
+					"path": "/brand/sboritm-mark-512.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-analytics-desktop-dark.png",
+			"route": "analytics",
+			"theme": "dark",
+			"device": "desktop",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-team-desktop-dark.png",
+			"route": "team",
+			"theme": "dark",
+			"device": "desktop",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-room-desktop-dark.png",
+			"route": "room",
+			"theme": "dark",
+			"device": "desktop",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-service-desktop-dark.png",
+			"route": "service",
+			"theme": "dark",
+			"device": "desktop",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-overview-mobile-dark.png",
+			"route": "overview",
+			"theme": "dark",
+			"device": "mobile",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				},
+				{
+					"path": "/brand/sboritm-mark-512.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-incidents-mobile-dark.png",
+			"route": "incidents",
+			"theme": "dark",
+			"device": "mobile",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-services-mobile-dark.png",
+			"route": "services",
+			"theme": "dark",
+			"device": "mobile",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-board-mobile-dark.png",
+			"route": "board",
+			"theme": "dark",
+			"device": "mobile",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				},
+				{
+					"path": "/brand/sboritm-mark-512.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-analytics-mobile-dark.png",
+			"route": "analytics",
+			"theme": "dark",
+			"device": "mobile",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-team-mobile-dark.png",
+			"route": "team",
+			"theme": "dark",
+			"device": "mobile",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-room-mobile-dark.png",
+			"route": "room",
+			"theme": "dark",
+			"device": "mobile",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-room-history-mobile-dark.png",
+			"route": "room",
+			"theme": "dark",
+			"device": "mobile",
+			"history": true,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 998,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		},
+		{
+			"name": "after-service-mobile-dark.png",
+			"route": "service",
+			"theme": "dark",
+			"device": "mobile",
+			"history": false,
+			"rootOverflow": 0,
+			"shellOverflow": 0,
+			"mainRight": -10,
+			"windowScrollY": 0,
+			"columnScrollY": 0,
+			"fonts": "loaded",
+			"images": [
+				{
+					"path": "/brand/sboritm-mark-128.webp",
+					"complete": true
+				}
+			]
+		}
+	],
+	"errors": [],
+	"failedRequests": []
+}

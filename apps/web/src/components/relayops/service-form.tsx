@@ -34,16 +34,21 @@ export function ServiceForm({
       const value = String(form.get(key) || "").trim();
       return value || null;
     };
-    await onSubmit({
-      name: String(form.get("name")).trim(),
-      slug: String(form.get("slug")).trim(),
-      description: String(form.get("description") || "").trim() || undefined,
-      tier: String(form.get("tier")) as RelayOpsServiceInput["tier"],
-      health: String(form.get("health")) as RelayOpsServiceInput["health"],
-      ownerTeamId: nullable("ownerTeamId"),
-      repositoryUrl: nullable("repositoryUrl"),
-      runbookUrl: nullable("runbookUrl"),
-    });
+    try {
+      await onSubmit({
+        name: String(form.get("name")).trim(),
+        slug: String(form.get("slug")).trim(),
+        description: String(form.get("description") || "").trim() || undefined,
+        tier: String(form.get("tier")) as RelayOpsServiceInput["tier"],
+        health: String(form.get("health")) as RelayOpsServiceInput["health"],
+        ownerTeamId: nullable("ownerTeamId"),
+        repositoryUrl: nullable("repositoryUrl"),
+        runbookUrl: nullable("runbookUrl"),
+      });
+    } catch {
+      // The mutation owns the error shown below. Keep the form and its draft
+      // mounted so a failed request can be retried without losing input.
+    }
   }
 
   const fieldClass = "space-y-1.5 text-sm";
@@ -51,7 +56,7 @@ export function ServiceForm({
     "h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-[#6757ec]";
 
   return (
-    <form className="space-y-4" onSubmit={submit}>
+    <form className="relayops-service-form space-y-4" onSubmit={submit}>
       <div className="grid gap-4 sm:grid-cols-2">
         <label className={fieldClass} htmlFor={`${formId}-name`}>
           <span>{t("relayops:service.name")}</span>

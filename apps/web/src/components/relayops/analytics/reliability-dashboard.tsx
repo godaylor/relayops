@@ -1,20 +1,35 @@
-import { Download, ExternalLink } from "lucide-react";
+import {
+  Activity,
+  ArrowUpRight,
+  ChartNoAxesCombined,
+  CheckCircle2,
+  Clock3,
+  Download,
+  ExternalLink,
+  Gauge,
+  RotateCcw,
+  Timer,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
+import {
+  RelayOpsErrorState,
+  RelayOpsSkeleton,
+} from "@/components/relayops/route-state";
 import { Button } from "@/components/ui/button";
-import { Field, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import type { RelayOpsReliabilityAnalytics } from "@/fetchers/relayops-analytics";
 import type { ReliabilityAnalyticsSearch } from "@/lib/relayops-analytics-search";
 import { getRelayOpsLocale } from "@/lib/relayops-format";
-import {
-  relayOpsIncidentStatuses,
-  relayOpsSeverities,
-} from "@/lib/relayops-workbench-search";
+import { ReliabilityFilters } from "./reliability-filters";
+import { VolumeChart } from "./volume-chart";
+import "../service-analytics.css";
 
 type ServiceOption = { id: string; name: string };
 
 type ReliabilityDashboardProps = {
-  data: RelayOpsReliabilityAnalytics;
+  data?: RelayOpsReliabilityAnalytics;
+  loading?: boolean;
+  error?: unknown;
+  onRetry?: () => void;
   search: ReliabilityAnalyticsSearch;
   services: ServiceOption[];
   canExport: boolean;
@@ -22,6 +37,7 @@ type ReliabilityDashboardProps = {
   onSearchChange: (search: ReliabilityAnalyticsSearch) => void;
   onDrilldown: (bucket: string) => void;
   onExport: () => void;
+  onServiceOpen?: (serviceId: string) => void;
 };
 
 function duration(value: number | null) {
@@ -58,21 +74,29 @@ function MetricCard({
   value,
   detail,
   comparison,
+  sample,
+  icon: Icon,
+  primary,
 }: {
   label: string;
   value: string;
   detail: string;
   comparison?: string;
+  sample?: string;
+  icon: typeof Activity;
+  primary?: boolean;
 }) {
   return (
-    <article className="rounded-lg border border-[#1b1d36]/10 bg-white p-4 dark:border-white/10 dark:bg-[#1a1c35]">
-      <p className="font-mono text-[0.68rem] text-muted-foreground uppercase tracking-[0.16em]">
-        {label}
-      </p>
-      <p className="mt-2 font-semibold text-3xl tabular-nums tracking-tight">
-        {value}
-      </p>
-      <p className="mt-1 text-muted-foreground text-xs">{detail}</p>
+    <article className="sbor-reliability-metric" data-primary={primary}>
+      <span className="sbor-reliability-metric-icon">
+        <Icon size={18} aria-hidden="true" />
+      </span>
+      <p className="sbor-reliability-metric-label">{label}</p>
+      <p className="sbor-reliability-metric-value">{value}</p>
+      <p className="sbor-reliability-metric-detail">{detail}</p>
+      {sample ? (
+        <p className="sbor-reliability-metric-detail">{sample}</p>
+      ) : null}
       {comparison ? (
         <p className="mt-3 border-[#1b1d36]/8 border-t pt-2 text-muted-foreground text-xs dark:border-white/10">
           {comparison}
@@ -82,11 +106,11 @@ function MetricCard({
   );
 }
 
-const selectClassName =
-  "min-h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/24";
-
 export function ReliabilityDashboard({
   data,
+  loading = false,
+  error,
+  onRetry = () => undefined,
   search,
   services,
   canExport,
@@ -94,86 +118,13 @@ export function ReliabilityDashboard({
   onSearchChange,
   onDrilldown,
   onExport,
+  onServiceOpen,
 }: ReliabilityDashboardProps) {
   const { t } = useTranslation();
-  const maxVolume = Math.max(1, ...data.series.map((item) => item.volume));
-  const compare = data.comparison?.metrics;
-  const metricCards = [
-    {
-      label: t("relayops:analytics.volume"),
-      value: String(data.metrics.volume.count),
-      detail: t("relayops:analytics.incidentsInPeriod"),
-      comparison: compare
-        ? t("relayops:analytics.previousValue", {
-            value: compare.volume.count,
-          })
-        : undefined,
-    },
-    {
-      label: t("relayops:analytics.mtta"),
-      value: duration(data.metrics.mtta.p50Ms),
-      detail: t("relayops:analytics.sampleDetail", {
-        sample: data.metrics.mtta.sampleSize,
-        missing: data.metrics.mtta.excludedMissing,
-      }),
-      comparison: compare
-        ? t("relayops:analytics.previousValue", {
-            value: duration(compare.mtta.p50Ms),
-          })
-        : undefined,
-    },
-    {
-      label: t("relayops:analytics.mttr"),
-      value: duration(data.metrics.mttr.p50Ms),
-      detail: t("relayops:analytics.p90", {
-        value: duration(data.metrics.mttr.p90Ms),
-      }),
-      comparison: compare
-        ? t("relayops:analytics.previousValue", {
-            value: duration(compare.mttr.p50Ms),
-          })
-        : undefined,
-    },
-    {
-      label: t("relayops:analytics.mitigation"),
-      value: duration(data.metrics.mitigation.p50Ms),
-      detail: t("relayops:analytics.p90", {
-        value: duration(data.metrics.mitigation.p90Ms),
-      }),
-      comparison: compare
-        ? t("relayops:analytics.previousValue", {
-            value: duration(compare.mitigation.p50Ms),
-          })
-        : undefined,
-    },
-    {
-      label: t("relayops:analytics.reopen"),
-      value: rate(data.metrics.reopen.percent),
-      detail: `${data.metrics.reopen.numerator} / ${data.metrics.reopen.denominator}`,
-      comparison: compare
-        ? t("relayops:analytics.previousValue", {
-            value: rate(compare.reopen.percent),
-          })
-        : undefined,
-    },
-    {
-      label: t("relayops:analytics.stale"),
-      value: rate(data.metrics.stale.percent),
-      detail: t("relayops:analytics.staleDetail", {
-        stale: data.metrics.stale.numerator,
-        active: data.metrics.stale.denominator,
-      }),
-      comparison: compare
-        ? t("relayops:analytics.previousValue", {
-            value: rate(compare.stale.percent),
-          })
-        : undefined,
-    },
-  ];
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-col justify-between gap-4 border-[#1b1d36]/10 border-b pb-5 dark:border-white/10 lg:flex-row lg:items-end">
+    <div className="sbor-analytics space-y-6">
+      <header className="sbor-surface-header">
         <div>
           <p className="font-mono text-[#6757ec] text-xs tracking-[0.18em] dark:text-[#b3a5ff]">
             {t("relayops:analytics.eyebrow")}
@@ -190,6 +141,7 @@ export function ReliabilityDashboard({
             type="button"
             variant="outline"
             loading={isExporting}
+            disabled={loading || Boolean(error) || !data}
             onClick={onExport}
           >
             <Download aria-hidden="true" />
@@ -198,161 +150,137 @@ export function ReliabilityDashboard({
         ) : null}
       </header>
 
-      <section
-        aria-labelledby="reliability-filters"
-        className="rounded-xl border border-[#1b1d36]/10 bg-white p-4 dark:border-white/10 dark:bg-[#1a1c35]"
-      >
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 id="reliability-filters" className="font-semibold text-lg">
-            {t("relayops:analytics.filters")}
-          </h2>
-          <p className="font-mono text-muted-foreground text-xs">
-            {search.timezone}
-          </p>
-        </div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
-          <Field>
-            <FieldLabel>{t("relayops:analytics.from")}</FieldLabel>
-            <Input
-              type="date"
-              value={search.from}
-              max={search.to}
-              onChange={(event) =>
-                onSearchChange({ ...search, from: event.target.value })
-              }
-            />
-          </Field>
-          <Field>
-            <FieldLabel>{t("relayops:analytics.to")}</FieldLabel>
-            <Input
-              type="date"
-              value={search.to}
-              min={search.from}
-              onChange={(event) =>
-                onSearchChange({ ...search, to: event.target.value })
-              }
-            />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="reliability-status">
-              {t("relayops:analytics.status")}
-            </FieldLabel>
-            <select
-              id="reliability-status"
-              className={selectClassName}
-              value={search.status[0] ?? ""}
-              onChange={(event) =>
-                onSearchChange({
-                  ...search,
-                  status: event.target.value
-                    ? [event.target.value as (typeof search.status)[number]]
-                    : [],
-                })
-              }
-            >
-              <option value="">{t("relayops:analytics.all")}</option>
-              {relayOpsIncidentStatuses.map((status) => (
-                <option key={status} value={status}>
-                  {t(`relayops:status.${status}`)}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="reliability-severity">
-              {t("relayops:analytics.severity")}
-            </FieldLabel>
-            <select
-              id="reliability-severity"
-              className={selectClassName}
-              value={search.severity[0] ?? ""}
-              onChange={(event) =>
-                onSearchChange({
-                  ...search,
-                  severity: event.target.value
-                    ? [event.target.value as (typeof search.severity)[number]]
-                    : [],
-                })
-              }
-            >
-              <option value="">{t("relayops:analytics.all")}</option>
-              {relayOpsSeverities.map((severity) => (
-                <option key={severity} value={severity}>
-                  {t(`relayops:severity.${severity}`)}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="reliability-service">
-              {t("relayops:analytics.service")}
-            </FieldLabel>
-            <select
-              id="reliability-service"
-              className={selectClassName}
-              value={search.service[0] ?? ""}
-              onChange={(event) =>
-                onSearchChange({
-                  ...search,
-                  service: event.target.value ? [event.target.value] : [],
-                })
-              }
-            >
-              <option value="">{t("relayops:analytics.all")}</option>
-              {services.map((service) => (
-                <option key={service.id} value={service.id}>
-                  {service.name}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <div className="flex min-h-10 items-end pb-1">
-            <label className="flex min-h-9 cursor-pointer items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={search.compare}
-                onChange={(event) =>
-                  onSearchChange({ ...search, compare: event.target.checked })
-                }
-                className="size-4 accent-[#6757ec]"
-              />
-              {t("relayops:analytics.compare")}
-            </label>
-          </div>
-        </div>
-        <div className="sbor-analytics-demo-policy mt-4 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
-          <label className="flex min-h-9 cursor-pointer items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={search.includeDemo}
-              aria-describedby="analytics-demo-policy"
-              onChange={(event) =>
-                onSearchChange({ ...search, includeDemo: event.target.checked })
-              }
-              className="size-4 accent-[#6757ec]"
-            />
-            {t("relayops:analytics.includeDemo")}
-          </label>
-          <p
-            id="analytics-demo-policy"
-            className="max-w-xl text-muted-foreground text-xs leading-5"
-          >
-            {t(
-              search.includeDemo
-                ? "relayops:analytics.demoIncluded"
-                : "relayops:analytics.demoExcluded",
-            )}
-          </p>
-        </div>
-      </section>
+      <ReliabilityFilters
+        search={search}
+        services={services}
+        onSearchChange={onSearchChange}
+      />
+      {loading ? (
+        <RelayOpsSkeleton rows={8} />
+      ) : error || !data ? (
+        <RelayOpsErrorState error={error} onRetry={onRetry} />
+      ) : (
+        <ReliabilityResults
+          data={data}
+          search={search}
+          onDrilldown={onDrilldown}
+          onServiceOpen={onServiceOpen}
+        />
+      )}
+    </div>
+  );
+}
 
+function ReliabilityResults({
+  data,
+  search,
+  onDrilldown,
+  onServiceOpen,
+}: {
+  data: RelayOpsReliabilityAnalytics;
+  search: ReliabilityAnalyticsSearch;
+  onDrilldown: (bucket: string) => void;
+  onServiceOpen?: (serviceId: string) => void;
+}) {
+  const { t } = useTranslation();
+  const compare = data.comparison?.metrics;
+  const number = new Intl.NumberFormat(getRelayOpsLocale());
+  const metricCards = [
+    {
+      label: t("relayops:analytics.volume"),
+      value: number.format(data.metrics.volume.count),
+      detail: t("relayops:analytics.incidentsInPeriod"),
+      icon: Activity,
+      comparison: compare
+        ? t("relayops:analytics.previousValue", {
+            value: compare.volume.count,
+          })
+        : undefined,
+    },
+    {
+      label: t("relayops:analytics.mtta"),
+      icon: Timer,
+      value: duration(data.metrics.mtta.p50Ms),
+      detail: t("relayops:analytics.sampleDetail", {
+        sample: data.metrics.mtta.sampleSize,
+        missing: data.metrics.mtta.excludedMissing,
+      }),
+      comparison: compare
+        ? t("relayops:analytics.previousValue", {
+            value: duration(compare.mtta.p50Ms),
+          })
+        : undefined,
+    },
+    {
+      label: t("relayops:analytics.mttr"),
+      icon: CheckCircle2,
+      value: duration(data.metrics.mttr.p50Ms),
+      detail: t("relayops:analytics.p90", {
+        value: duration(data.metrics.mttr.p90Ms),
+      }),
+      sample: t("relayops:analytics.sampleDetail", {
+        sample: data.metrics.mttr.sampleSize,
+        missing: data.metrics.mttr.excludedMissing,
+      }),
+      comparison: compare
+        ? t("relayops:analytics.previousValue", {
+            value: duration(compare.mttr.p50Ms),
+          })
+        : undefined,
+    },
+    {
+      label: t("relayops:analytics.mitigation"),
+      icon: Gauge,
+      value: duration(data.metrics.mitigation.p50Ms),
+      detail: t("relayops:analytics.p90", {
+        value: duration(data.metrics.mitigation.p90Ms),
+      }),
+      sample: t("relayops:analytics.sampleDetail", {
+        sample: data.metrics.mitigation.sampleSize,
+        missing: data.metrics.mitigation.excludedMissing,
+      }),
+      comparison: compare
+        ? t("relayops:analytics.previousValue", {
+            value: duration(compare.mitigation.p50Ms),
+          })
+        : undefined,
+    },
+    {
+      label: t("relayops:analytics.reopen"),
+      icon: RotateCcw,
+      value: rate(data.metrics.reopen.percent),
+      detail: `${data.metrics.reopen.numerator} / ${data.metrics.reopen.denominator}`,
+      comparison: compare
+        ? t("relayops:analytics.previousValue", {
+            value: rate(compare.reopen.percent),
+          })
+        : undefined,
+    },
+    {
+      label: t("relayops:analytics.stale"),
+      icon: Clock3,
+      value: rate(data.metrics.stale.percent),
+      detail: t("relayops:analytics.staleDetail", {
+        stale: data.metrics.stale.numerator,
+        active: data.metrics.stale.denominator,
+      }),
+      comparison: compare
+        ? t("relayops:analytics.previousValue", {
+            value: rate(compare.stale.percent),
+          })
+        : undefined,
+    },
+  ];
+
+  return (
+    <>
       <section aria-labelledby="reliability-metrics">
         <h2 id="reliability-metrics" className="sr-only">
           {t("relayops:analytics.metrics")}
         </h2>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
-          {metricCards.map((metric) => (
-            <MetricCard key={metric.label} {...metric} />
+        <div className="sbor-reliability-metrics">
+          {metricCards.map((metric, index) => (
+            <MetricCard key={metric.label} {...metric} primary={index < 3} />
           ))}
         </div>
         <details className="mt-3 rounded-lg border bg-background p-4 text-sm">
@@ -365,51 +293,18 @@ export function ReliabilityDashboard({
         </details>
       </section>
 
-      <section className="grid gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(20rem,0.8fr)]">
-        <article className="rounded-xl border border-[#1b1d36]/10 bg-white p-4 dark:border-white/10 dark:bg-[#1a1c35]">
+      <section className="sbor-reliability-charts">
+        <article className="sbor-volume-panel">
           <h2 className="font-semibold text-xl">
             {t("relayops:analytics.volumeTrend")}
           </h2>
           <p className="mt-1 text-muted-foreground text-sm">
             {t("relayops:analytics.drilldownHint")}
           </p>
-          {data.series.length > 0 ? (
-            <ul className="mt-5 flex min-h-48 items-end gap-1 overflow-x-auto border-[#1b1d36]/8 border-b pb-2 dark:border-white/10">
-              {data.series.map((item) => (
-                <li
-                  key={item.bucket}
-                  className="flex min-w-11 flex-1 items-end"
-                >
-                  <button
-                    type="button"
-                    className="group flex min-h-11 w-full items-end rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6757ec]"
-                    aria-label={t("relayops:analytics.openBucket", {
-                      date: item.bucket,
-                      count: item.volume,
-                    })}
-                    onClick={() => onDrilldown(item.bucket)}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="flex w-full min-w-5 items-start justify-center rounded-sm bg-[#6757ec] pt-1 font-mono text-[0.62rem] text-white transition-colors group-hover:bg-[#184a9c]"
-                      style={{
-                        height: `${Math.max(14, (item.volume / maxVolume) * 176)}px`,
-                      }}
-                    >
-                      {item.volume}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="mt-5 rounded-lg border border-dashed p-6 text-muted-foreground text-sm">
-              {t("relayops:analytics.empty")}
-            </p>
-          )}
+          <VolumeChart series={data.series} onDrilldown={onDrilldown} />
         </article>
 
-        <article className="rounded-xl border border-[#1b1d36]/10 bg-[#1b1d36] p-4 text-white dark:border-white/10">
+        <article className="sbor-hotspots-panel">
           <p className="font-mono text-[#b3a5ff] text-xs tracking-[0.16em]">
             {t("relayops:analytics.hotspotEyebrow")}
           </p>
@@ -419,30 +314,48 @@ export function ReliabilityDashboard({
           <p className="mt-1 text-sm text-white/65">
             {t("relayops:analytics.primaryServiceOnly")}
           </p>
-          <ol className="mt-5 space-y-3">
-            {data.hotspots.map((hotspot, index) => (
-              <li
-                key={hotspot.serviceId}
-                className="grid grid-cols-[2rem_1fr_auto] items-center gap-3 border-white/10 border-t pt-3"
-              >
-                <span className="font-mono text-white/45 text-xs">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <span className="min-w-0 truncate font-medium">
-                  {hotspot.serviceName}
-                </span>
-                <span className="font-mono text-sm tabular-nums">
-                  {hotspot.incidentCount}
-                </span>
-              </li>
-            ))}
-          </ol>
+          {data.hotspots.length === 0 ? (
+            <div className="sbor-hotspots-empty">
+              <ChartNoAxesCombined size={26} aria-hidden="true" />
+              <p>{t("relayops:analytics.empty")}</p>
+            </div>
+          ) : (
+            <ol className="mt-5 space-y-3">
+              {data.hotspots.map((hotspot, index) => (
+                <li
+                  key={hotspot.serviceId}
+                  className="grid grid-cols-[2rem_1fr_auto] items-center gap-3 border-white/10 border-t pt-3"
+                >
+                  <span className="font-mono text-white/45 text-xs">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  {onServiceOpen ? (
+                    <button
+                      type="button"
+                      className="sbor-hotspot-service"
+                      onClick={() => onServiceOpen(hotspot.serviceId)}
+                    >
+                      {hotspot.serviceName}
+                      <ArrowUpRight size={15} aria-hidden="true" />
+                    </button>
+                  ) : (
+                    <span className="min-w-0 break-words font-medium">
+                      {hotspot.serviceName}
+                    </span>
+                  )}
+                  <span className="font-mono text-sm tabular-nums">
+                    {number.format(hotspot.incidentCount)}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          )}
         </article>
       </section>
 
       <section
         aria-labelledby="reliability-table"
-        className="rounded-xl border border-[#1b1d36]/10 bg-white p-4 dark:border-white/10 dark:bg-[#1a1c35]"
+        className="sbor-reliability-table rounded-xl border border-[#1b1d36]/10 bg-white p-4 dark:border-white/10 dark:bg-[#1a1c35]"
       >
         <div className="flex items-center gap-2">
           <h2 id="reliability-table" className="font-semibold text-xl">
@@ -472,16 +385,28 @@ export function ReliabilityDashboard({
               </tr>
             </thead>
             <tbody>
+              {data.series.length === 0 ? (
+                <tr>
+                  <td colSpan={3} className="px-3 py-6 text-muted-foreground">
+                    {t("relayops:analytics.empty")}
+                  </td>
+                </tr>
+              ) : null}
               {data.series.map((item) => (
                 <tr
                   key={item.bucket}
                   className="border-[#1b1d36]/8 border-b last:border-0 dark:border-white/8"
                 >
                   <th scope="row" className="px-3 py-2 font-mono font-normal">
-                    {item.bucket}
+                    <time dateTime={item.bucket}>
+                      {new Intl.DateTimeFormat(getRelayOpsLocale(), {
+                        dateStyle: "medium",
+                        timeZone: "UTC",
+                      }).format(new Date(`${item.bucket}T12:00:00Z`))}
+                    </time>
                   </th>
                   <td className="px-3 py-2 text-right tabular-nums">
-                    {item.volume}
+                    {number.format(item.volume)}
                   </td>
                   <td className="px-3 py-2 text-right">
                     <Button
@@ -508,6 +433,6 @@ export function ReliabilityDashboard({
           })}
         </p>
       </section>
-    </div>
+    </>
   );
 }

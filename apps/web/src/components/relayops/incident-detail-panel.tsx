@@ -303,15 +303,27 @@ export function IncidentDetailPanel({
 
       <div className="sbor-room-body">
         <div className="sbor-room-main">
-          {incident.resolutionSummary ? (
-            <section className="sbor-resolution-summary">
-              <CheckCircle2 aria-hidden="true" />
-              <div>
-                <h2>{t("relayops:incidentRoom.resolutionSummary")}</h2>
-                <p>{incident.resolutionSummary}</p>
-              </div>
-            </section>
-          ) : null}
+          <AnimatePresence initial={false}>
+            {incident.resolutionSummary ? (
+              <motion.section
+                key="resolution-summary"
+                className="sbor-resolution-summary"
+                initial={{
+                  opacity: 0,
+                  transform: reduceMotion ? "none" : "translateY(6px)",
+                }}
+                animate={{ opacity: 1, transform: "none" }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+              >
+                <CheckCircle2 aria-hidden="true" />
+                <div>
+                  <h2>{t("relayops:incidentRoom.resolutionSummary")}</h2>
+                  <p>{incident.resolutionSummary}</p>
+                </div>
+              </motion.section>
+            ) : null}
+          </AnimatePresence>
 
           <section
             className="sbor-room-history"
@@ -327,7 +339,11 @@ export function IncidentDetailPanel({
                 {t("relayops:incidentRoom.noTimeline")}
               </p>
             ) : null}
-            <ol className="sbor-timeline">
+            <ol
+              className="sbor-timeline"
+              aria-live="polite"
+              aria-relevant="additions"
+            >
               <AnimatePresence initial={false}>
                 {timeline.map((event) => (
                   <motion.li

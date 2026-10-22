@@ -2227,7 +2227,9 @@
 			"allQuiet": "A clear picture. A ready team.",
 			"demoNotice": "Training data · saved in your private workspace",
 			"noBoardTitle": "The next response starts here",
-			"noBoardDescription": "Create an incident or open Overview to prepare your first service. The board will show how the response moves forward."
+			"noBoardDescription": "Create an incident or open Overview to prepare your first service. The board will show how the response moves forward.",
+			"pauseAnimation": "Pause animation",
+			"resumeAnimation": "Resume animation"
 		},
 		"access": {
 			"explanation": "Access to this link depends on your account and role. Each browser signs in separately. Open your own workspace or sign in with a member account.",
@@ -2440,7 +2442,11 @@
 			"eyebrow": "MANAGE",
 			"team": "Members and roles",
 			"teamDescription": "Manage workspace membership and authorization.",
-			"title": "Workspace controls"
+			"title": "Workspace controls",
+			"membersTitle": "Workspace team",
+			"membersDescription": "People who can work in this workspace. Their role determines which actions are available.",
+			"openMembers": "Manage members",
+			"technicalTitle": "Access rules and archived data"
 		},
 		"nav": {
 			"insights": "Insights",
@@ -2487,7 +2493,12 @@
 			"noUpdates": "No incident updates have been recorded yet.",
 			"openCatalog": "Open Service Catalog",
 			"services": "Active services",
-			"title": "Current operational state"
+			"title": "Current operational state",
+			"focusTitle": "The next step for your team",
+			"focusUnassigned": "Incidents without a response lead: {{count}}.",
+			"focusActive": "Active incidents: {{count}}. Open a room to continue the response.",
+			"reviewIncident": "Open incident",
+			"openAll": "View all"
 		},
 		"shell": {
 			"provenance": "Сборитм is derived from the MIT-licensed Kaneo project and is not officially endorsed by Kaneo.",
@@ -2620,7 +2631,7 @@
 			"compare": "Compare previous period",
 			"date": "Date",
 			"description": "Compare response speed, resolution, reopen risk, stale work and service hotspots with one shareable filter set.",
-			"drilldownHint": "Choose any day to open the Incident Workbench with the identical filters.",
+			"drilldownHint": "Open the selected day in the incident list. Status, severity and service filters carry over; dates use UTC and demo incidents may be included.",
 			"empty": "No incidents match this period and filter set.",
 			"export": "Export filtered CSV",
 			"eyebrow": "RELIABILITY ANALYTICS",

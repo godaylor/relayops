@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1023">
+  <title>Сборитм — визуальные изменения, 23 октября 2026</title>
+  <meta name="description" content="Реальные снимки обновлённого Сборитма: до и после, восемь рабочих экранов, две темы, мобильная версия и результаты проверок.">
+  <style>
+    :root{color-scheme:dark;--page:#0d1023;--surface:#15192f;--surface-2:#1b203a;--ink:#f3f2ff;--muted:#a9aec8;--line:#2c314b;--accent:#b4a6ff;--green:#8ce0c3;--amber:#f0bf8c;--ease:cubic-bezier(.23,1,.32,1)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:104px}body{margin:0;background:var(--page);color:var(--ink);font:15px/1.65 "Segoe UI Variable", "Segoe UI", sans-serif}button,a{-webkit-tap-highlight-color:transparent;touch-action:manipulation}a{color:inherit}button{font:inherit}button:focus-visible,a:focus-visible,video:focus-visible{outline:3px solid var(--green);outline-offset:5px}button{cursor:pointer}img{display:block;width:100%;height:auto}button,figure,p,h1,h2,h3{margin:0}figure{min-width:0}a{text-underline-offset:4px}::selection{background:#7563b5;color:#fff}.wrap{width:min(1200px,calc(100% - 64px));margin-inline:auto}.skip{position:fixed;top:12px;left:16px;z-index:100;padding:10px 18px;border-radius:10px;background:var(--green);color:var(--page);transform:translateY(-160%)}.skip:focus{transform:none}
+    .site-header{position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line);background:#0d1023f5;backdrop-filter:blur(18px)}.header-inner{display:flex;align-items:center;gap:28px;min-height:80px}.brand{display:inline-flex;align-items:center;gap:10px;font-size:23px;font-weight:700;letter-spacing:-.055em;text-decoration:none;white-space:nowrap}.brand img{width:36px;height:36px;flex-shrink:0;object-fit:contain}.header-inner nav{display:flex;align-items:center;gap:23px;margin-left:auto}.header-inner nav a{font-size:12px;color:var(--muted);text-decoration:none;white-space:nowrap}.button-link{display:inline-flex;align-items:center;justify-content:center;gap:15px;min-height:44px;padding:10px 18px;border:1px solid var(--line);border-radius:10px;text-decoration:none;font-size:13px;font-weight:600;line-height:1.4;transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease}.button-link.primary{background:var(--accent);color:#16122e;border-color:transparent}.button-link .arrow{font-size:18px;line-height:1}.header-inner>.button-link{margin-left:6px;font-size:12px;white-space:nowrap}
+    .hero{padding:66px 0 0}.eyebrow{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:650;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}.eyebrow .status-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}h1{max-width:900px;margin-top:22px;font-size:clamp(42px,6.2vw,78px);font-weight:650;letter-spacing:-.065em;line-height:1.04;text-wrap:balance}.hero-copy{display:grid;grid-template-columns:1.25fr .75fr;align-items:end;gap:60px;margin-top:30px}.lead{max-width:680px;font-size:18px;line-height:1.65;color:#c6c8dd}.hero-copy aside{padding-left:23px;border-left:1px solid var(--line);font-size:13px;color:var(--muted)}.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}.hero-proof{display:flex;flex-wrap:wrap;gap:12px 24px;margin-top:30px;color:var(--muted);font-size:12px}.hero-proof span{display:flex;gap:8px;align-items:center}.hero-proof i{display:block;width:5px;height:5px;border-radius:50%;background:var(--green)}.hero-shot{margin-top:36px;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--surface);box-shadow:0 28px 90px #04051133}.frame-bar{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:43px;padding:10px 18px;border-bottom:1px solid var(--line);font-size:11px;color:var(--muted);line-height:1.4}.frame-bar strong{color:var(--ink);font-weight:550}.tag{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid #8ce0c333;border-radius:5px;background:#8ce0c30a;color:var(--green);font-size:9px;line-height:1.3;font-weight:700;letter-spacing:.075em;white-space:nowrap}.tag.concept{color:var(--amber);border-color:#f0bf8c40;background:#f0bf8c0a}.hero-shot>a{display:block}.image-caption{display:flex;justify-content:space-between;gap:18px;padding:14px 18px;color:var(--muted);font-size:11px;border-top:1px solid var(--line)}.image-caption a{white-space:nowrap}
+    .chapter{padding:82px 0;border-bottom:1px solid var(--line);scroll-margin-top:24px}.chapter-heading{display:grid;grid-template-columns:1fr .72fr;gap:70px;align-items:end;margin-bottom:30px}.chapter-heading h2{margin-top:14px;font-size:clamp(30px,3.6vw,47px);font-weight:600;letter-spacing:-.055em;line-height:1.1;text-wrap:balance}.chapter-heading>p{max-width:480px;color:var(--muted);font-size:14px;line-height:1.8}.subhead{font-size:17px;font-weight:600;letter-spacing:-.025em}.body-note{color:var(--muted);font-size:12px;line-height:1.8}.controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 18px}.control-set{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:5px;border:1px solid var(--line);border-radius:12px;background:#11152b}.control-set .group-label{padding:0 9px;font-size:10px;letter-spacing:.05em;color:var(--muted);white-space:nowrap}.controls button,.route-controls button{min-height:40px;padding:9px 13px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--muted);font-size:12px;line-height:1.4;transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease}.controls button[aria-pressed="true"],.route-controls button[aria-pressed="true"]{background:#b4a6ff18;border-color:#b4a6ff35;color:#d8d0ff}.controls .hint{margin-left:auto;font-size:11px;color:var(--muted)}.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.screenshot-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}.compare-label{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}.compare-label strong{color:var(--ink);font-weight:550}.compare-label .after{color:var(--green)}.screenshot-card>a{display:block}.compare-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px;margin-top:28px}.compare-summary article{padding-left:18px;border-left:2px solid #b4a6ff55}.compare-summary h3{font-size:14px;font-weight:600}.compare-summary p{margin-top:7px;font-size:12px;line-height:1.8;color:var(--muted)}
+    .route-controls{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:17px}.route-controls button{border-color:var(--line);min-height:42px}.viewer-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 22px;border-bottom:1px solid var(--line)}.viewer-heading h3{font-size:17px;font-weight:600}.viewer-heading p{margin-top:5px;font-size:12px;color:var(--muted)}.viewer{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--surface)}.viewer-stage{display:grid;place-items:start center;min-width:0;padding:18px;background:radial-gradient(ellipse at 50% 5%,#24294b,transparent 80%),#11152a}.viewer-stage>a{display:block;width:100%;max-width:100%;overflow:hidden;border:1px solid #ffffff0d;border-radius:9px;box-shadow:0 12px 40px #02041126}.viewer-stage[data-device="mobile"]>a{width:min(390px,100%);border-radius:19px}.viewer-stage img{background:#101124}.viewer-status{min-height:47px;padding:12px 20px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}.viewer-bottom{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-top:14px}.viewer-bottom>p{max-width:650px;font-size:11px;color:var(--muted)}.viewer-bottom>a{white-space:nowrap;font-size:12px;color:var(--accent)}.entry-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(220px,.55fr);gap:20px;align-items:start;margin-top:25px}.entry-grid .phone{width:min(290px,100%);margin-inline:auto}.entry-grid figcaption{padding:13px 16px;font-size:11px;color:var(--muted);border-top:1px solid var(--line)}.entry-section{margin-top:54px}.entry-section>.body-note{max-width:650px;margin-top:9px}
+    .motion-player{overflow:hidden;border:1px solid var(--line);border-radius:16px;background:var(--surface)}.motion-player video{display:block;width:100%;max-height:690px;background:#090d20}.motion-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px;margin-top:30px}.motion-grid article{padding-top:18px;border-top:1px solid var(--line)}.motion-grid .small-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)}.motion-grid h3{margin-top:12px;font-size:17px;font-weight:600;letter-spacing:-.025em}.motion-grid p{margin-top:9px;font-size:12px;color:var(--muted);line-height:1.8}.concept-note{display:flex;align-items:flex-start;gap:14px;margin-bottom:24px;padding:18px 20px;border:1px solid #f0bf8c30;border-radius:12px;background:#f0bf8c06}.concept-note p{max-width:850px;font-size:12px;color:#d7c6b7;line-height:1.8}.concept-grid{display:grid;gap:24px}.concept-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}.concept-card>a{display:block;background:#e9ebf4}.concept-caption{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding:18px 20px}.concept-caption h3{font-size:15px;font-weight:600}.concept-caption p{margin-top:5px;color:var(--muted);font-size:12px;line-height:1.7}.concept-caption a{font-size:11px;white-space:nowrap;color:var(--accent)}.concept-mobile{display:grid;grid-template-columns:.65fr 1.35fr;align-items:center;background:var(--surface)}.concept-mobile .concept-caption{display:block;padding:28px}.concept-mobile .concept-caption>a{display:inline-block;margin-top:15px}.concept-mobile>a{order:2}
+    .checks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--surface)}.check{padding:25px;border-right:1px solid var(--line)}.check:last-child{border:0}.check strong{display:block;color:var(--green);font-size:43px;font-weight:550;letter-spacing:-.06em;line-height:1.1;font-variant-numeric:tabular-nums}.check span{display:block;margin-top:10px;font-size:12px;color:var(--muted)}.widths{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:21px}.widths>span:first-child{font-size:11px;color:var(--muted);margin-right:7px}.widths code{padding:5px 9px;border:1px solid var(--line);border-radius:6px;font:11px/1.4 ui-monospace,monospace;color:#bfc3db}.checks-note{max-width:890px;margin-top:19px;font-size:12px;line-height:1.9;color:var(--muted)}.evidence-links{display:flex;flex-wrap:wrap;gap:16px 24px;margin-top:19px;font-size:12px}.evidence-links a{color:var(--accent)}.finding-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:36px}.finding{padding:25px;border:1px solid var(--line);border-radius:14px;background:#13172d}.finding h3{font-size:19px;font-weight:600;letter-spacing:-.025em}.finding ul{padding-left:18px;margin:17px 0 0;color:var(--muted);font-size:12px;line-height:1.9}.finding li+li{margin-top:10px}.finding.good{border-top:2px solid #8ce0c355}.finding.next{border-top:2px solid #f0bf8c55}.final-cta{display:flex;align-items:center;justify-content:space-between;gap:30px;padding:44px 0}.final-cta h2{font-size:29px;line-height:1.2;font-weight:600;letter-spacing:-.045em}.final-cta p{max-width:610px;margin-top:9px;font-size:12px;color:var(--muted)}.final-cta .hero-actions{margin-top:0;justify-content:flex-end}.footer{padding:23px 0 30px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}.footer-inner{display:flex;justify-content:space-between;gap:25px}.footer p{max-width:780px}.footer a{white-space:nowrap}
+    @media(hover:hover) and (pointer:fine){.header-inner nav a:hover,.evidence-links a:hover{color:var(--ink)}.button-link:hover{background:#252a46;border-color:#77729f}.button-link.primary:hover{background:#c7bcff;border-color:transparent;color:#16122e}.controls button:hover,.route-controls button:hover{background:#ffffff09;color:var(--ink)}.controls button[aria-pressed="true"]:hover,.route-controls button[aria-pressed="true"]:hover{background:#b4a6ff26}}
+    @media(max-width:1050px){.header-inner nav{gap:15px}.header-inner nav a{font-size:11px}.header-inner>.button-link{display:none}.chapter-heading{gap:40px}.hero-copy{gap:35px}.check{padding:22px 18px}.viewer-bottom{align-items:flex-start}.concept-mobile{grid-template-columns:.8fr 1.2fr}}
+    @media(max-width:760px){.wrap{width:min(1200px,calc(100% - 36px))}.header-inner{min-height:68px;gap:15px}.brand{font-size:21px}.header-inner nav{gap:16px;overflow-x:auto;padding-block:8px}.header-inner nav a{font-size:11px}.header-inner nav a[href="#motion"],.header-inner nav a[href="#checks"]{display:none}.hero{padding-top:39px}.eyebrow{font-size:10px;letter-spacing:.08em}h1{font-size:clamp(38px,8.4vw,62px);margin-top:19px}.hero-copy{grid-template-columns:1fr;gap:20px;margin-top:24px}.lead{font-size:16px}.hero-copy aside{padding-left:17px;max-width:590px;font-size:12px}.hero-shot{margin-top:28px;border-radius:12px}.frame-bar{min-height:37px;padding:10px 13px;font-size:10px}.image-caption{font-size:10px;padding:11px 13px}.chapter{padding:54px 0}.chapter-heading{grid-template-columns:1fr;gap:19px;margin-bottom:25px}.chapter-heading h2{font-size:35px}.chapter-heading>p{font-size:13px}.compare-grid{gap:12px}.compare-summary{gap:18px}.compare-summary h3{font-size:13px}.compare-summary p{font-size:11px}.controls .hint{margin-left:0;flex-basis:100%;padding-top:4px}.viewer-heading{padding:16px}.viewer-heading h3{font-size:16px}.viewer-heading p{font-size:11px}.viewer-stage{padding:10px}.viewer-bottom{flex-direction:column;gap:9px}.entry-grid{gap:14px;grid-template-columns:minmax(0,1.35fr) minmax(145px,.65fr)}.entry-grid figcaption{font-size:10px;padding:11px}.motion-grid{gap:22px}.motion-grid h3{font-size:16px}.motion-grid p{font-size:11px}.concept-caption{padding:16px}.concept-caption h3{font-size:14px}.concept-caption p{font-size:11px}.concept-mobile{display:block}.concept-mobile .concept-caption{padding:20px}.checks{grid-template-columns:1fr 1fr}.check:nth-child(2){border-right:0}.check:nth-child(-n+2){border-bottom:1px solid var(--line)}.check strong{font-size:38px}.finding-grid{gap:14px}.finding{padding:20px}.finding h3{font-size:17px}.finding ul{font-size:11px}.final-cta{align-items:flex-start;flex-direction:column;padding:35px 0}.final-cta .hero-actions{justify-content:flex-start}.footer-inner{flex-direction:column;gap:12px}}
+    @media(max-width:500px){.header-inner{justify-content:space-between}.header-inner nav{gap:14px;margin-left:0}.header-inner nav a[href="#concepts"]{display:none}.hero-actions{gap:9px}.button-link{padding:11px 13px;font-size:12px;gap:10px}.hero-proof{gap:9px 16px;font-size:11px}.hero-shot .frame-bar .tag{display:none}.image-caption{flex-direction:column;gap:4px}.chapter-heading h2{font-size:31px}.compare-grid{grid-template-columns:1fr}.compare-summary{grid-template-columns:1fr;gap:17px}.compare-summary article{padding-left:14px}.compare-summary h3{font-size:14px}.compare-summary p{font-size:12px}.controls button,.route-controls button{min-height:44px;font-size:12px;padding:10px 12px}.control-set{gap:2px}.control-set .group-label{display:none}.viewer-heading{align-items:flex-start;gap:12px}.viewer-heading>.tag{margin-top:4px;font-size:8px}.viewer-stage{padding:7px}.viewer-stage[data-device="mobile"]{padding:14px}.entry-grid{grid-template-columns:1fr}.entry-grid .phone{width:min(320px,100%)}.entry-section{margin-top:35px}.motion-grid{grid-template-columns:1fr;gap:23px}.motion-grid h3{font-size:17px}.motion-grid p{font-size:12px}.concept-note{padding:15px;gap:11px;flex-direction:column}.concept-caption{flex-direction:column;gap:9px}.concept-caption p{font-size:12px}.checks .check{padding:21px 17px}.check span{font-size:11px}.finding-grid{grid-template-columns:1fr;gap:16px}.finding ul{font-size:12px}.final-cta h2{font-size:26px}.footer-inner{font-size:10px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
+    @media(forced-colors:active){.tag,.button-link,.control-set,.controls button,.route-controls button,.screenshot-card,.viewer,.finding,.check{border-color:CanvasText}.tag,.eyebrow,.check strong{color:CanvasText}.controls button[aria-pressed="true"],.route-controls button[aria-pressed="true"]{outline:2px solid Highlight}.hero-proof i{background:CanvasText}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#content">К содержимому</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#content" translate="no"><img src="brand-mark.webp" width="36" height="36" alt="">Сборитм</a>
+      <nav aria-label="Разделы отчёта">
+        <a href="#comparison">До / после</a><a href="#screens">Экраны</a><a href="#motion">Движение</a><a href="#concepts">Концепты</a><a href="#checks">Проверки</a>
+      </nav>
+      <a class="button-link" href="http://127.0.0.1:32045/" target="_blank" rel="noopener">Открыть сборку <span class="arrow" aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+  <main id="content" class="wrap" tabindex="-1">
+    <section class="hero" aria-labelledby="hero-title">
+      <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span>Работающий интерфейс · 23 октября 2026</p>
+      <h1 id="hero-title">Больше ясности.<br>Живее каждое действие.</h1>
+      <div class="hero-copy">
+        <p class="lead">Сборитм помогает команде понять сбой, назначить ответственного и довести инцидент до результата. Здесь — реальные изменения интерфейса и то, что ещё можно улучшить.</p>
+        <aside>Снимки сделаны в установленном Google Chrome. Учебные записи обозначены <strong>DEMO</strong> и сохранены через API. Сгенерированные макеты показаны отдельно и помечены как концепции.</aside>
+      </div>
+      <div class="hero-actions">
+        <a class="button-link primary" href="http://127.0.0.1:32045/" target="_blank" rel="noopener">Открыть локальную сборку <span class="arrow" aria-hidden="true">↗</span></a>
+        <a class="button-link" href="https://relayops-godaylor.onrender.com/" target="_blank" rel="noopener">Публичный сайт <span class="arrow" aria-hidden="true">↗</span></a>
+      </div>
+      <div class="hero-proof" aria-label="Объём проверки"><span><i aria-hidden="true"></i>8 рабочих экранов</span><span><i aria-hidden="true"></i>Светлая и тёмная темы</span><span><i aria-hidden="true"></i>От 320 до 1920 px</span></div>
+      <figure class="hero-shot">
+        <div class="frame-bar"><strong>Сводка · после изменений</strong><span class="tag">РЕАЛЬНЫЙ ИНТЕРФЕЙС</span></div>
+        <a href="screenshots/after-overview-desktop-light.png" target="_blank" rel="noopener" aria-label="Открыть полный снимок обновлённой сводки"><img src="screenshots/after-overview-desktop-light.png" width="1440" height="1000" fetchpriority="high" alt="Обновлённая сводка Сборитма в светлой теме: реальный учебный инцидент, следующий шаг, метрики и последние обновления"></a>
+        <figcaption class="image-caption"><span>Локальная версия · светлая тема · 1440 px</span><a href="screenshots/after-overview-desktop-light.png" target="_blank" rel="noopener">Рассмотреть снимок ↗</a></figcaption>
+      </figure>
+    </section>
+
+    <section id="comparison" class="chapter" aria-labelledby="comparison-title">
+      <div class="chapter-heading"><div><p class="eyebrow">Сравнение реализации</p><h2 id="comparison-title">Изменения видны<br>в самой работе.</h2></div><p>Одинаковые рабочие экраны до и после полировки. Сравните читаемость, иерархию и то, насколько легко найти следующее действие.</p></div>
+      <div class="controls" id="comparison-controls" role="group" aria-label="Экран для сравнения">
+        <button type="button" data-compare="overview" aria-pressed="true">Сводка</button><button type="button" data-compare="services" aria-pressed="false">Сервисы</button><p class="hint">Изображение открывается в полном размере.</p>
+      </div>
+      <div class="compare-grid">
+        <figure class="screenshot-card"><figcaption class="compare-label"><strong>До</strong><span>Предыдущая версия</span></figcaption><a id="compare-before-link" href="screenshots/before-overview-desktop.png" target="_blank" rel="noopener"><img id="compare-before" src="screenshots/before-overview-desktop.png" width="1440" height="1000" loading="lazy" alt="Сводка Сборитма до изменений, реальный снимок предыдущей реализации"></a></figure>
+        <figure class="screenshot-card"><figcaption class="compare-label"><strong class="after">После</strong><span>Обновлённая сборка</span></figcaption><a id="compare-after-link" href="screenshots/after-overview-desktop-light.png" target="_blank" rel="noopener"><img id="compare-after" src="screenshots/after-overview-desktop-light.png" width="1440" height="1000" loading="lazy" alt="Сводка Сборитма после изменений, реальный снимок в светлой теме"></a></figure>
+      </div>
+      <div class="compare-summary">
+        <article><h3>Следующий шаг заметнее</h3><p>Сводка выделяет инцидент, который требует внимания, и показывает контекст рядом с проблемой.</p></article>
+        <article><h3>Текст и действия читаются легче</h3><p>Крупнее подписи, поля, статусы и области нажатия. Карточки сервисов складываются в единую адаптивную сетку.</p></article>
+        <article><h3>Обновление сохраняет контекст</h3><p>Навигация не перемонтирует рабочую область ради эффекта. Короткие переходы сопровождают действие.</p></article>
+      </div>
+    </section>
+
+    <section id="screens" class="chapter" aria-labelledby="screens-title">
+      <div class="chapter-heading"><div><p class="eyebrow">Галерея рабочих экранов</p><h2 id="screens-title">Одна система.<br>На каждом экране.</h2></div><p>Выберите раздел, тему и размер. Здесь используются актуальные снимки реализации, а не изображения сгенерированного интерфейса.</p></div>
+      <div class="route-controls" id="screen-controls" role="group" aria-label="Раздел приложения">
+        <button type="button" data-screen="overview" aria-pressed="true">Сводка</button><button type="button" data-screen="incidents" aria-pressed="false">Инциденты</button><button type="button" data-screen="services" aria-pressed="false">Сервисы</button><button type="button" data-screen="service" aria-pressed="false">Карточка сервиса</button><button type="button" data-screen="board" aria-pressed="false">Доска</button><button type="button" data-screen="analytics" aria-pressed="false">Аналитика</button><button type="button" data-screen="team" aria-pressed="false">Команда и доступ</button><button type="button" data-screen="room" aria-pressed="false">Комната инцидента</button>
+      </div>
+      <div class="controls">
+        <div class="control-set" id="theme-controls" role="group" aria-label="Тема снимка"><span class="group-label" aria-hidden="true">ТЕМА</span><button type="button" data-theme="light" aria-pressed="true">Светлая</button><button type="button" data-theme="dark" aria-pressed="false">Тёмная</button></div>
+        <div class="control-set" id="device-controls" role="group" aria-label="Размер снимка"><span class="group-label" aria-hidden="true">ЭКРАН</span><button type="button" data-device="desktop" aria-pressed="true">Компьютер</button><button type="button" data-device="mobile" aria-pressed="false">Телефон</button></div>
+      </div>
+      <figure class="viewer" id="screen-viewer">
+        <div class="viewer-heading"><div><h3 id="screen-title">Сводка</h3><p id="screen-description">Активные инциденты, внимание команды и последние обновления.</p></div><span class="tag">РЕАЛЬНЫЙ СНИМОК</span></div>
+        <div class="viewer-stage" id="viewer-stage" data-device="desktop"><a id="screen-full-link" href="screenshots/after-overview-desktop-light.png" target="_blank" rel="noopener" aria-label="Открыть снимок сводки в полном размере"><img id="screen-image" src="screenshots/after-overview-desktop-light.png" width="1440" height="1000" loading="lazy" alt="Сводка · компьютер · светлая тема · реальный интерфейс Сборитма"></a></div>
+        <figcaption class="viewer-status" id="screen-status" aria-live="polite">Сводка · компьютер · светлая тема · 1440 × 1000 px</figcaption>
+      </figure>
+      <div class="viewer-bottom"><p>Учебные данные отмечены DEMO. Светлая и тёмная темы проверены отдельно; мобильный снимок сделан при ширине 390 px.</p><a id="screen-download-link" href="screenshots/after-overview-desktop-light.png" target="_blank" rel="noopener">Открыть полный снимок ↗</a></div>
+      <div class="entry-section">
+        <h3 class="subhead">Первое знакомство и гостевой вход</h3>
+        <p class="body-note">Продукт объясняет своё назначение до входа. Кнопка «Попробовать без регистрации» открывает отдельное пространство с сохранёнными учебными данными.</p>
+        <div class="entry-grid">
+          <figure class="screenshot-card"><a href="screenshots/after-entry-desktop.png" target="_blank" rel="noopener"><img src="screenshots/after-entry-desktop.png" width="1440" height="1000" loading="lazy" alt="Реальная страница входа Сборитма на компьютере: объяснение продукта, управляемая анимация и гостевой вход"></a><figcaption>Компьютер · реальный экран входа</figcaption></figure>
+          <figure class="screenshot-card phone"><a href="screenshots/after-entry-mobile.png" target="_blank" rel="noopener"><img src="screenshots/after-entry-mobile.png" width="390" height="844" loading="lazy" alt="Реальная мобильная страница входа Сборитма с заметной кнопкой гостевого входа"></a><figcaption>Телефон · 390 px · гостевой вход под рукой</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="motion" class="chapter" aria-labelledby="motion-title">
+      <div class="chapter-heading"><div><p class="eyebrow">Движение в реализации</p><h2 id="motion-title">Плавность, которая<br>объясняет изменение.</h2></div><p>В видео — работающий интерфейс. Короткие переходы помогают следить за действием, а декоративную сцену можно остановить. При уменьшенном движении сохраняется понятная обратная связь.</p></div>
+      <figure class="motion-player"><video src="motion.webm" controls muted playsinline preload="metadata" poster="screenshots/after-overview-desktop-light.png" aria-label="Запись анимаций и переходов работающего Сборитма"></video><figcaption class="image-caption"><span>Запись браузера · обычная скорость воспроизведения</span><span>Управление воспроизведением — в видеоплеере</span></figcaption></figure>
+      <div class="motion-grid">
+        <article><p class="small-label">Навигация</p><h3>Содержимое остаётся на месте</h3><p>Переход между разделами не сбрасывает оболочку и не скрывает всю рабочую область. Изменение фильтра не запускает появление страницы заново.</p></article>
+        <article><p class="small-label">Состояние и результат</p><h3>Действие получает ответ</h3><p>Раскрытие контекста, назначение ответственного, новая запись в истории и сохранённый результат заметны рядом с изменившимся объектом.</p></article>
+        <article><p class="small-label">Контроль движения</p><h3>Темп выбирает пользователь</h3><p>Объясняющая сцена плавно меняет этапы, поддерживает ручной выбор и паузу. Вне экрана и скрытой вкладке её движение останавливается.</p></article>
+      </div>
+    </section>
+
+    <section id="concepts" class="chapter" aria-labelledby="concepts-title">
+      <div class="chapter-heading"><div><p class="eyebrow">Сгенерированные ориентиры</p><h2 id="concepts-title">Направление для дизайна.<br>Отдельно от результата.</h2></div><p>Эти изображения помогают сравнить композицию, иерархию, цвет и материалы. Реализованные экраны и реальные данные показаны в галерее выше.</p></div>
+      <div class="concept-note"><span class="tag concept">КОНЦЕПЦИИ · ИИ</span><p>Это сгенерированные референсы, а не снимки сайта. Они могут содержать неточный текст, примерные данные и элементы управления, которых пока нет в приложении. Наличие такого элемента в макете не означает, что функция реализована.</p></div>
+      <div class="concept-grid">
+        <figure class="concept-card"><a href="reference-primary.png" target="_blank" rel="noopener"><img src="reference-primary.png" width="2043" height="770" loading="lazy" alt="Сгенерированный концепт основных экранов Сборитма, не работающий интерфейс; содержит иллюстративные данные и возможные дополнительные элементы"></a><figcaption class="concept-caption"><div><h3>Основное рабочее пространство</h3><p>Референс композиции, читаемости и согласованности рабочих разделов.</p></div><a href="reference-primary.png" target="_blank" rel="noopener">Открыть концепт ↗</a></figcaption></figure>
+        <figure class="concept-card"><a href="reference-response.png" target="_blank" rel="noopener"><img src="reference-response.png" width="2056" height="765" loading="lazy" alt="Сгенерированный концепт совместного реагирования в Сборитме, не снимок реализации; возможны вымышленные данные и функции"></a><figcaption class="concept-caption"><div><h3>Совместное реагирование</h3><p>Референс для контекста инцидента, действий команды и сохранённой истории.</p></div><a href="reference-response.png" target="_blank" rel="noopener">Открыть концепт ↗</a></figcaption></figure>
+        <figure class="concept-card concept-mobile"><a href="reference-mobile.png" target="_blank" rel="noopener"><img src="reference-mobile.png" width="1536" height="1024" loading="lazy" alt="Сгенерированные мобильные концепты Сборитма; это ориентиры, которые могут отличаться от работающих экранов"></a><figcaption class="concept-caption"><span class="tag concept">МОБИЛЬНЫЙ КОНЦЕПТ</span><h3 style="margin-top:15px">Главное действие — под рукой.</h3><p>Иерархия на узком экране, читаемые статусы и доступные действия. С реальной мобильной версией можно сравнить через переключатель «Телефон» выше.</p><a href="reference-mobile.png" target="_blank" rel="noopener">Открыть концепт ↗</a></figcaption></figure>
+      </div>
+    </section>
+
+    <section id="checks" class="chapter" aria-labelledby="checks-title">
+      <div class="chapter-heading"><div><p class="eyebrow">Зафиксированные проверки</p><h2 id="checks-title">Не только выглядит.<br>Проверено в браузере.</h2></div><p>Матрица в установленном Google Chrome 155.0.8059.85: восемь рабочих экранов, семь ширин и две темы. Результаты доступны в исходном отчёте.</p></div>
+      <div class="checks" aria-label="Результаты браузерной матрицы"><div class="check"><strong>112</strong><span>вариантов вёрстки<br>8 экранов × 7 ширин × 2 темы</span></div><div class="check"><strong>7</strong><span>ширин экрана<br>от 320 до 1920 px</span></div><div class="check"><strong>2</strong><span>темы оформления<br>светлая и тёмная</span></div><div class="check"><strong>0</strong><span>найденных нарушений<br>в 12 прогонах axe</span></div></div>
+      <div class="widths" aria-label="Проверенные ширины"><span>Ширины, px:</span><code>320</code><code>360</code><code>390</code><code>768</code><code>1024</code><code>1440</code><code>1920</code></div>
+      <p class="checks-note">Проверка размеров в браузере подтверждает поведение в этих режимах. Она не заменяет испытания на физических телефонах, ручной проход со скринридером и проверку больших объёмов данных. Автоматические проверки доступности относятся к указанным в отчёте экранам и состояниям.</p>
+      <div class="evidence-links"><a href="verification.json" target="_blank" rel="noopener">Результаты матрицы · JSON ↗</a><a href="final-capture-verification.json" target="_blank" rel="noopener">Проверка финальных снимков · JSON ↗</a><a href="AUDIT.md" target="_blank" rel="noopener">Подробный аудит и сложность улучшений ↗</a></div>
+      <div class="finding-grid">
+        <article class="finding good"><h3>Что стало сильнее</h3><ul><li>Узнаваемые знак, типографика и материалы связывают первое знакомство и рабочую область.</li><li>Крупнее текст, понятнее состояния, заметнее следующий шаг и результат действия.</li><li>Данные остаются настоящими: учебные записи обозначены, нулевые периоды в аналитике не превращаются в выдуманные столбики.</li><li>Движение поддерживает навигацию и обратную связь; предусмотрены пауза, клавиатура и уменьшенное движение.</li></ul></article>
+        <article class="finding next"><h3>Что ещё доводить</h3><ul><li>Плотные таблицы, длинные названия и история из сотен событий требуют отдельного прохода с большими выборками.</li><li>Сенсорное перетаскивание и взаимодействия с клавиатурой телефона стоит проверить на физических устройствах.</li><li>Ручная доступность и работа со скринридером остаются самостоятельной задачей.</li><li>Новые SLO, тепловые карты и показатели доступности требуют источников данных и проверки расчётов; одной визуальной доработки недостаточно.</li></ul></article>
+      </div>
+    </section>
+    <section class="final-cta" aria-labelledby="try-title"><div><h2 id="try-title">Посмотреть и попробовать.</h2><p>Локальная сборка открывает рабочий продукт. Сравнения, концепты и результаты проверок остаются на этой странице.</p></div><div class="hero-actions"><a class="button-link primary" href="http://127.0.0.1:32045/" target="_blank" rel="noopener">Открыть сборку <span class="arrow" aria-hidden="true">↗</span></a><a class="button-link" href="https://relayops-godaylor.onrender.com/" target="_blank" rel="noopener">Публичная версия <span class="arrow" aria-hidden="true">↗</span></a></div></section>
+  </main>
+  <footer class="footer"><div class="wrap footer-inner"><p>Сборитм — независимый продукт на основе Kaneo с лицензией MIT. Исходное авторство: Andrej Acevski. Официального одобрения Kaneo нет.</p><a href="#content">К началу ↑</a></div></footer>
+  <script>
+    (() => {
+      const screens = {
+        overview: { title: "Сводка", description: "Активные инциденты, внимание команды и последние обновления." },
+        incidents: { title: "Инциденты", description: "Рабочий список с фильтрами, состояниями и быстрым доступом к проблеме." },
+        services: { title: "Сервисы", description: "Состояние систем, важность, описание и ответственная команда." },
+        service: { title: "Карточка сервиса", description: "Контекст одного сервиса и связанные с ним операционные действия." },
+        board: { title: "Доска реагирования", description: "Стадии ответа на инцидент и доступные действия для команды." },
+        analytics: { title: "Аналитика", description: "Показатели с реальными выборками, понятными датами и честными нулевыми значениями." },
+        team: { title: "Команда и доступ", description: "Участники рабочего пространства и доступные функции управления." },
+        room: { title: "Комната инцидента", description: "Ответственный, действия, контекст и сохранённая история реагирования." }
+      };
+      let screen = "overview";
+      let theme = "light";
+      let device = "desktop";
+      let requestId = 0;
+      const image = document.getElementById("screen-image");
+      const status = document.getElementById("screen-status");
+      const viewer = document.getElementById("screen-viewer");
+      function selectButtons(container, attribute, value) {
+        document.querySelectorAll(`${container} button[${attribute}]`).forEach((button) => {
+          button.setAttribute("aria-pressed", String(button.getAttribute(attribute) === value));
+        });
+      }
+      function updateScreen() {
+        const currentRequest = ++requestId;
+        const selected = screens[screen];
+        const selectedDevice = device;
+        const themeLabel = theme === "dark" ? "тёмная тема" : "светлая тема";
+        const deviceLabel = device === "mobile" ? "телефон" : "компьютер";
+        const file = `screenshots/after-${screen}-${device}-${theme}.png`;
+        const caption = `${selected.title} · ${deviceLabel} · ${themeLabel}`;
+        viewer.setAttribute("aria-busy", "true");
+        status.textContent = "Загружаем выбранный снимок…";
+        const next = new Image();
+        next.onload = () => {
+          if (currentRequest !== requestId) return;
+          image.src = file;
+          image.width = next.naturalWidth;
+          image.height = next.naturalHeight;
+          image.alt = `${caption} · реальный интерфейс Сборитма`;
+          document.getElementById("screen-title").textContent = selected.title;
+          document.getElementById("screen-description").textContent = selected.description;
+          document.getElementById("viewer-stage").dataset.device = selectedDevice;
+          document.getElementById("screen-full-link").href = file;
+          document.getElementById("screen-full-link").setAttribute("aria-label", `Открыть полный снимок: ${caption}`);
+          document.getElementById("screen-download-link").href = file;
+          status.textContent = `${caption} · ${next.naturalWidth} × ${next.naturalHeight} px`;
+          viewer.removeAttribute("aria-busy");
+        };
+        next.onerror = () => {
+          if (currentRequest !== requestId) return;
+          viewer.removeAttribute("aria-busy");
+          status.textContent = "Этот снимок пока недоступен. Выберите другой раздел или размер.";
+        };
+        next.src = file;
+      }
+      document.getElementById("screen-controls").addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-screen]");
+        if (!button) return;
+        screen = button.dataset.screen;
+        selectButtons("#screen-controls", "data-screen", screen);
+        updateScreen();
+      });
+      document.getElementById("theme-controls").addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-theme]");
+        if (!button) return;
+        theme = button.dataset.theme;
+        selectButtons("#theme-controls", "data-theme", theme);
+        updateScreen();
+      });
+      document.getElementById("device-controls").addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-device]");
+        if (!button) return;
+        device = button.dataset.device;
+        selectButtons("#device-controls", "data-device", device);
+        updateScreen();
+      });
+      document.getElementById("comparison-controls").addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-compare]");
+        if (!button) return;
+        const key = button.dataset.compare;
+        const title = key === "services" ? "Каталог сервисов" : "Сводка";
+        selectButtons("#comparison-controls", "data-compare", key);
+        const before = `screenshots/before-${key}-desktop.png`;
+        const after = `screenshots/after-${key}-desktop-light.png`;
+        document.getElementById("compare-before").src = before;
+        document.getElementById("compare-before").alt = `${title} до изменений · реальный снимок`;
+        document.getElementById("compare-before-link").href = before;
+        document.getElementById("compare-after").src = after;
+        document.getElementById("compare-after").alt = `${title} после изменений · реальный снимок в светлой теме`;
+        document.getElementById("compare-after-link").href = after;
+      });
+    })();
+  </script>
+</body>
+</html>

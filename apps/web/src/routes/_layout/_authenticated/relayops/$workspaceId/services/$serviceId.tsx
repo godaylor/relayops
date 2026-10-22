@@ -2,7 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Archive,
   ArrowLeft,
+  ArrowUpRight,
   ExternalLink,
+  ListFilter,
   RotateCcw,
   Server,
 } from "lucide-react";
@@ -33,6 +35,7 @@ import {
 } from "@/hooks/queries/relayops/use-relayops";
 import { useRelayOpsCapability } from "@/hooks/relayops/use-relayops-capability";
 import { formatRelayOpsDateTime } from "@/lib/relayops-format";
+import "@/components/relayops/service-analytics.css";
 
 export const Route = createFileRoute(
   "/_layout/_authenticated/relayops/$workspaceId/services/$serviceId",
@@ -54,6 +57,11 @@ function ServiceDetail() {
   );
   const archiveCapability = useRelayOpsCapability(
     "action.service.archive",
+    {},
+    workspaceId,
+  );
+  const workbenchCapability = useRelayOpsCapability(
+    "route.workbench",
     {},
     workspaceId,
   );
@@ -81,7 +89,7 @@ function ServiceDetail() {
     !archiveCapability.isCheckingPermissions && archiveCapability.allowed;
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className="sbor-service-detail mx-auto max-w-6xl space-y-6">
       <Button
         variant="ghost"
         render={
@@ -92,7 +100,10 @@ function ServiceDetail() {
         {t("relayops:service.backToCatalog")}
       </Button>
 
-      <section className="rounded-xl border border-[#1b1d36]/10 bg-white p-5 dark:border-white/10 dark:bg-[#1a1c35] sm:p-7">
+      <section
+        className="sbor-service-profile rounded-xl border border-[#1b1d36]/10 bg-white p-5 dark:border-white/10 dark:bg-[#1a1c35] sm:p-7"
+        data-health={item.health}
+      >
         <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
           <div className="flex min-w-0 gap-4">
             <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-[#6757ec]/8 text-[#6757ec] dark:text-[#b3a5ff]">
@@ -100,7 +111,7 @@ function ServiceDetail() {
             </span>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="truncate font-semibold text-3xl tracking-tight">
+                <h1 className="font-semibold text-3xl tracking-tight">
                   {item.name}
                 </h1>
                 {item.archivedAt ? (
@@ -112,6 +123,10 @@ function ServiceDetail() {
               <p className="mt-1 font-mono text-muted-foreground text-sm">
                 {item.slug}
               </p>
+              <div className="sbor-service-profile-status">
+                <span className="sbor-health-dot" aria-hidden="true" />
+                {t(`relayops:health.${item.health}`)}
+              </div>
             </div>
           </div>
           {canUpdate || canArchive ? (
@@ -119,6 +134,8 @@ function ServiceDetail() {
               {canUpdate ? (
                 <Button
                   variant="outline"
+                  aria-expanded={editing}
+                  aria-controls="service-edit-panel"
                   onClick={() => setEditing((value) => !value)}
                 >
                   {editing
@@ -182,7 +199,10 @@ function ServiceDetail() {
         ) : null}
 
         {editing ? (
-          <div className="mt-7 border-t pt-6">
+          <div
+            id="service-edit-panel"
+            className="sbor-service-create mt-7 border-t pt-6"
+          >
             <ServiceForm
               initial={item}
               teams={teams.data}
@@ -197,7 +217,7 @@ function ServiceDetail() {
           </div>
         ) : (
           <>
-            <dl className="mt-8 grid gap-5 border-t pt-6 sm:grid-cols-2 lg:grid-cols-4">
+            <dl className="sbor-service-profile-facts mt-8 grid gap-5 border-t pt-6 sm:grid-cols-2 lg:grid-cols-4">
               <div>
                 <dt className="text-muted-foreground text-xs uppercase tracking-wide">
                   {t("relayops:service.tier")}
@@ -231,16 +251,16 @@ function ServiceDetail() {
                 </dd>
               </div>
             </dl>
-            <div className="mt-7 grid gap-5 border-t pt-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+            <div className="sbor-service-profile-content mt-7 grid gap-5 border-t pt-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
               <div>
                 <h2 className="font-medium">
                   {t("relayops:service.descriptionTitle")}
                 </h2>
-                <p className="mt-2 whitespace-pre-wrap text-muted-foreground text-sm">
+                <p className="mt-2 whitespace-pre-wrap break-words text-muted-foreground text-sm">
                   {item.description || t("relayops:service.noDescription")}
                 </p>
               </div>
-              <div className="space-y-2">
+              <div className="sbor-service-links space-y-2">
                 <h2 className="font-medium">{t("relayops:service.links")}</h2>
                 {item.repositoryUrl ? (
                   <a
@@ -271,6 +291,19 @@ function ServiceDetail() {
                 ) : null}
               </div>
             </div>
+            {workbenchCapability.allowed ? (
+              <div className="sbor-service-workbench-link">
+                <ListFilter size={18} aria-hidden="true" />
+                <Link
+                  to="/relayops/$workspaceId/incidents"
+                  params={{ workspaceId }}
+                  search={{ service: item.id }}
+                >
+                  {t("relayops:analytics.openWorkbench")}
+                  <ArrowUpRight size={16} aria-hidden="true" />
+                </Link>
+              </div>
+            ) : null}
           </>
         )}
       </section>
