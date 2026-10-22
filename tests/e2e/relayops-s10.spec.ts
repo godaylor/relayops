@@ -8,7 +8,10 @@ import {
   test,
 } from "@playwright/test";
 
-const API_URL = process.env.PLAYWRIGHT_API_URL ?? "http://127.0.0.1:32041";
+const API_URL =
+  process.env.PLAYWRIGHT_API_URL ??
+  process.env.PLAYWRIGHT_BASE_URL ??
+  "http://127.0.0.1:32041";
 const axeSource = readFileSync(
   resolve(
     import.meta.dirname,
@@ -535,8 +538,14 @@ test("S10 ten-step clean-DB demo proves two users, keyboard lifecycle, conflict,
       `&timezone=UTC&status=resolved&severity=sev2&service=${serviceId}` +
       "&compare=false&includeDemo=true",
   );
+  const bucketLabel = new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  }).format(new Date(`${today}T12:00:00Z`));
   const drilldown = page.getByRole("button", {
-    name: new RegExp(`Open ${today} with 1 incidents in Workbench`),
+    name: `Open ${bucketLabel} with 1 incidents in Workbench`,
+    exact: true,
   });
   await expect(drilldown).toBeVisible();
   await drilldown.click();

@@ -53,6 +53,11 @@ function ReliabilityAnalyticsRoute() {
     {},
     workspaceId,
   );
+  const serviceCapability = useRelayOpsCapability(
+    "route.services",
+    {},
+    workspaceId,
+  );
 
   const denied =
     (!routeCapability.isCheckingPermissions && !routeCapability.allowed) ||
@@ -66,23 +71,8 @@ function ReliabilityAnalyticsRoute() {
       />
     );
   }
-  if (
-    routeCapability.isCheckingPermissions ||
-    analytics.isLoading ||
-    services.isLoading
-  ) {
+  if (routeCapability.isCheckingPermissions) {
     return <RelayOpsSkeleton rows={8} />;
-  }
-  if (analytics.error || services.error || !analytics.data) {
-    return (
-      <RelayOpsErrorState
-        error={analytics.error ?? services.error}
-        onRetry={() => {
-          void analytics.refetch();
-          void services.refetch();
-        }}
-      />
-    );
   }
 
   const updateSearch = (next: typeof search) => {
@@ -121,6 +111,12 @@ function ReliabilityAnalyticsRoute() {
   return (
     <ReliabilityDashboard
       data={analytics.data}
+      loading={analytics.isLoading || services.isLoading}
+      error={analytics.error ?? services.error}
+      onRetry={() => {
+        void analytics.refetch();
+        void services.refetch();
+      }}
       search={search}
       services={(services.data ?? []).map(({ id, name }) => ({ id, name }))}
       canExport={
@@ -130,6 +126,16 @@ function ReliabilityAnalyticsRoute() {
       onSearchChange={updateSearch}
       onDrilldown={drilldown}
       onExport={download}
+      onServiceOpen={
+        serviceCapability.allowed
+          ? (serviceId) => {
+              void navigate({
+                to: "/relayops/$workspaceId/services/$serviceId",
+                params: { workspaceId, serviceId },
+              });
+            }
+          : undefined
+      }
     />
   );
 }

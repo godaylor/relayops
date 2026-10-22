@@ -1,0 +1,37 @@
+{
+	"createdAt": "2026-10-23",
+	"generator": "OpenAI built-in ImageGen",
+	"promptDescriptions": "PROMPTS.md",
+	"assets": [
+		{
+			"file": "response-network.png",
+			"purpose": "Transparent decorative onboarding illustration",
+			"generatedSource": "exec-6b17baec-d183-4de0-a6b3-4ee4c26c8dbb.png",
+			"derivedFiles": [
+				"../../apps/web/public/brand/response-network-320.webp",
+				"../../apps/web/public/brand/response-network-640.webp"
+			],
+			"processing": "Resize and WebP encoding with Sharp; transparency preserved"
+		},
+		{
+			"file": "reference-primary.png",
+			"purpose": "Concept only: overview, services, analytics",
+			"generatedSource": "exec-fd7c0c6c-e35d-487e-8089-a622c737cd0e.png"
+		},
+		{
+			"file": "reference-response.png",
+			"purpose": "Concept only: incidents, response board, incident room",
+			"generatedSource": "exec-e1ca56bc-d324-4cfc-be98-7e73fbdce67a.png"
+		},
+		{
+			"file": "reference-mobile.png",
+			"purpose": "Concept only: entry, room, create, team",
+			"generatedSource": "exec-4ccb11e5-2743-48b8-b679-2ccc537d313b.png"
+		}
+	],
+	"limitations": [
+		"Concept images can contain imprecise labels and invented controls.",
+		"Actual application capabilities and API data take precedence.",
+		"No third-party stock images were added in this iteration."
+	]
+}

@@ -86,6 +86,52 @@ const data = {
 } as const satisfies RelayOpsReliabilityAnalytics;
 
 describe("ReliabilityDashboard", () => {
+  it("shows an honest empty chart for zero-only periods and keeps the daily table", () => {
+    render(
+      <ReliabilityDashboard
+        data={{
+          ...data,
+          series: [{ bucket: "2026-03-10", volume: 0 }],
+          hotspots: [],
+        }}
+        search={search}
+        services={[]}
+        canExport={false}
+        onSearchChange={vi.fn()}
+        onDrilldown={vi.fn()}
+        onExport={vi.fn()}
+      />,
+    );
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "relayops:analytics.empty",
+    );
+    expect(
+      screen.queryByRole("button", { name: "relayops:analytics.openBucket" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("table")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "relayops:analytics.openWorkbench" }),
+    ).toBeInTheDocument();
+  });
+
+  it("opens the real service behind a hotspot", () => {
+    const onServiceOpen = vi.fn();
+    render(
+      <ReliabilityDashboard
+        data={data}
+        search={search}
+        services={[]}
+        canExport={false}
+        onSearchChange={vi.fn()}
+        onDrilldown={vi.fn()}
+        onExport={vi.fn()}
+        onServiceOpen={onServiceOpen}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Checkout" }));
+    expect(onServiceOpen).toHaveBeenCalledWith("service-1");
+  });
+
   it("keeps filters, chart drilldown and table alternative keyboard-accessible", () => {
     const onSearchChange = vi.fn();
     const onDrilldown = vi.fn();
@@ -110,16 +156,88 @@ describe("ReliabilityDashboard", () => {
     fireEvent.change(screen.getByLabelText("relayops:analytics.service"), {
       target: { value: "service-1" },
     });
-    expect(onSearchChange).toHaveBeenCalledWith(
-      expect.objectContaining({ service: ["service-1"] }),
-    );
     fireEvent.click(screen.getByLabelText("relayops:analytics.includeDemo"));
+    expect(onSearchChange).not.toHaveBeenCalled();
+    fireEvent.click(
+      screen.getByRole("button", { name: "relayops:catalog.apply" }),
+    );
     expect(onSearchChange).toHaveBeenCalledWith(
-      expect.objectContaining({ includeDemo: true }),
+      expect.objectContaining({ service: ["service-1"], includeDemo: true }),
     );
     expect(
-      screen.getByText("relayops:analytics.demoExcluded"),
+      screen.getByText("relayops:analytics.demoIncluded"),
     ).toBeInTheDocument();
+  });
+
+  it("keeps the focused date and draft through applied URL, loading and failure", () => {
+    const onSearchChange = vi.fn();
+    const props = {
+      search,
+      services: [],
+      canExport: false,
+      onSearchChange,
+      onDrilldown: vi.fn(),
+      onExport: vi.fn(),
+    };
+    const { rerender } = render(
+      <ReliabilityDashboard {...props} data={data} />,
+    );
+    const from = screen.getByLabelText("relayops:analytics.from");
+    from.focus();
+    fireEvent.change(from, { target: { value: "2026-03-04" } });
+    expect(onSearchChange).not.toHaveBeenCalled();
+    fireEvent.submit(from.closest("form") as HTMLFormElement);
+    const applied = { ...search, from: "2026-03-04" };
+    expect(onSearchChange).toHaveBeenCalledWith(applied);
+
+    // A later draft must survive arrival of this form's own submitted URL.
+    fireEvent.change(from, { target: { value: "2026-03-05" } });
+    rerender(<ReliabilityDashboard {...props} search={applied} loading />);
+    expect(screen.getByLabelText("relayops:analytics.from")).toBe(from);
+    expect(from).toHaveFocus();
+    expect(from).toHaveValue("2026-03-05");
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+
+    rerender(
+      <ReliabilityDashboard
+        {...props}
+        search={applied}
+        error={new Error("offline")}
+      />,
+    );
+    expect(screen.getByLabelText("relayops:analytics.from")).toBe(from);
+    expect(from).toHaveFocus();
+    expect(from).toHaveValue("2026-03-05");
+  });
+
+  it("synchronizes external URL changes without replacing filter controls", () => {
+    const props = {
+      data,
+      search,
+      services: [],
+      canExport: false,
+      onSearchChange: vi.fn(),
+      onDrilldown: vi.fn(),
+      onExport: vi.fn(),
+    };
+    const { rerender } = render(<ReliabilityDashboard {...props} />);
+    const from = screen.getByLabelText("relayops:analytics.from");
+    const demo = screen.getByLabelText("relayops:analytics.includeDemo");
+    fireEvent.change(from, { target: { value: "" } });
+    expect(from).toHaveValue("");
+    expect(props.onSearchChange).not.toHaveBeenCalled();
+    rerender(
+      <ReliabilityDashboard
+        {...props}
+        search={{ ...search, from: "2026-03-10", includeDemo: true }}
+      />,
+    );
+    expect(screen.getByLabelText("relayops:analytics.from")).toBe(from);
+    expect(from).toHaveValue("2026-03-10");
+    expect(demo).toBeChecked();
+    rerender(<ReliabilityDashboard {...props} />);
+    expect(from).toHaveValue(search.from);
+    expect(demo).not.toBeChecked();
   });
 
   it("has no automated axe violations and hides unauthorized export", async () => {

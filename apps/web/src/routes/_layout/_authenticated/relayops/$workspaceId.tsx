@@ -17,7 +17,7 @@ import {
   Server,
   Settings2,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import PageTitle from "@/components/page-title";
 import useAuth from "@/components/providers/auth-provider/hooks/use-auth";
@@ -51,6 +51,7 @@ import {
 } from "@/hooks/relayops/realtime-store";
 import { useRelayOpsCapability } from "@/hooks/relayops/use-relayops-capability";
 import { useUserWebSocket } from "@/hooks/use-user-websocket";
+import "@/components/relayops/signal-scene-motion.css";
 
 export const Route = createFileRoute(
   "/_layout/_authenticated/relayops/$workspaceId",
@@ -62,8 +63,66 @@ function RelayOpsShell() {
   const { t } = useTranslation();
   const pathname = useLocation({ select: (location) => location.pathname });
   const reduceMotion = useReducedMotion();
+  const mainRef = useRef<HTMLElement>(null);
+  const routeAnimation = useRef<Animation | null>(null);
+  const previousPath = useRef(pathname);
+  const navigationInput = useRef<"pointer" | "keyboard">("keyboard");
+  const [keyboardNavigation, setKeyboardNavigation] = useState(true);
   const { user } = useAuth();
   const [navigationOpen, setNavigationOpen] = useState(false);
+  useEffect(() => {
+    const pointer = () => {
+      navigationInput.current = "pointer";
+      setKeyboardNavigation(false);
+    };
+    const keyboard = () => {
+      navigationInput.current = "keyboard";
+      setKeyboardNavigation(true);
+    };
+    window.addEventListener("pointerdown", pointer, true);
+    window.addEventListener("keydown", keyboard, true);
+    return () => {
+      window.removeEventListener("pointerdown", pointer, true);
+      window.removeEventListener("keydown", keyboard, true);
+    };
+  }, []);
+  useEffect(() => {
+    if (previousPath.current === pathname) {
+      if (reduceMotion) routeAnimation.current?.cancel();
+      return;
+    }
+    previousPath.current = pathname;
+    setNavigationOpen(false);
+    const main = mainRef.current;
+    if (
+      reduceMotion ||
+      navigationInput.current === "keyboard" ||
+      !main?.animate
+    ) {
+      routeAnimation.current?.cancel();
+      return;
+    }
+    // Keep Outlet mounted: only the surface moves, without hiding fresh data
+    // or throwing away a nested route's form state just to replay an entrance.
+    const from =
+      routeAnimation.current?.playState === "running"
+        ? getComputedStyle(main).transform
+        : "translate3d(0, 6px, 0)";
+    routeAnimation.current?.cancel();
+    routeAnimation.current = main.animate(
+      [{ transform: from }, { transform: "translate3d(0, 0, 0)" }],
+      { duration: 200, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
+    );
+  }, [pathname, reduceMotion]);
+  useEffect(() => () => routeAnimation.current?.cancel(), []);
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 961px)");
+    const closeOnDesktop = () => {
+      if (desktop.matches) setNavigationOpen(false);
+    };
+    desktop.addEventListener("change", closeOnDesktop);
+    return () => desktop.removeEventListener("change", closeOnDesktop);
+  }, []);
   const { workspaceId } = Route.useParams();
   const workspace = useRelayOpsWorkspaceState(workspaceId);
   const fullWorkspace = useGetFullWorkspace({ workspaceId });
@@ -277,9 +336,11 @@ function RelayOpsShell() {
             {active ? (
               <motion.span
                 className="sbor-nav-indicator"
+                aria-hidden="true"
+                initial={false}
                 layoutId={mobile ? "mobile-navigation" : "desktop-navigation"}
                 transition={{
-                  duration: reduceMotion ? 0 : 0.22,
+                  duration: reduceMotion || keyboardNavigation ? 0 : 0.2,
                   ease: [0.23, 1, 0.32, 1],
                 }}
               />
@@ -413,23 +474,14 @@ function RelayOpsShell() {
             />
           </div>
         ) : null}
-        <motion.main
+        <main
           id="relayops-main"
+          ref={mainRef}
           tabIndex={-1}
           className="sbor-main"
-          key={pathname}
-          initial={{
-            opacity: 0,
-            transform: reduceMotion ? "none" : "translateY(10px)",
-          }}
-          animate={{ opacity: 1, transform: "none" }}
-          transition={{
-            duration: reduceMotion ? 0.12 : 0.26,
-            ease: [0.23, 1, 0.32, 1],
-          }}
         >
           <Outlet />
-        </motion.main>
+        </main>
         <footer className="sbor-footer">
           {t("relayops:shell.provenance")}
         </footer>

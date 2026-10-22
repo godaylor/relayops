@@ -6,23 +6,29 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove("light", "dark");
+    const applyTheme = (resolved: "light" | "dark") => {
+      root.classList.remove("light", "dark");
+      root.classList.add(resolved);
+      root.style.colorScheme = resolved;
+      document
+        .querySelector('meta[name="theme-color"]')
+        ?.setAttribute("content", resolved === "dark" ? "#101124" : "#f5f4fb");
+    };
 
     if (theme === "system") {
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
         .matches
         ? "dark"
         : "light";
-      root.classList.add(systemTheme);
+      applyTheme(systemTheme);
     } else {
-      root.classList.add(theme);
+      applyTheme(theme);
     }
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = (e: MediaQueryListEvent) => {
       if (theme === "system") {
-        root.classList.remove("light", "dark");
-        root.classList.add(e.matches ? "dark" : "light");
+        applyTheme(e.matches ? "dark" : "light");
       }
     };
 

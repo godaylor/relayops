@@ -1,0 +1,995 @@
+{
+	"date": "2026-10-22T21:34:09.090Z",
+	"browser": "155.0.8059.85",
+	"status": "passed",
+	"layouts": [
+		{
+			"theme": "light",
+			"width": 320,
+			"route": "overview",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 320,
+			"route": "incidents",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 320,
+			"route": "services",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 320,
+			"route": "board",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 320,
+			"route": "analytics",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 320,
+			"route": "team",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 320,
+			"route": "room",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 320,
+			"route": "service",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 360,
+			"route": "overview",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 360,
+			"route": "incidents",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 360,
+			"route": "services",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 360,
+			"route": "board",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 360,
+			"route": "analytics",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 360,
+			"route": "team",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 360,
+			"route": "room",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 360,
+			"route": "service",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 390,
+			"route": "overview",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 390,
+			"route": "incidents",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 390,
+			"route": "services",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 390,
+			"route": "board",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 390,
+			"route": "analytics",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 390,
+			"route": "team",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 390,
+			"route": "room",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 390,
+			"route": "service",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 768,
+			"route": "overview",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 768,
+			"route": "incidents",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 768,
+			"route": "services",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 768,
+			"route": "board",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 768,
+			"route": "analytics",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 768,
+			"route": "team",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 768,
+			"route": "room",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 768,
+			"route": "service",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1024,
+			"route": "overview",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1024,
+			"route": "incidents",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1024,
+			"route": "services",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1024,
+			"route": "board",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1024,
+			"route": "analytics",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1024,
+			"route": "team",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1024,
+			"route": "room",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1024,
+			"route": "service",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1440,
+			"route": "overview",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1440,
+			"route": "incidents",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1440,
+			"route": "services",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1440,
+			"route": "board",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1440,
+			"route": "analytics",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1440,
+			"route": "team",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1440,
+			"route": "room",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1440,
+			"route": "service",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1920,
+			"route": "overview",
+			"root": 0,
+			"shell": 0,
+			"main": -17
+		},
+		{
+			"theme": "light",
+			"width": 1920,
+			"route": "incidents",
+			"root": 0,
+			"shell": 0,
+			"main": -17
+		},
+		{
+			"theme": "light",
+			"width": 1920,
+			"route": "services",
+			"root": 0,
+			"shell": 0,
+			"main": -17
+		},
+		{
+			"theme": "light",
+			"width": 1920,
+			"route": "board",
+			"root": 0,
+			"shell": 0,
+			"main": -17
+		},
+		{
+			"theme": "light",
+			"width": 1920,
+			"route": "analytics",
+			"root": 0,
+			"shell": 0,
+			"main": -17
+		},
+		{
+			"theme": "light",
+			"width": 1920,
+			"route": "team",
+			"root": 0,
+			"shell": 0,
+			"main": -17
+		},
+		{
+			"theme": "light",
+			"width": 1920,
+			"route": "room",
+			"root": 0,
+			"shell": 0,
+			"main": -17
+		},
+		{
+			"theme": "light",
+			"width": 1920,
+			"route": "service",
+			"root": 0,
+			"shell": 0,
+			"main": -17
+		},
+		{
+			"theme": "dark",
+			"width": 320,
+			"route": "overview",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 320,
+			"route": "incidents",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 320,
+			"route": "services",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 320,
+			"route": "board",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 320,
+			"route": "analytics",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 320,
+			"route": "team",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 320,
+			"route": "room",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 320,
+			"route": "service",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 360,
+			"route": "overview",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 360,
+			"route": "incidents",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 360,
+			"route": "services",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 360,
+			"route": "board",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 360,
+			"route": "analytics",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 360,
+			"route": "team",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 360,
+			"route": "room",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 360,
+			"route": "service",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 390,
+			"route": "overview",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 390,
+			"route": "incidents",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 390,
+			"route": "services",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 390,
+			"route": "board",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 390,
+			"route": "analytics",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 390,
+			"route": "team",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 390,
+			"route": "room",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 390,
+			"route": "service",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 768,
+			"route": "overview",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 768,
+			"route": "incidents",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 768,
+			"route": "services",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 768,
+			"route": "board",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 768,
+			"route": "analytics",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 768,
+			"route": "team",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 768,
+			"route": "room",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 768,
+			"route": "service",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1024,
+			"route": "overview",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1024,
+			"route": "incidents",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1024,
+			"route": "services",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1024,
+			"route": "board",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1024,
+			"route": "analytics",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1024,
+			"route": "team",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1024,
+			"route": "room",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1024,
+			"route": "service",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1440,
+			"route": "overview",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1440,
+			"route": "incidents",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1440,
+			"route": "services",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1440,
+			"route": "board",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1440,
+			"route": "analytics",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1440,
+			"route": "team",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1440,
+			"route": "room",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1440,
+			"route": "service",
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1920,
+			"route": "overview",
+			"root": 0,
+			"shell": 0,
+			"main": -17
+		},
+		{
+			"theme": "dark",
+			"width": 1920,
+			"route": "incidents",
+			"root": 0,
+			"shell": 0,
+			"main": -17
+		},
+		{
+			"theme": "dark",
+			"width": 1920,
+			"route": "services",
+			"root": 0,
+			"shell": 0,
+			"main": -17
+		},
+		{
+			"theme": "dark",
+			"width": 1920,
+			"route": "board",
+			"root": 0,
+			"shell": 0,
+			"main": -17
+		},
+		{
+			"theme": "dark",
+			"width": 1920,
+			"route": "analytics",
+			"root": 0,
+			"shell": 0,
+			"main": -17
+		},
+		{
+			"theme": "dark",
+			"width": 1920,
+			"route": "team",
+			"root": 0,
+			"shell": 0,
+			"main": -17
+		},
+		{
+			"theme": "dark",
+			"width": 1920,
+			"route": "room",
+			"root": 0,
+			"shell": 0,
+			"main": -17
+		},
+		{
+			"theme": "dark",
+			"width": 1920,
+			"route": "service",
+			"root": 0,
+			"shell": 0,
+			"main": -17
+		}
+	],
+	"accessibility": [
+		{
+			"name": "overview-light",
+			"violations": []
+		},
+		{
+			"name": "services-light",
+			"violations": []
+		},
+		{
+			"name": "analytics-light",
+			"violations": []
+		},
+		{
+			"name": "team-light",
+			"violations": []
+		},
+		{
+			"name": "room-light",
+			"violations": []
+		},
+		{
+			"name": "overview-dark",
+			"violations": []
+		},
+		{
+			"name": "services-dark",
+			"violations": []
+		},
+		{
+			"name": "analytics-dark",
+			"violations": []
+		},
+		{
+			"name": "team-dark",
+			"violations": []
+		},
+		{
+			"name": "room-dark",
+			"violations": []
+		},
+		{
+			"name": "entry-desktop",
+			"violations": []
+		},
+		{
+			"name": "entry-mobile",
+			"violations": []
+		}
+	],
+	"errors": [],
+	"failedRequests": [],
+	"screenshots": [
+		"after-overview-mobile-light.png",
+		"after-incidents-mobile-light.png",
+		"after-services-mobile-light.png",
+		"after-board-mobile-light.png",
+		"after-analytics-mobile-light.png",
+		"after-team-mobile-light.png",
+		"after-room-mobile-light.png",
+		"after-room-history-mobile-light.png",
+		"after-service-mobile-light.png",
+		"after-overview-desktop-light.png",
+		"after-incidents-desktop-light.png",
+		"after-services-desktop-light.png",
+		"after-board-desktop-light.png",
+		"after-analytics-desktop-light.png",
+		"after-team-desktop-light.png",
+		"after-room-desktop-light.png",
+		"after-service-desktop-light.png",
+		"after-overview-mobile-dark.png",
+		"after-incidents-mobile-dark.png",
+		"after-services-mobile-dark.png",
+		"after-board-mobile-dark.png",
+		"after-analytics-mobile-dark.png",
+		"after-team-mobile-dark.png",
+		"after-room-mobile-dark.png",
+		"after-room-history-mobile-dark.png",
+		"after-service-mobile-dark.png",
+		"after-overview-desktop-dark.png",
+		"after-incidents-desktop-dark.png",
+		"after-services-desktop-dark.png",
+		"after-board-desktop-dark.png",
+		"after-analytics-desktop-dark.png",
+		"after-team-desktop-dark.png",
+		"after-room-desktop-dark.png",
+		"after-service-desktop-dark.png",
+		"after-entry-desktop.png",
+		"after-entry-mobile.png"
+	],
+	"states": {},
+	"motion": {}
+}

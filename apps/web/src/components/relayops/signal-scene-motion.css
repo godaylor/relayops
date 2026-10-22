@@ -1,0 +1,79 @@
+/* One interruptible story surface: all stages remain mounted while crossfading. */
+.signal-scene .signal-story-card {
+  animation: none;
+  min-height: 94px;
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+  pointer-events: none;
+  transition: opacity 240ms var(--ease-out), transform 240ms var(--ease-out);
+}
+.signal-scene .signal-story-card[data-active="true"] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+.signal-scene[data-story-transition="false"] .signal-story-card { transition: none; }
+.signal-scene .signal-scene-top { right: 76px; }
+.signal-scene .signal-motion-toggle {
+  position: absolute;
+  z-index: 6;
+  right: 18px;
+  top: 16px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: #eeeaff;
+  background: #141832b3;
+  border: 1px solid #ffffff30;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease;
+}
+.signal-scene.is-compact .signal-motion-toggle { top: 10px; right: 10px; }
+.signal-scene .signal-motion-toggle:focus-visible,
+.signal-scene .signal-progress > button:focus-visible { outline: 2px solid #eeeaff; outline-offset: 3px; }
+.signal-scene .signal-progress { bottom: 33px; gap: 6px; border: 0; min-inline-size: 0; margin: 0; padding: 0; }
+.signal-scene .signal-progress > button {
+  min-width: 0;
+  flex: 1;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+}
+.signal-scene .signal-progress > button > span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  flex: 1;
+  transition: background-color 160ms ease;
+}
+.signal-scene .signal-progress > button > span[data-active="true"]::after { animation-duration: 3600ms; }
+.signal-scene[data-motion-running="false"] :is(.signal-art-depth, .signal-trails path, .signal-traveler),
+.signal-scene[data-motion-running="false"] .signal-progress span[data-active="true"]::after { animation-play-state: paused; }
+.signal-scene[data-motion-running="false"] .signal-sculpture { will-change: auto; }
+.sbor-navigation .sbor-nav-indicator { pointer-events: none; }
+@media (hover: hover) and (pointer: fine) {
+  .signal-scene .signal-motion-toggle:hover { color: #fff; background: #32365acc; border-color: #ffffff65; }
+  .signal-scene .signal-progress > button:hover > span { background: #ffffff50; }
+}
+@media (max-width: 700px) {
+  .sbor-auth-hero .signal-motion-toggle { top: auto; bottom: 10px; right: 14px; }
+  .sbor-auth-hero .signal-scene-top { right: 68px; }
+  /* The existing mobile composition hides its story cards, so hide their controls too. */
+  .sbor-auth-hero .signal-progress { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .signal-scene .signal-story-card { transform: none; transition: opacity 120ms var(--ease-out); }
+  .signal-scene .signal-motion-toggle { display: none; }
+  .signal-scene .signal-progress span[data-active="true"] { background: #a79aff; }
+}
+@media (forced-colors: active) {
+  .signal-scene .signal-motion-toggle { color: ButtonText; background: ButtonFace; border: 1px solid ButtonText; }
+  .signal-scene .signal-progress > button > span { background: GrayText; }
+  .signal-scene .signal-progress > button[aria-pressed="true"] > span { background: Highlight; }
+}

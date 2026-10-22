@@ -1,0 +1,188 @@
+/* Service and reliability surfaces share the shell's operational palette. */
+.sbor-surface-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--sb-line);
+}
+.sbor-surface-header > div { min-width: 0; }
+.sbor-surface-header > div > p:first-child { color: var(--sb-accent); font: 11px var(--font-mono); letter-spacing: .12em; }
+.sbor-surface-header h1 { max-width: 880px; margin-top: 12px; text-wrap: balance; }
+.sbor-surface-header > div > p:last-child { max-width: 650px; margin-top: 12px; color: var(--sb-muted); font-size: 14px; line-height: 1.75; }
+.sbor-surface-header > [data-slot="button"] { min-height: 42px; flex-shrink: 0; }
+.sbor-surface-empty { border-style: dashed; border-radius: 18px; }
+.sbor-service-create { border-radius: 16px; transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out); }
+@starting-style { .sbor-service-create { opacity: 0; transform: translateY(-8px); } }
+.sbor-service-search form { gap: 12px; padding: 14px; }
+.sbor-services .sbor-service-search :is(input, select, [data-slot="button"]) { min-height: 44px; height: 44px; font-size: 13px; }
+.sbor-service-search :is(input, select) { width: 100%; min-width: 0; }
+.sbor-service-search select { background: var(--sb-surface); color: var(--sb-ink); }
+.sbor-service-results-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+.sbor-service-results-heading h2 { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
+.sbor-service-results-heading h2 > span { display: grid; place-items: center; min-width: 26px; height: 26px; padding-inline: 6px; border: 1px solid var(--sb-line); border-radius: 7px; background: var(--sb-surface); font: 11px var(--font-mono); color: var(--sb-muted); }
+.sbor-service-health-summary { display: flex; flex-wrap: wrap; gap: 12px 20px; }
+.sbor-service-health-summary > span { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--sb-muted); }
+.sbor-service-health-summary strong { margin-left: 1px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--sb-ink); }
+.sbor-service-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 18px; }
+.sbor-service-grid > li { min-width: 0; display: flex; }
+.sbor-service-card {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  padding: 22px;
+  border: 1px solid var(--sb-line);
+  border-radius: 17px;
+  background: var(--sb-surface);
+  box-shadow: var(--sb-shadow);
+  transition: transform 200ms var(--ease-out), border-color 160ms ease, box-shadow 200ms ease;
+}
+.sbor-service-card::before { content: ""; position: absolute; top: 23px; left: -1px; width: 3px; height: 30px; border-radius: 0 3px 3px 0; background: var(--sa-health); }
+[data-health="operational"] { --sa-health: #258568; }
+[data-health="degraded"] { --sa-health: #b67a2e; }
+[data-health="major_outage"] { --sa-health: #c34f65; }
+[data-health="maintenance"] { --sa-health: #7665d4; }
+.dark [data-health="operational"] { --sa-health: #82cfb4; }
+.dark [data-health="degraded"] { --sa-health: #e4b77c; }
+.dark [data-health="major_outage"] { --sa-health: #ee9bad; }
+.dark [data-health="maintenance"] { --sa-health: #b5a8f6; }
+.sbor-health-dot { display: inline-block; width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%; background: var(--sa-health, currentColor); }
+.sbor-service-card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 25px; }
+.sbor-service-symbol { display: grid; place-items: center; width: 42px; height: 42px; flex-shrink: 0; border-radius: 13px; border: 1px solid var(--sb-line); background: var(--sb-soft); color: var(--sb-accent); }
+.sbor-app .sbor-service-card [data-slot="badge"] { font-size: 11px; min-height: 25px; border: 0; gap: 6px; padding: 4px 8px; }
+.sbor-service-card-title { display: flex; align-items: flex-start; gap: 8px; min-width: 0; }
+.sbor-service-card-title h3 { overflow-wrap: anywhere; font-size: 18px; font-weight: 600; letter-spacing: -.025em; line-height: 1.35; }
+.sbor-service-card-title > svg { flex-shrink: 0; margin-top: 4px; color: var(--sb-muted); }
+.sbor-service-slug { margin-top: 6px; color: var(--sb-muted); font: 11px/1.6 var(--font-mono); overflow-wrap: anywhere; }
+.sbor-service-description { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; min-height: 44px; margin-top: 17px; color: var(--sb-muted); font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+.sbor-service-card-facts { display: grid; gap: 13px; margin-top: 24px; margin-bottom: 24px; }
+.sbor-service-card-facts > div { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; min-width: 0; }
+.sbor-service-card-facts dt { display: flex; align-items: center; gap: 7px; color: var(--sb-muted); font-size: 12px; flex-shrink: 0; }
+.sbor-service-card-facts dd { min-width: 0; text-align: right; color: var(--sb-ink); font-size: 12px; overflow-wrap: anywhere; }
+.sbor-service-card-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: auto; border-top: 1px solid var(--sb-line); padding-top: 16px; color: var(--sb-muted); }
+.sbor-service-card-footer > span { display: grid; gap: 3px; font-size: 10px; }
+.sbor-service-card-footer time { font-size: 11px; }
+.sbor-service-card-footer > svg { flex-shrink: 0; color: var(--sb-accent); transition: transform 160ms var(--ease-out); }
+.sbor-service-detail { width: 100%; }
+.sbor-service-profile { overflow: hidden; border-radius: 20px; box-shadow: var(--sb-shadow); }
+.sbor-service-profile h1 { overflow-wrap: anywhere; }
+.sbor-service-profile > div:first-child p { overflow-wrap: anywhere; }
+.sbor-service-profile-status { display: flex; align-items: center; gap: 7px; margin-top: 13px; color: var(--sa-health); font-size: 13px; font-weight: 550; }
+.sbor-service-profile-facts { gap: 20px; }
+.sbor-service-profile-facts > div { min-width: 0; }
+.sbor-service-profile-facts dt { text-transform: none; font-size: 12px; letter-spacing: 0; line-height: 1.6; }
+.sbor-service-profile-facts dd { margin-top: 7px; font-size: 14px; overflow-wrap: anywhere; }
+.sbor-service-profile-content h2 { font-size: 14px; font-weight: 600; }
+.sbor-service-profile-content p { font-size: 14px; line-height: 1.8; }
+.sbor-service-links > a { min-height: 46px; gap: 16px; border-color: var(--sb-line); border-radius: 10px; background: var(--sb-soft); transition: background-color 160ms ease, border-color 160ms ease; }
+.sbor-service-links > a > svg { flex-shrink: 0; }
+.sbor-service-workbench-link { display: flex; gap: 12px; align-items: center; margin-top: 28px; border-top: 1px solid var(--sb-line); padding-top: 22px; color: var(--sb-accent); }
+.sbor-service-workbench-link > a { display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: 13px; font-weight: 550; }
+.sbor-service-workbench-link > svg { flex-shrink: 0; }
+.sbor-analytics :is(section, article, header) { min-width: 0; }
+.sbor-analytics :is(input, select) { min-width: 0; min-height: 44px; color: var(--sb-ink); background: var(--sb-surface); font-size: 13px; }
+.sbor-reliability-filters { border-color: var(--sb-line); border-radius: 16px; background: var(--sb-surface); padding: 20px; }
+.sbor-reliability-filters h2 { font-size: 14px; }
+.sbor-reliability-filters [data-slot="field-label"] { color: var(--sb-muted); font-size: 12px; }
+.sbor-reliability-filters label:has(input[type="checkbox"]) { min-height: 44px; font-size: 12px; }
+.sbor-reliability-filters > div:nth-child(2) { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.sbor-reliability-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.sbor-reliability-metric { position: relative; min-width: 0; padding: 22px; border: 1px solid var(--sb-line); border-radius: 15px; background: var(--sb-surface); }
+.sbor-reliability-metric[data-primary="true"] { box-shadow: var(--sb-shadow); }
+.sbor-reliability-metric[data-primary="false"] { background: color-mix(in srgb, var(--sb-surface) 65%, transparent); }
+.sbor-reliability-metric-icon { display: grid; place-items: center; width: 34px; height: 34px; margin-bottom: 18px; color: var(--sb-accent); background: var(--sb-accent-soft); border-radius: 10px; }
+.sbor-reliability-metric[data-primary="false"] .sbor-reliability-metric-icon { color: var(--sb-muted); background: var(--sb-soft); }
+.sbor-reliability-metric-label { color: var(--sb-muted); font-size: 12px; font-weight: 500; line-height: 1.6; }
+.sbor-reliability-metric-value { margin-top: 9px; font-size: clamp(28px, 3vw, 40px); font-weight: 550; letter-spacing: -.06em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.sbor-reliability-metric-detail { margin-top: 6px; color: var(--sb-muted); font-size: 12px; line-height: 1.6; }
+.sbor-analytics details { border-color: var(--sb-line); border-radius: 12px; background: transparent; }
+.sbor-analytics details > summary { min-height: 28px; font-size: 13px; }
+.sbor-analytics details > p { color: var(--sb-muted); line-height: 1.8; font-size: 13px; }
+.sbor-reliability-charts { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(260px, .8fr); gap: 20px; }
+.sbor-volume-panel { overflow: hidden; padding: 24px; border: 1px solid var(--sb-line); border-radius: 18px; background: var(--sb-surface); }
+.sbor-volume-panel > h2, .sbor-hotspots-panel > h2 { font-size: 18px; font-weight: 550; letter-spacing: -.03em; }
+.sbor-volume-panel > p { max-width: 460px; margin-top: 8px; color: var(--sb-muted); font-size: 12px; line-height: 1.7; }
+.sbor-volume-chart { margin-top: 24px; overflow-x: auto; overscroll-behavior-inline: contain; scrollbar-width: thin; }
+.sbor-volume-columns { display: flex; align-items: flex-end; gap: 3px; min-height: 220px; padding-block: 4px 10px; }
+.sbor-volume-columns > li { display: flex; flex: 1; min-width: 48px; }
+.sbor-volume-bucket { display: flex; flex-direction: column; justify-content: flex-end; gap: 12px; width: 100%; min-height: 212px; padding: 5px 3px; border-radius: 8px; transition: background-color 140ms ease; }
+.sbor-volume-track { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 7px; width: 100%; min-height: 180px; padding-inline: 4px; border-bottom: 1px solid var(--sb-line); }
+.sbor-volume-value { color: var(--sb-ink); font: 11px var(--font-mono); }
+.sbor-volume-bar { display: block; width: 100%; max-width: 35px; border-radius: 5px 5px 0 0; background: linear-gradient(180deg, #8b7af3, var(--sb-accent)); transform-origin: bottom; transition: opacity 150ms ease; }
+.sbor-volume-bucket[data-empty="true"] .sbor-volume-bar { background: var(--sb-line); }
+.sbor-volume-bucket[data-empty="true"] .sbor-volume-value { color: var(--sb-muted); }
+.sbor-volume-bucket > time { align-self: center; white-space: nowrap; color: var(--sb-muted); font-size: 10px; }
+.sbor-volume-empty { display: grid; place-content: center; justify-items: center; gap: 17px; min-height: 234px; margin-top: 20px; padding: 24px; border: 1px dashed var(--sb-line); border-radius: 12px; color: var(--sb-muted); text-align: center; }
+.sbor-volume-empty > svg { color: var(--sb-accent); }
+.sbor-volume-empty > p { max-width: 320px; font-size: 13px; line-height: 1.8; }
+.sbor-hotspots-panel { overflow: hidden; padding: 24px; border: 1px solid #ffffff12; border-radius: 18px; background: #171a35; color: #f5f4ff; }
+.sbor-hotspots-panel > p:first-child { font: 10px/1.6 var(--font-mono); letter-spacing: .08em; color: #b9aef9; }
+.sbor-hotspots-panel > p:not(:first-child) { color: #bdc0d8; font-size: 12px; line-height: 1.75; }
+.sbor-hotspots-panel ol > li { grid-template-columns: 20px minmax(0, 1fr) auto; gap: 10px; }
+.sbor-hotspot-service { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; min-height: 44px; text-align: left; font-size: 13px; font-weight: 500; line-height: 1.6; overflow-wrap: anywhere; }
+.sbor-hotspot-service > svg { flex-shrink: 0; opacity: .5; transition: opacity 150ms ease, transform 160ms var(--ease-out); }
+.sbor-hotspots-empty { display: grid; justify-items: start; gap: 16px; margin-top: 30px; padding-top: 22px; border-top: 1px solid #ffffff14; color: #bdc0d8; }
+.sbor-hotspots-empty > p { font-size: 13px; line-height: 1.8; }
+.sbor-reliability-table { border-color: var(--sb-line); padding: 24px; border-radius: 18px; background: var(--sb-surface); }
+.sbor-reliability-table h2 { font-size: 18px; }
+.sbor-reliability-table > p { color: var(--sb-muted); font-size: 12px; line-height: 1.8; }
+.sbor-reliability-table table { font-size: 12px; }
+.sbor-reliability-table th { color: var(--sb-muted); }
+.sbor-reliability-table td { color: var(--sb-ink); }
+.sbor-reliability-table time { white-space: nowrap; font-family: var(--font-sans); }
+.sbor-reliability-table [data-slot="button"] { min-height: 40px; font-size: 12px; }
+@media (hover: hover) and (pointer: fine) {
+  .sbor-service-card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--sb-accent) 36%, var(--sb-line)); box-shadow: 0 14px 34px #1a174310; }
+  .sbor-service-card:hover .sbor-service-card-footer > svg { transform: translateX(3px); }
+  .sbor-volume-bucket:hover { background: var(--sb-accent-soft); }
+  .sbor-hotspot-service:hover > svg { opacity: 1; transform: translate(2px, -2px); }
+}
+@media (max-width: 1150px) {
+  .sbor-reliability-charts { grid-template-columns: minmax(0, 1fr); }
+  .sbor-hotspots-panel { min-height: 210px; }
+}
+@media (max-width: 700px) {
+  .sbor-surface-header { flex-direction: column; align-items: stretch; gap: 20px; padding-bottom: 22px; }
+  .sbor-surface-header > [data-slot="button"] { align-self: flex-start; min-height: 44px; }
+  .sbor-surface-header > div > p:last-child { font-size: 13px; }
+  .sbor-service-search form { padding: 12px; }
+  .sbor-service-search form > [data-slot="button"] { width: 100%; }
+  .sbor-service-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .sbor-service-card { padding: 20px; }
+  .sbor-service-card-top { margin-bottom: 20px; }
+  .sbor-service-card-facts dt, .sbor-service-card-facts dd { font-size: 12px; }
+  .sbor-service-profile { border-radius: 16px; }
+  .sbor-service-profile > div:first-child > div:last-child { gap: 8px; }
+  .sbor-service-profile [data-slot="button"] { min-height: 44px; font-size: 12px; }
+  .sbor-service-profile-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sbor-service-profile-facts dd { font-size: 13px; }
+  .sbor-reliability-filters { padding: 16px; }
+  .sbor-reliability-filters > div:nth-child(2) { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; }
+  .sbor-reliability-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .sbor-reliability-metric { padding: 17px 14px; border-radius: 13px; }
+  .sbor-reliability-metric-label { font-size: 11px; }
+  .sbor-reliability-metric-value { font-size: 28px; letter-spacing: -.05em; }
+  .sbor-reliability-metric-detail { font-size: 11px; }
+  .sbor-volume-panel, .sbor-hotspots-panel, .sbor-reliability-table { padding: 20px 16px; border-radius: 16px; }
+  .sbor-reliability-table [data-slot="button"] { min-height: 44px; }
+}
+@media (max-width: 374px) {
+  .sbor-service-card-facts > div { flex-direction: column; gap: 5px; }
+  .sbor-service-card-facts dd { text-align: left; margin-left: 21px; }
+  .sbor-reliability-filters > div:nth-child(2) { grid-template-columns: minmax(0, 1fr); }
+  .sbor-reliability-metric { padding-inline: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sbor-service-create { transform: none; transition-property: opacity; transition-duration: 120ms; }
+  .sbor-service-card { transition-property: border-color, box-shadow; }
+  .sbor-service-card:hover, .sbor-service-card:hover .sbor-service-card-footer > svg, .sbor-hotspot-service:hover > svg { transform: none; }
+  .sbor-service-card-footer > svg, .sbor-hotspot-service > svg { transition-property: opacity; }
+}
+@media (forced-colors: active) {
+  .sbor-service-card::before, .sbor-health-dot, .sbor-volume-bar { background: CanvasText; }
+  .sbor-hotspots-panel { border-color: CanvasText; background: Canvas; color: CanvasText; }
+  .sbor-hotspots-panel :is(p, span) { color: CanvasText; }
+}

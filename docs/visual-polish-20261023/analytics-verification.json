@@ -1,0 +1,70 @@
+{
+	"date": "2026-10-22T21:51:48.908Z",
+	"baseURL": "http://127.0.0.1:32045",
+	"status": "passed",
+	"localTestData": true,
+	"cases": [
+		{
+			"name": "draft-and-incomplete-date-do-not-fetch",
+			"status": "passed",
+			"requestsBefore": 1,
+			"requestsAfter": 1
+		},
+		{
+			"name": "delayed-query-keeps-focused-submit-and-values-without-stale-metrics",
+			"status": "passed"
+		},
+		{
+			"name": "later-draft-survives-response",
+			"status": "passed"
+		},
+		{
+			"name": "browser-back-forward-synchronizes-controls",
+			"status": "passed"
+		},
+		{
+			"name": "external-url-loads-authoritative-filters",
+			"status": "passed"
+		}
+	],
+	"layouts": [
+		{
+			"theme": "light",
+			"width": 320,
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "light",
+			"width": 1440,
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 320,
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		},
+		{
+			"theme": "dark",
+			"width": 1440,
+			"root": 0,
+			"shell": 0,
+			"main": -10
+		}
+	],
+	"screenshots": [
+		"analytics-submit-320-light.png",
+		"analytics-submit-1440-light.png",
+		"analytics-submit-320-dark.png",
+		"analytics-submit-1440-dark.png"
+	],
+	"pageErrors": [],
+	"failedResponses": [],
+	"browser": "155.0.8059.85",
+	"completedAt": "2026-10-22T21:51:52.419Z"
+}

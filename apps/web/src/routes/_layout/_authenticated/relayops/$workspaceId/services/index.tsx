@@ -1,33 +1,39 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
+  Activity,
   Archive,
   ArrowRight,
   FilterX,
   Plus,
-  Search,
   Server,
+  UsersRound,
 } from "lucide-react";
-import { type FormEvent, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   RelayOpsErrorState,
   RelayOpsSkeleton,
 } from "@/components/relayops/route-state";
+import {
+  ServiceCatalogFilters,
+  type ServiceCatalogSearch,
+} from "@/components/relayops/service-catalog-filters";
 import { ServiceForm } from "@/components/relayops/service-form";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   useCreateRelayOpsService,
   useRelayOpsServices,
   useRelayOpsTeams,
 } from "@/hooks/queries/relayops/use-relayops";
 import { useRelayOpsCapability } from "@/hooks/relayops/use-relayops-capability";
+import {
+  formatRelayOpsDateTime,
+  getRelayOpsLocale,
+} from "@/lib/relayops-format";
+import "@/components/relayops/service-analytics.css";
 
-type ServiceSearch = {
-  q?: string;
-  status: "active" | "archived" | "all";
-};
+type ServiceSearch = ServiceCatalogSearch;
 
 export function parseServiceSearch(
   search: Record<string, unknown>,
@@ -76,34 +82,21 @@ function ServiceCatalog() {
     workspaceId,
   );
 
-  if (services.isLoading || teams.isLoading)
-    return <RelayOpsSkeleton rows={8} />;
   const error = services.error || teams.error;
-  if (error || !services.data || !teams.data) {
-    return (
-      <RelayOpsErrorState
-        error={error}
-        onRetry={() => {
-          void services.refetch();
-          void teams.refetch();
-        }}
-      />
-    );
-  }
-
-  function applyFilters(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const q = String(form.get("q") || "").trim() || undefined;
-    const status = String(form.get("status")) as ServiceSearch["status"];
-    void navigate({ search: { q, status }, replace: true });
-  }
-
+  const items = services.data ?? [];
   const filtered = Boolean(search.q) || search.status !== "active";
+  const count = new Intl.NumberFormat(getRelayOpsLocale());
+  const healthCounts = items.reduce(
+    (counts, service) => {
+      counts[service.health]++;
+      return counts;
+    },
+    { operational: 0, degraded: 0, major_outage: 0, maintenance: 0 },
+  );
 
   return (
     <div className="sbor-services space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+      <header className="sbor-surface-header">
         <div>
           <p className="font-mono text-[#6757ec] text-xs tracking-[0.16em] dark:text-[#b3a5ff]">
             {t("relayops:catalog.eyebrow")}
@@ -116,16 +109,24 @@ function ServiceCatalog() {
           </p>
         </div>
         {!canCreateService.isCheckingPermissions && canCreateService.allowed ? (
-          <Button onClick={() => setShowCreate((value) => !value)}>
-            <Plus className="size-4" />
-            {t("relayops:catalog.create")}
+          <Button
+            aria-expanded={showCreate}
+            aria-controls="create-service-panel"
+            disabled={teams.isLoading || Boolean(teams.error)}
+            onClick={() => setShowCreate((value) => !value)}
+          >
+            <Plus className="size-4" aria-hidden="true" />
+            {showCreate
+              ? t("common:actions.cancel")
+              : t("relayops:catalog.create")}
           </Button>
         ) : null}
-      </div>
+      </header>
 
       {showCreate ? (
         <section
-          className="rounded-lg border border-[#6757ec]/25 bg-white p-5 dark:bg-[#1a1c35] sm:p-6"
+          id="create-service-panel"
+          className="sbor-service-create rounded-lg border border-[#6757ec]/25 bg-white p-5 dark:bg-[#1a1c35] sm:p-6"
           aria-labelledby="create-service-title"
         >
           <h2 id="create-service-title" className="font-semibold text-xl">
@@ -135,7 +136,7 @@ function ServiceCatalog() {
             {t("relayops:catalog.createDescription")}
           </p>
           <ServiceForm
-            teams={teams.data}
+            teams={teams.data ?? []}
             pending={createService.isPending}
             error={createService.error}
             submitLabel={t("relayops:service.submit")}
@@ -151,43 +152,23 @@ function ServiceCatalog() {
         </section>
       ) : null}
 
-      <search>
-        <form
-          className="grid gap-3 rounded-lg border border-[#1b1d36]/10 bg-white p-3 dark:border-white/10 dark:bg-[#1a1c35] sm:grid-cols-[minmax(14rem,1fr)_12rem_auto]"
-          onSubmit={applyFilters}
-        >
-          <label className="relative" htmlFor="relayops-service-search">
-            <span className="sr-only">{t("relayops:catalog.searchLabel")}</span>
-            <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              id="relayops-service-search"
-              name="q"
-              defaultValue={search.q ?? ""}
-              placeholder={t("relayops:catalog.searchPlaceholder")}
-              className="min-h-11 pl-9"
-            />
-          </label>
-          <label htmlFor="relayops-service-status">
-            <span className="sr-only">{t("relayops:catalog.statusLabel")}</span>
-            <select
-              id="relayops-service-status"
-              name="status"
-              defaultValue={search.status}
-              className="min-h-11 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6757ec]"
-            >
-              <option value="active">{t("relayops:catalog.active")}</option>
-              <option value="archived">{t("relayops:catalog.archived")}</option>
-              <option value="all">{t("relayops:catalog.all")}</option>
-            </select>
-          </label>
-          <Button type="submit" size="lg">
-            {t("relayops:catalog.apply")}
-          </Button>
-        </form>
-      </search>
+      <ServiceCatalogFilters
+        search={search}
+        onApply={(next) => void navigate({ search: next, replace: true })}
+      />
 
-      {services.data.length === 0 ? (
-        <section className="grid min-h-72 place-items-center rounded-lg border border-[#1b1d36]/10 bg-white p-8 text-center dark:border-white/10 dark:bg-[#1a1c35]">
+      {services.isLoading || teams.isLoading ? (
+        <RelayOpsSkeleton rows={4} />
+      ) : error || !services.data || !teams.data ? (
+        <RelayOpsErrorState
+          error={error}
+          onRetry={() => {
+            void services.refetch();
+            void teams.refetch();
+          }}
+        />
+      ) : items.length === 0 ? (
+        <section className="sbor-surface-empty grid min-h-72 place-items-center rounded-lg border border-[#1b1d36]/10 bg-white p-8 text-center dark:border-white/10 dark:bg-[#1a1c35]">
           <div className="max-w-md">
             {filtered ? (
               <FilterX className="mx-auto size-9 text-muted-foreground" />
@@ -214,92 +195,101 @@ function ServiceCatalog() {
               >
                 {t("relayops:catalog.clearFilters")}
               </Button>
+            ) : canCreateService.allowed ? (
+              <Button className="mt-5" onClick={() => setShowCreate(true)}>
+                <Plus className="size-4" aria-hidden="true" />
+                {t("relayops:catalog.create")}
+              </Button>
             ) : null}
           </div>
         </section>
       ) : (
-        <section aria-label={t("relayops:catalog.results")}>
-          <div className="hidden overflow-hidden rounded-lg border border-[#1b1d36]/10 bg-white dark:border-white/10 dark:bg-[#1a1c35] md:block">
-            <div className="grid grid-cols-[minmax(16rem,1fr)_8rem_10rem_12rem_2rem] gap-4 border-b bg-[#eeedf8]/45 px-5 py-3 font-medium text-xs uppercase tracking-wide dark:bg-white/5">
-              <span>{t("relayops:catalog.columnService")}</span>
-              <span>{t("relayops:catalog.columnTier")}</span>
-              <span>{t("relayops:catalog.columnHealth")}</span>
-              <span>{t("relayops:catalog.columnOwner")}</span>
-              <span className="sr-only">{t("relayops:catalog.open")}</span>
+        <section
+          className="sbor-service-results"
+          aria-label={t("relayops:catalog.results")}
+        >
+          <div className="sbor-service-results-heading">
+            <h2>
+              {t("relayops:catalog.results")}{" "}
+              <span>{count.format(items.length)}</span>
+            </h2>
+            <div className="sbor-service-health-summary">
+              {Object.entries(healthCounts)
+                .filter(([, value]) => value > 0)
+                .map(([health, value]) => (
+                  <span key={health} data-health={health}>
+                    <span className="sbor-health-dot" aria-hidden="true" />
+                    {t(`relayops:health.${health}`)}{" "}
+                    <strong>{count.format(value)}</strong>
+                  </span>
+                ))}
             </div>
-            {services.data.map((service) => (
-              <Link
-                key={service.id}
-                to="/relayops/$workspaceId/services/$serviceId"
-                params={{ workspaceId, serviceId: service.id }}
-                className="grid min-h-16 grid-cols-[minmax(16rem,1fr)_8rem_10rem_12rem_2rem] items-center gap-4 border-b px-5 py-3 last:border-b-0 hover:bg-[#eeedf8]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#6757ec]"
-              >
-                <span className="min-w-0">
-                  <span className="flex items-center gap-2 font-medium">
-                    {service.name}
-                    {service.archivedAt ? (
-                      <Archive className="size-3.5 text-muted-foreground" />
-                    ) : null}
-                  </span>
-                  <span className="block truncate font-mono text-muted-foreground text-xs">
-                    {service.slug}
-                  </span>
-                </span>
-                <span className="text-sm">
-                  {t(`relayops:tier.${service.tier}`)}
-                </span>
-                <Badge variant="outline" className={healthTone[service.health]}>
-                  {t(`relayops:health.${service.health}`)}
-                </Badge>
-                <span className="truncate text-muted-foreground text-sm">
-                  {service.ownerTeamName || t("relayops:service.noOwner")}
-                </span>
-                <ArrowRight className="size-4 text-muted-foreground" />
-              </Link>
-            ))}
           </div>
-
-          <div className="grid gap-3 md:hidden">
-            {services.data.map((service) => (
-              <Link
-                key={service.id}
-                to="/relayops/$workspaceId/services/$serviceId"
-                params={{ workspaceId, serviceId: service.id }}
-                className="rounded-lg border border-[#1b1d36]/10 bg-white p-4 dark:border-white/10 dark:bg-[#1a1c35]"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <span>
-                    <span className="font-medium">{service.name}</span>
-                    <span className="mt-1 block font-mono text-muted-foreground text-xs">
-                      {service.slug}
+          <ul className="sbor-service-grid">
+            {items.map((service) => (
+              <li key={service.id}>
+                <Link
+                  to="/relayops/$workspaceId/services/$serviceId"
+                  params={{ workspaceId, serviceId: service.id }}
+                  className="sbor-service-card"
+                  data-health={service.health}
+                >
+                  <div className="sbor-service-card-top">
+                    <span className="sbor-service-symbol">
+                      <Server size={21} aria-hidden="true" />
                     </span>
-                  </span>
-                  <Badge
-                    variant="outline"
-                    className={healthTone[service.health]}
-                  >
-                    {t(`relayops:health.${service.health}`)}
-                  </Badge>
-                </div>
-                <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <dt className="text-muted-foreground">
-                      {t("relayops:service.tier")}
-                    </dt>
-                    <dd>{t(`relayops:tier.${service.tier}`)}</dd>
+                    <Badge
+                      variant="outline"
+                      className={healthTone[service.health]}
+                    >
+                      <span className="sbor-health-dot" aria-hidden="true" />
+                      {t(`relayops:health.${service.health}`)}
+                    </Badge>
                   </div>
-                  <div>
-                    <dt className="text-muted-foreground">
-                      {t("relayops:service.ownerTeam")}
-                    </dt>
-                    <dd>
-                      {service.ownerTeamName || t("relayops:service.noOwner")}
-                    </dd>
+                  <div className="sbor-service-card-title">
+                    <h3>{service.name}</h3>
+                    {service.archivedAt ? (
+                      <Archive
+                        size={15}
+                        aria-label={t("relayops:catalog.archived")}
+                      />
+                    ) : null}
                   </div>
-                </dl>
-              </Link>
+                  <p className="sbor-service-slug">{service.slug}</p>
+                  <p className="sbor-service-description">
+                    {service.description || t("relayops:service.noDescription")}
+                  </p>
+                  <dl className="sbor-service-card-facts">
+                    <div>
+                      <dt>
+                        <Activity size={14} aria-hidden="true" />
+                        {t("relayops:service.tier")}
+                      </dt>
+                      <dd>{t(`relayops:tier.${service.tier}`)}</dd>
+                    </div>
+                    <div>
+                      <dt>
+                        <UsersRound size={14} aria-hidden="true" />
+                        {t("relayops:service.ownerTeam")}
+                      </dt>
+                      <dd>
+                        {service.ownerTeamName || t("relayops:service.noOwner")}
+                      </dd>
+                    </div>
+                  </dl>
+                  <div className="sbor-service-card-footer">
+                    <span>
+                      {t("relayops:service.updated")}{" "}
+                      <time dateTime={service.updatedAt}>
+                        {formatRelayOpsDateTime(service.updatedAt)}
+                      </time>
+                    </span>
+                    <ArrowRight size={17} aria-hidden="true" />
+                  </div>
+                </Link>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
       )}
     </div>

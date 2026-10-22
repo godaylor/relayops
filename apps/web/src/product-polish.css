@@ -1,0 +1,142 @@
+/* Product-wide rhythm: readable controls, a clear next action, calm state feedback. */
+.sbor-app, .sbor-auth, .relay-dialog { font-size: 14px; }
+:is(.sbor-app,.sbor-auth,.relay-dialog) .text-destructive { color: #b72e35; }
+.dark :is(.sbor-app,.sbor-auth,.relay-dialog) .text-destructive { color: #ff969b; }
+.sbor-app-column { scrollbar-gutter: stable; scroll-padding-bottom: 24px; }
+.sbor-navigation a { font-size: 14px; }
+.sbor-workspace-selector strong { font-size: 13px; }
+.sbor-workspace-selector small { font-size: 11px; }
+.sbor-connection { font-size: 12px; }
+.sbor-topbar [data-guide="create"] button { min-height: 42px; }
+.sbor-topbar .sbor-account-menu > summary { min-width: 44px; min-height: 44px; }
+.sbor-avatar { flex-shrink: 0; font-size: 11px; }
+.sbor-footer { font-size: 11px; line-height: 1.7; padding-bottom: max(18px,env(safe-area-inset-bottom)); }
+.sbor-main h1 { text-wrap: balance; }
+.sbor-main :is(p,li,a) { overflow-wrap: anywhere; }
+.sbor-overview { display: grid; gap: 24px; }
+.sbor-overview > * { margin-block: 0; }
+.sbor-overview-hero { min-height: 226px; padding: 28px 32px; }
+.sbor-overview-hero h1 { font-size: clamp(32px,3vw,46px); letter-spacing: -.045em; }
+.sbor-overview-hero p:last-child { font-size: 14px; }
+.sbor-metric-number { position: relative; display: inline-grid; min-width: 1ch; vertical-align: top; font-variant-numeric: tabular-nums; }
+.sbor-metric-number > span { display: inline-block; }
+.sbor-metrics [data-sbor-metric] > p:last-child { font-size: 12px; line-height: 1.5; }
+.sbor-focus-strip { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 16px; padding: 18px 20px; border: 1px solid var(--sb-line); border-radius: 14px; background: var(--sb-surface); }
+.sbor-focus-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; color: #287857; background: #e8f5ee; }
+.sbor-focus-icon svg { width: 20px; height: 20px; }
+.sbor-focus-strip[data-attention="true"] .sbor-focus-icon { color: #a45a20; background: #fff1df; }
+.sbor-focus-strip h2 { font-size: 14px; font-weight: 600; }
+.sbor-focus-strip p { margin-top: 4px; color: var(--sb-muted); font-size: 13px; line-height: 1.6; }
+.sbor-focus-action { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 42px; padding: 10px 15px; border-radius: 9px; background: var(--sb-accent-soft); color: var(--sb-accent); font-size: 13px; font-weight: 550; white-space: nowrap; transition: background-color 160ms ease,transform 160ms var(--ease-out); }
+.sbor-focus-action:active { transform: scale(.97); }
+.sbor-panel-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.sbor-panel-heading > a { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; font-size: 12px; color: var(--sb-accent); }
+.sbor-overview-panel > div:first-child { padding-block: 18px 16px; }
+.sbor-overview-panel h2 { font-size: 16px; }
+.sbor-overview-panel p { font-size: 13px; line-height: 1.6; }
+.sbor-overview-panel > div.divide-y > a { position: relative; transition: background-color 160ms ease; }
+.sbor-overview-panel > div.divide-y > a > span:first-child { min-width: 0; }
+.sbor-overview-panel > div.divide-y > a > span > .sbor-overview-incident-meta { display: flex; flex-wrap: wrap; gap: 5px 12px; margin-top: 8px; font-size: 12px; font-weight: 400; line-height: 1.6; color: var(--sb-muted); }
+.sbor-overview-incident-meta > span + span::before { content: "·"; padding-right: 12px; color: var(--sb-muted); }
+.sbor-overview-panel > div.divide-y > a > span > span:first-child { font-size: 11px; }
+.sbor-overview-updates .sbor-update-entry { padding-block: 2px; }
+.sbor-update-type { display: block; margin-bottom: 4px; color: var(--sb-accent); font-size: 11px; font-weight: 550; }
+.sbor-update-entry time { white-space: normal; font-variant-numeric: tabular-nums; }
+.sbor-onboarding { position: relative; }
+.sbor-response-art { float: right; width: 220px; height: 138px; margin: -18px 0 8px 24px; object-fit: contain; pointer-events: none; animation: sbor-art-arrive 600ms var(--ease-out) both; }
+.sbor-onboarding > ol { clear: both; }
+@keyframes sbor-art-arrive { from { opacity: 0; transform: translate3d(0,10px,0); } to { opacity: 1; transform: translate3d(0,0,0); } }
+.sbor-workbench > header p { font-size: 14px; }
+.sbor-workbench .relay-filters input, .relay-facet > summary { min-height: 40px; }
+.sbor-workbench input[type="checkbox"] { width: 16px; height: 16px; }
+.relay-facet > summary { align-items: center; font-size: 13px; }
+.relay-facet fieldset label { min-height: 40px; font-size: 13px; }
+.relay-facet fieldset { max-height: min(360px,60svh); overflow-y: auto; overscroll-behavior: contain; }
+.sbor-workbench [data-testid="workbench-scroll-viewport"] { scrollbar-gutter: stable; }
+.sbor-workbench .sbor-table-owner { font-size: 13px; }
+.sbor-app .sbor-status, .sbor-app .sbor-severity { font-size: 11px; line-height: 1.5; }
+.sbor-board-summary { font-size: 13px; }
+.sbor-board-card-body > button[data-response-board-drag] { width: 44px; min-width: 44px; height: 44px; min-height: 44px; bottom: 7px; left: 2px; opacity: .55; }
+.sbor-board-card-body [data-slot="menu-trigger"] { width: 44px; min-width: 44px; height: 44px; min-height: 44px; top: 0; right: 0; }
+.sbor-board-card-body > div:first-of-type > div:first-child { padding-right: 27px; flex-wrap: wrap; }
+.sbor-board-card-body button:not([data-response-board-control]) { min-height: 44px; font-size: 14px; line-height: 1.5; }
+.sbor-board-card-body [data-slot="badge"] { font-size: 11px; min-height: 21px; }
+.sbor-card-meta { min-height: 42px; padding-left: 32px; }
+.sbor-card-service, .sbor-card-owner { font-size: 12px; }
+.sbor-card-meta time { font-size: 11px; }
+.sbor-board-lanes > section > header [data-slot="badge"] { font-size: 11px; }
+.sbor-board-lanes > section > header h2 { font-size: 13px; }
+.sbor-board-lanes > section > ul > li:not([data-response-board-card-id]) { font-size: 12px; }
+.sbor-auth-entry [data-slot="card-description"], .sbor-entry-note { font-size: 13px; }
+.sbor-auth-description { font-size: 14px; }
+.sbor-auth-entry .sbor-entry-title { font-size: 32px; }
+.sbor-auth-entry [data-slot="input-control"], .sbor-auth-entry [data-slot="input"] { min-height: 46px; }
+.sbor-auth-entry [data-testid="guest-demo-entry"] { font-size: 14px; }
+.sbor-hosting-note { font-size: 12px; }
+.sbor-hosting-note summary { min-height: 38px; padding-block: 8px; }
+.sbor-auth-footer { font-size: 11px; line-height: 1.7; }
+.relay-dialog { color-scheme: light; }
+.dark .relay-dialog { color-scheme: dark; }
+.relay-dialog [data-slot="dialog-panel"], .relay-dialog [data-slot="sheet-panel"] { overscroll-behavior: contain; }
+.sbor-main :is(input,select,textarea), .relay-dialog :is(input,select,textarea) { scroll-margin-block: 24px; }
+.dark .sbor-focus-icon { color: #9ad7b8; background: #21372f; }
+.dark .sbor-focus-strip[data-attention="true"] .sbor-focus-icon { color: #edbf8b; background: #3e3025; }
+@media (hover: hover) and (pointer: fine) {
+  .sbor-focus-action:hover { background: color-mix(in srgb,var(--sb-accent-soft) 80%,var(--sb-accent) 20%); }
+  .sbor-panel-heading > a:hover, .sbor-update-entry a:hover { text-decoration: underline; text-underline-offset: 3px; }
+}
+@media (max-width: 960px) {
+  .sbor-mobile-menu { width: 44px; height: 44px; flex-shrink: 0; }
+  .sbor-topbar { padding-inline: 16px; }
+  .sbor-workspace-selector { min-height: 44px; }
+  .sbor-workspace-selector strong { max-width: min(32vw,240px); }
+  .sbor-mobile-sidebar { padding-top: max(28px,env(safe-area-inset-top)); padding-bottom: max(28px,env(safe-area-inset-bottom)); }
+}
+@media (max-width: 700px) {
+  .sbor-topbar { gap: 8px; }
+  .sbor-workspace-selector strong { font-size: 12px; max-width: min(35vw,180px); }
+  .sbor-workspace-selector small { font-size: 10px; }
+  .sbor-topbar-actions { gap: 6px; }
+  .sbor-topbar [data-guide="create"] button { width: 44px; height: 44px; min-height: 44px; }
+  .sbor-topbar [data-guide="create"] button svg { width: 20px; height: 20px; }
+  .sbor-overview { gap: 20px; }
+  .sbor-overview-hero { min-height: 232px; padding: 24px; }
+  .sbor-overview-hero p:last-child { font-size: 13px; }
+  .sbor-focus-strip { grid-template-columns: auto minmax(0,1fr); gap: 12px; padding: 16px; }
+  .sbor-focus-strip > div { min-width: 0; }
+  .sbor-focus-action { grid-column: 1 / -1; width: 100%; min-height: 44px; }
+  .sbor-focus-strip p { font-size: 13px; }
+  .sbor-overview-panel > div:first-child { padding: 16px 18px; }
+  .sbor-overview-panel > div.divide-y > a { padding-inline: 18px; }
+  .sbor-overview-panel > div.divide-y > a > span > span:last-child { font-size: 14px; }
+  .sbor-panel-heading > a { min-height: 36px; }
+  .sbor-metrics [data-sbor-metric] { padding: 18px; }
+  .sbor-metrics [data-sbor-metric] > p:last-child { font-size: 12px; }
+  .sbor-board-mobile-stages button { min-height: 44px; font-size: 12px; }
+  .sbor-board-mobile-stages button span { font-size: 11px; }
+  .sbor-board-summary { gap: 14px; flex-wrap: wrap; }
+  .sbor-board-lanes > section { width: calc(100vw - 44px); }
+  .sbor-board-lanes > section > header h2 { font-size: 14px; }
+  .relay-facet > summary, .relay-facet fieldset label { min-height: 44px; }
+  .sbor-workbench .relay-filters input, .sbor-main :is(input,select,textarea), .relay-dialog :is(input,select,textarea) { font-size: 16px; }
+  .relay-dialog [data-slot="dialog-footer"] button { min-height: 44px; }
+  [data-slot="dialog-popup"].relay-dialog > button { min-width: 44px; min-height: 44px; }
+  .relayops-service-form :is(input,select,button[type="submit"]) { min-height: 44px; }
+  .sbor-onboarding > .sbor-response-art { float: none; display: block; width: 160px; height: 100px; margin: 0 auto 16px; }
+  .sbor-auth-headline { padding-inline: 24px; }
+  .sbor-auth-headline h1 { font-size: clamp(32px,9vw,42px); }
+  .sbor-auth-footer { font-size: 11px; }
+  .sbor-footer { font-size: 10px; }
+}
+@media (max-width: 374px) {
+  .sbor-workspace-selector strong { max-width: 100px; }
+  .sbor-overview-hero { padding-inline: 20px; }
+  .sbor-overview-hero h1 { font-size: 30px; }
+  .sbor-overview-panel > div.divide-y > a { flex-wrap: wrap; }
+  .sbor-overview-panel > div.divide-y > a > span:last-child { margin-left: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sbor-response-art { animation: none; }
+  .sbor-focus-action { transition-property: background-color; }
+  .sbor-focus-action:active { transform: none; }
+}

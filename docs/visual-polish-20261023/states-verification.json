@@ -1,0 +1,122 @@
+{
+	"date": "2026-10-22T21:57:44.059Z",
+	"baseURL": "http://127.0.0.1:32045",
+	"browser": "155.0.8059.85",
+	"status": "passed",
+	"states": [
+		{
+			"name": "create-mobile",
+			"status": "passed",
+			"durationMs": 1790,
+			"created": true,
+			"persistedAfterReload": true,
+			"footerControls": [
+				{
+					"text": "Отмена",
+					"height": 44,
+					"width": 342
+				},
+				{
+					"text": "Новый инцидент",
+					"height": 44,
+					"width": 342
+				}
+			],
+			"overflow": 0
+		},
+		{
+			"name": "loading",
+			"status": "passed",
+			"durationMs": 750,
+			"delayedRequests": 1,
+			"recovered": true
+		},
+		{
+			"name": "service-error-retry-draft",
+			"status": "passed",
+			"durationMs": 1440,
+			"draftIntact": true,
+			"retrySavedOnce": true,
+			"noUnhandledError": true,
+			"serviceControls": [
+				{
+					"name": "tier",
+					"height": 44,
+					"width": 306
+				},
+				{
+					"name": "health",
+					"height": 44,
+					"width": 306
+				},
+				{
+					"name": "ownerTeamId",
+					"height": 44,
+					"width": 306
+				},
+				{
+					"name": "submit",
+					"height": 44,
+					"width": 124.6875
+				}
+			],
+			"seriousAxe": 0
+		},
+		{
+			"name": "empty-search",
+			"status": "passed",
+			"durationMs": 845,
+			"filteredEmpty": true,
+			"resetRestoredResults": true
+		},
+		{
+			"name": "onboarding-artwork",
+			"status": "passed",
+			"durationMs": 637,
+			"emptyWorkspaceCreated": true,
+			"artworkLoaded": true,
+			"realServices": 0,
+			"overflow": 0
+		}
+	],
+	"screenshots": [
+		"state-create-mobile-form.png",
+		"state-create-mobile-form-footer.png",
+		"state-created-mobile-room.png",
+		"state-services-loading.png",
+		"state-service-error-draft.png",
+		"state-service-error-draft-dark.png",
+		"state-service-retry-success.png",
+		"state-empty-service-search.png",
+		"state-onboarding-desktop.png",
+		"state-onboarding-mobile.png"
+	],
+	"pageErrors": [],
+	"expectedFaults": [
+		{
+			"state": "service-error-retry-draft",
+			"method": "POST",
+			"status": 503
+		}
+	],
+	"accessibility": [
+		{
+			"state": "service-error-retry-draft",
+			"scope": "#create-service-panel",
+			"theme": "light",
+			"violations": []
+		},
+		{
+			"state": "service-error-retry-draft",
+			"scope": "#create-service-panel",
+			"theme": "dark",
+			"violations": []
+		}
+	],
+	"localTestData": true,
+	"fixture": {
+		"workspaceId": "CB4nMVnNarAMSUXO1nlwQucOUuQarCWn",
+		"emptyWorkspaceId": "wDDQUgA2x2bYTNkDRnVRDphqyGhjXXiI"
+	},
+	"completedAt": "2026-10-22T21:57:49.817Z"
+}
