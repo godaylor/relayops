@@ -11,6 +11,11 @@ export function installStartupRecovery(copy: {
   "en-US": RecoveryCopy;
   "ru-RU": RecoveryCopy;
 }) {
+  let appReady = false;
+  window.addEventListener("relayops:ready", () => {
+    appReady = true;
+  });
+
   function showRecovery() {
     if (!document.body) {
       document.addEventListener("DOMContentLoaded", showRecovery, {
@@ -59,6 +64,7 @@ export function installStartupRecovery(copy: {
   window.addEventListener(
     "error",
     (event) => {
+      if (appReady) return;
       const target = event.target;
       if (
         (target instanceof HTMLScriptElement && target.type === "module") ||
@@ -70,6 +76,9 @@ export function installStartupRecovery(copy: {
     true,
   );
   window.addEventListener("vite:preloadError", (event) => {
+    // Intent preloading may fail while the current screen and its draft are
+    // healthy. Let the router handle a requested route's failure locally.
+    if (appReady) return;
     event.preventDefault();
     showRecovery();
   });
